@@ -12,10 +12,17 @@
 // - render: entity -> the full block.
 
 #import "adversary.typ": statblock
+#import "environment.typ": environment-block, environment-summary
+#import "item.typ": loot-card, loot-summary
 #import "theme.typ": summary
 
+// Sections are the words the SRD uses for each table ("Environments",
+// "Items", "Consumables"); adversaries are a script's "Cast".
 #let system = (
   kinds: (
     adversary: (section: "Cast", outline: true, summary: summary, render: statblock),
+    environment: (section: "Environments", outline: true, summary: environment-summary, render: environment-block),
+    item: (section: "Items", outline: true, summary: loot-summary, render: loot-card),
+    consumable: (section: "Consumables", outline: true, summary: loot-summary, render: loot-card),
   ),
 )
