@@ -314,15 +314,41 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   hence `attack-range`, `adversary-type`.
 
 ## Next up (as of 2026-11-17)
-1. New kinds: transformations (pp. 42-45), Druid Beastforms (pp. 15-18),
-   Brawler Martial Stances (p. 13).
-2. Multiclass derivation.
+1. Submit to Typst Universe (owner's go): set up the fork + UNIVERSE_TOKEN
+   (see `.github/workflows/universe.yml`), then tag `v0.1.0`. Reviewers may
+   object to `ttrpg-core` as too generic a name ("not the obvious or
+   canonical name"); have an alternative ready.
+2. `examples/learn-characters.typ`: a commented walkthrough (creation,
+   level-ups, card choice, companion, sheet); leveling is only shown in
+   tests/heartweaver-companion.typ today.
+3. Stat lines: never leave a "|" at a line edge when they wrap (core
+   `stat-line`).
+4. New kinds: transformations (pp. 42-45), Druid Beastforms (pp. 15-18),
+   Brawler Martial Stances (p. 13). Same path as the companion: parser in
+   player.py + emitter + cross-check, numbers in heartweaver.
+5. Multiclass derivation.
+
+## Publishing (decided 2026-11-17)
+- GitHub: public, https://github.com/noctisatrae/typst-ttrpg. Owner's
+  players' story files were only placeholders; keep real backstories out
+  of the repo.
+- CI (`.github/workflows/ci.yml`): tests, examples, bundle check.
+  `scripts/bundle.sh <out> <pkgs...>` builds Universe bundles (LICENSE
+  copied, `@local` -> `@preview`, manifest/README/dependency checks).
+- Universe: ttrpg-core, ttrpg-script, heartweaver only (MPL-2.0, no SRD
+  text). daggerheart-srd is NOT submitted: Universe allows third-party
+  copyrighted content only if the holder clears distribution in a package,
+  and DPCGL Permitted Formats don't list packages. Bump `version` in
+  typst.toml (and the `@local/...:<ver>` imports) before each release; the
+  workflow skips versions already published.
 
 ## Pending with the owner
 - Inskel's companion Brindille (red fox) is a made-up example; the owner
   may redesign it. Confirm against a printed companion sheet: starting
   Stress 3 and the option limits.
 - Owner uses Zed (Typst extension = Tinymist). Check field completion there.
+- DPCGL: the public repo shares the SRD transcription; software repos are
+  not a listed Permitted Format (owner chose public knowingly).
 
 ## Tooling setup (recreate per session)
 - Python venv OUTSIDE the repo with `pypdf` and `fonttools`; run scripts

@@ -1,0 +1,93 @@
+# Prepares a Typst Universe submission: a pull request on typst/packages
+# from your fork, with every publishable package whose version is not
+# published yet. Run it by pushing a tag (`git tag v0.1.0 && git push
+# --tags`) or by hand (Actions > Universe > Run workflow).
+#
+# Setup, once:
+#   1. Fork https://github.com/typst/packages to your account.
+#   2. Create a token (classic, scope `public_repo`; or fine-grained with
+#      Contents + Pull requests on your fork and typst/packages) and save it
+#      as the repository secret UNIVERSE_TOKEN.
+# daggerheart-srd is never submitted: Universe needs the copyright holder
+# to clear distribution in a package, and the DPCGL does not list packages.
+name: Universe
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+env:
+  PACKAGES: ttrpg-core ttrpg-script heartweaver
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: typst-community/setup-typst@v4
+        with:
+          typst-version: "0.15.1"
+      - run: ./scripts/link-local.sh
+      - run: ./scripts/test.sh
+
+      - name: Pick unpublished versions
+        id: pick
+        run: |
+          new=""
+          for p in $PACKAGES; do
+            v=$(sed -n 's/^version = "\(.*\)"/\1/p' "packages/$p/typst.toml")
+            if curl -sfI "https://packages.typst.org/preview/$p-$v.tar.gz" >/dev/null; then
+              echo "$p $v is already published"
+            else
+              new="$new $p"; echo "$p $v will be submitted"
+            fi
+          done
+          echo "packages=${new# }" >> "$GITHUB_OUTPUT"
+
+      - name: Bundle
+        if: steps.pick.outputs.packages != ''
+        run: ./scripts/bundle.sh "$RUNNER_TEMP/bundle" ${{ steps.pick.outputs.packages }}
+
+      - name: Open the pull request on typst/packages
+        if: steps.pick.outputs.packages != ''
+        env:
+          GH_TOKEN: ${{ secrets.UNIVERSE_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          gh repo sync "$OWNER/packages" --source typst/packages
+          # Sparse, shallow clone: the packages repository is large.
+          git clone --depth 1 --filter=blob:none --sparse \
+            "https://x-access-token:$GH_TOKEN@github.com/$OWNER/packages.git" fork
+          cd fork
+          git sparse-checkout set --no-cone /README.md
+          title=""
+          for dir in "$RUNNER_TEMP"/bundle/*/*; do
+            name=$(basename "$(dirname "$dir")"); ver=$(basename "$dir")
+            mkdir -p "packages/preview/$name"
+            cp -R "$dir" "packages/preview/$name/$ver"
+            git sparse-checkout add "packages/preview/$name/$ver"
+            title="$title, $name:$ver"
+          done
+          title="${title#, }"
+          branch="submit-$(echo "$title" | tr ' ,:' '-__')"
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add packages/preview
+          git commit -m "$title"
+          git push -u origin "$branch"
+          gh pr create --repo typst/packages --head "$OWNER:$branch" --title "$title" --body "$(cat <<BODY
+          I am submitting
+          - [x] a new package
+          - [ ] an update for a package
+
+          Packages: $title. Source: https://github.com/${{ github.repository }}
+
+          ttrpg-script and heartweaver depend on ttrpg-core (same submission).
+          heartweaver is an unofficial, Daggerheart Compatible package; it contains no SRD content.
+
+          - [x] my package has a README and a LICENSE (MPL-2.0)
+          - [x] the manifest has all required fields
+          - [x] I have tested the package locally (bundles compiled as @preview in CI)
+          BODY
+          )"

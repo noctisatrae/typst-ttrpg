@@ -33,4 +33,12 @@ by Darrington Press or Critical Role.
 ```sh
 ./scripts/link-local.sh   # expose packages as @local/<name>:<version>
 ./scripts/test.sh         # compile every tests/*.typ
+./scripts/bundle.sh /tmp/b ttrpg-core ttrpg-script heartweaver   # Universe bundles
 ```
+
+## Releasing to Typst Universe
+`ttrpg-core`, `ttrpg-script` and `heartweaver` are released on Typst
+Universe; `daggerheart-srd` is not (its content is under the DPCGL, which
+does not cover redistribution as a package). Bump the versions, push a tag
+`vX.Y.Z`, and the `Universe` workflow opens the pull request on
+`typst/packages` (setup in `.github/workflows/universe.yml`).

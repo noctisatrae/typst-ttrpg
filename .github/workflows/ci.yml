@@ -1,0 +1,24 @@
+# Tests, examples and Universe bundles on every push and pull request.
+# Fonts are not installed: Typst falls back with warnings, which is enough
+# for the compile tests (asserts and expected errors).
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: typst-community/setup-typst@v4
+        with:
+          typst-version: "0.15.1"
+      - name: Link packages as @local
+        run: ./scripts/link-local.sh
+      - name: Compile tests
+        run: ./scripts/test.sh
+      - name: Compile examples
+        run: for f in examples/*.typ; do typst compile --root . "$f" "$RUNNER_TEMP/out.pdf"; done
+      - name: Check Universe bundles
+        run: ./scripts/bundle.sh "$RUNNER_TEMP/bundle" ttrpg-core ttrpg-script heartweaver
