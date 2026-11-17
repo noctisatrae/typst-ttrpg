@@ -66,7 +66,13 @@ def runs(pdf, first, last):
 
         def visit(text, cm, tm, font, size):
             if text:
-                chunks.append((page, font_name(font), clean(text)))
+                name = font_name(font)
+                if name.startswith('Wingdings'):
+                    # Symbol glyphs come out as private-use codepoints; the
+                    # only one in SRD 2.0 is the arrow in Sneak Attack's
+                    # "Level 1 → Tier 1" table (p. 22).
+                    text = text.replace('\uf0e0', '→')
+                chunks.append((page, name, clean(text)))
 
         reader.pages[page - 1].extract_text(visitor_text=visit)
         # Footer: the page number followed by "Daggerheart SRD". Only a

@@ -191,10 +191,10 @@
     feature("Sneak Attack", [
       #"When you succeed on an attack while Cloaked or while an ally is within Melee range of your target, add a number of d6s equal to your tier to your damage roll."
 
-      - #"Level 1  Tier 1"
-      - #"Levels 2–4  Tier 2"
-      - #"Levels 5–7  Tier 3"
-      - #"Levels 8–10  Tier 4"
+      - #"Level 1 → Tier 1"
+      - #"Levels 2–4 → Tier 2"
+      - #"Levels 5–7 → Tier 3"
+      - #"Levels 8–10 → Tier 4"
     ], ..fx("class", "rogue", "Sneak Attack")),
   ),
   background-questions: (

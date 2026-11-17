@@ -137,6 +137,8 @@ def build_player(data, rg, kinds, out):
         out['armor'] = recs
         write(os.path.join(SRD, 'player', 'armor.typ'), emit_player.armor(recs))
     note('feature names', sorted(set(player.ODD_NAMES)))
+    note('glyphs', sorted({f'p.{p}: a {f} glyph mapped to "{t.strip()}"' for p, f, t in data['runs']
+                           if f.startswith('Wingdings')}))
 
 
 def run_tool(args, stdout=None):
@@ -346,7 +348,7 @@ EXPORT = r'''
 
 
 def squash(s):
-    s = s.replace('−', '-').replace('–', '-').replace('’', "'").replace('“', '"').replace('”', '"')
+    s = s.replace('\uf0e0', '→').replace('−', '-').replace('–', '-').replace('’', "'").replace('“', '"').replace('”', '"')
     # Bullets and the colon or period after a feature name are layout, not
     # content: the SRD prints "Maestro." where others have "Name:".
     return re.sub(r'[\s•◦:.]+', '', s).lower()
