@@ -83,13 +83,26 @@ def parse(pdf, first, last, names):
             continue
         if font == 'EvelethCleanRegular':
             close_feature()
-            if 'ENVIRONMENTS' in t:
-                continue  # section heading, e.g. "TIER 1 ENVIRONMENTS (LEVEL 1)"
+            if 'ENVIRONMENTS' in t or re.fullmatch(r'\(LEVELS? [\d–-]+\)', t):
+                # Section heading, e.g. "TIER 1 ENVIRONMENTS (LEVEL 1)"; it
+                # may wrap, leaving "(LEVELS 8-10)" as its own run.
+                continue
             pending_name = norm(pending_name + ' ' + t)
             continue
         if font == 'QuestaSlab-BoldItalic' and t.startswith('Tier '):
             if pending_name not in by_caps:
-                raise SystemExit(f'p.{page}: block name {pending_name!r} is not in the names list')
+                # The list and the block may differ by an article ("City of
+                # Portals" / "THE CITY OF PORTALS", p. 179): the block's own
+                # spelling wins, title-cased, and the difference is reported.
+                bare = re.sub(r'\bTHE ', '', pending_name)
+                if bare not in by_caps:
+                    raise SystemExit(f'p.{page}: block name {pending_name!r} is not in the names list')
+                listed = by_caps.pop(bare)
+                by_caps[pending_name] = ' '.join(
+                    w if not i or w.lower() not in ('the', 'of', 'a', 'and') else w.lower()
+                    for i, w in enumerate(pending_name.title().split()))
+                print(f'REVIEW p.{page}: environment list says {listed!r}, its block says {by_caps[pending_name]!r}; '
+                      'using the block', file=sys.stderr)
             tier, kind = t.split(' ', 2)[1:]
             env = {'name': by_caps[pending_name], 'tier': int(tier), 'type': kind,
                    'description': '', 'impulses': '', 'difficulty': '',

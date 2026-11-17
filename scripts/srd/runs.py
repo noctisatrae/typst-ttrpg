@@ -69,8 +69,20 @@ def runs(pdf, first, last):
                 chunks.append((page, font_name(font), clean(text)))
 
         reader.pages[page - 1].extract_text(visitor_text=visit)
-        # Footer: "Daggerheart SRD" and the page number.
-        chunks = [c for c in chunks if c[2].strip() not in ('Daggerheart SRD', str(page))]
+        # Footer: the page number followed by "Daggerheart SRD". Only a
+        # number in that position is dropped: "10" elsewhere on page 10 is
+        # content (the Bard's starting Evasion).
+        keep = []
+        for k, c in enumerate(chunks):
+            t = c[2].strip()
+            if t == 'Daggerheart SRD':
+                continue
+            if t == str(page):
+                rest = [x[2].strip() for x in chunks[k + 1:] if x[2].strip()]
+                if not rest or rest[0] == 'Daggerheart SRD':
+                    continue
+            keep.append(c)
+        chunks = keep
         out += chunks
     return out
 
