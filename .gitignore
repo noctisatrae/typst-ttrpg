@@ -4,3 +4,4 @@ reference/*.pdf
 .DS_Store
 .claude/worktrees/
 fixtures/*.json
+__pycache__/
