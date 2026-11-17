@@ -43,4 +43,4 @@
 #hw.statblock(swarm)
 #hw.statblock(boss, register: false)
 #hw.attribution(modifications: "Test content only.")
-#context assert.eq(core.registered().len(), 6)
+#context assert.eq(core.registered().len(), adversaries.tier-1.len() + 1, message: "Tier 1 plus the swarm, counted once")
