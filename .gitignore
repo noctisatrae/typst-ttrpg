@@ -3,3 +3,4 @@ reference/*.pdf
 !fixtures/**
 .DS_Store
 .claude/worktrees/
+fixtures/*.json

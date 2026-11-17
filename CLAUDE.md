@@ -100,6 +100,9 @@ Foundry a burden (manual updates, needs battlemaps). The empty
 entities stay plain data and the registry still exists, so the adapter can
 be revived from these notes. Revival needs: target Foundry version, a
 Foundryborne clone, exported fixtures in `fixtures/`.
+Known from the owner's export (2026-11-17): Foundry core 14.367, system
+`daggerheart` 2.4.2. Exports hold choices but NOT derived values (Evasion,
+thresholds, max HP are computed at runtime and exported as 0/null).
 - Renderers (`statblock`, `sheet`, ...) register Foundry output as a side
   effect: `#metadata(to-foundry-actor(e)) <foundry>`.
   - Per-call opt-out (`export: false`) and a document-wide switch for
