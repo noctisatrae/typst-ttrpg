@@ -298,8 +298,30 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
 - Don't name exports after Typst built-ins (`range`, `type`, `list`, ...):
   hence `attack-range`, `adversary-type`.
 
+## Next up (as of 2026-11-17)
+1. Ranger (Beastbound) companion: read SRD pp. 21-22 first, then design
+   with the owner (a second entity attached to a character; Inskel is the
+   test case).
+2. New kinds: transformations (pp. 42-45), Druid Beastforms (pp. 15-18),
+   Brawler Martial Stances (p. 13).
+3. Rules gaps: grants gained after creation (Accomplished, Brilliant) at
+   level-up; Rune-Forged Exosuit "loadout reduced by one".
+
 ## Pending with the owner
+- Check in the SRD PDF whether two joined words are printed that way:
+  "cliffside" (Cliffside Ascent, p. 162, description and feature) and
+  "2-foot-deep" (Stonemason's Fortune, p. 82).
 - Owner uses Zed (Typst extension = Tinymist). Check field completion there.
+
+## Tooling setup (recreate per session)
+- Python venv OUTSIDE the repo with `pypdf` and `fonttools`; run scripts
+  with `python -I`. Example: `python3 -m venv /tmp/srd-venv &&
+  /tmp/srd-venv/bin/pip install pypdf fonttools`.
+- Foundryborne (read-only cross-check): `git clone --depth 1
+  https://github.com/Foundryborne/daggerheart.git` OUTSIDE the repo.
+- Worktree agents: `@local` links point at the main checkout; give each
+  agent its own package dir via `TYPST_PACKAGE_PATH`.
+- Fonts: `brew install --cask font-inter font-geist-mono font-courier-prime`.
 
 ## Design notes
 - LAYOUT RULE (owner, 2026-11-17): boxes hug their text (small inner
