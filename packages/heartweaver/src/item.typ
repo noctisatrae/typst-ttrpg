@@ -26,9 +26,13 @@
 #let loot-schema = (
   // The collection whose table lists it; rolls restart at 1 in each.
   collection: field(str, required: true, one-of: loot-collection.values()),
-  // The table roll (sum of the d12s rolled), 1-60.
-  roll: field(int, required: true, check: (value, fields) => {
-    if value < 1 or value > 60 { "`roll` must be between 1 and 60 (the loot tables, p. 75), got " + str(value) }
+  // The table roll (sum of the d12s rolled), 1-60, exactly as the SRD
+  // prints it: the Core Set tables use two digits ("07"), the Hope & Fear
+  // tables don't ("7").
+  roll: field(str, required: true, check: (value, fields) => {
+    if type(value) != str or value.match(regex("^\d{1,2}$")) == none or int(value) < 1 or int(value) > 60 {
+      "`roll` must be the printed roll, \"1\" to \"60\" (the loot tables, p. 75), got " + repr(value)
+    }
   }),
   // The table's description, verbatim. Stones that grant a feature print
   // it on its own line ("Resilient: ...").

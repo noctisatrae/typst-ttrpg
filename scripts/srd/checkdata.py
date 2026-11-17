@@ -63,7 +63,7 @@ def env_text(e):
 
 
 def loot_text(r):
-    roll = f"{r['roll']:02d}" if r['collection'] == 'Daggerheart Core Set' else str(r['roll'])
+    roll = r['roll']    # stored exactly as printed ("07" in the Core Set tables)
     return norm(f"{roll} {r['name']} {r['description']}")
 
 

@@ -6,14 +6,14 @@
 #for (data, kind) in ((items, "item"), (consumables, "consumable")) {
   assert.eq(data.len(), 120)
   for coll in hw.loot-collection.values() {
-    let rolls = data.values().filter(e => e.collection == coll).map(e => e.roll)
+    let rolls = data.values().filter(e => e.collection == coll).map(e => int(e.roll))
     assert.eq(rolls, range(1, 61), message: kind + " rolls in " + coll)
   }
   assert(data.values().all(e => e.kind == kind))
 }
 
 #let stone = items.valorstone
-#assert.eq(stone.roll, 15)
+#assert.eq(stone.roll, "15")
 #assert.eq(stone.flags.source.page, 75)
 #assert.eq(consumables.minor-health-potion.description, "Clear 1d4 HP.")
 #assert.eq(hw.loot-summary(stone), "Item")
@@ -26,7 +26,7 @@
 #let big = hw.extend(consumables.minor-health-potion, id: "big-health-potion",
   name: "Big Health Potion", description: "Clear 2d4 HP.")
 #assert.eq(big.kind, "consumable")
-#assert.eq(big.roll, 7)
+#assert.eq(big.roll, "07")
 
 #hw.loot-card(stone)
 #hw.loot-card(big)

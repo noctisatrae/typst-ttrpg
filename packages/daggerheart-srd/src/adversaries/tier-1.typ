@@ -1430,7 +1430,11 @@
   experiences: ((name: "Forbidden Knowledge", bonus: 2),),
   features: (
     feature("Relentless (3)", kind: feature-kind.passive)[The Mage can be spotlighted up to three times per GM turn. Spend Fear as usual to spotlight them.],
-    feature("Broken Magic", kind: feature-kind.action)[Mark a Stress to roll a d6. The Mage uses the corresponding move: 1–2: Dimension Rift. Choose a target within Far range. The target teleports to a point you choose within Close range of their original position and takes 2d6 direct magic damage as their body and mind reassemble. 3–4: Time Dilation. Choose a group of PCs within Far range. Each target is Slowed until they roll with Hope. While Slowed, a target is Vulnerable and must mark a Stress when they move. 5–6: Discordant Visions. Make an attack against up to three targets within Close range. Targets the Mage succeeds against take 2d8 direct magic damage.],
+    feature("Broken Magic", kind: feature-kind.action)[Mark a Stress to roll a d6. The Mage uses the corresponding move:
+
+- 1–2: Dimension Rift. Choose a target within Far range. The target teleports to a point you choose within Close range of their original position and takes 2d6 direct magic damage as their body and mind reassemble.
+- 3–4: Time Dilation. Choose a group of PCs within Far range. Each target is Slowed until they roll with Hope. While Slowed, a target is Vulnerable and must mark a Stress when they move.
+- 5–6: Discordant Visions. Make an attack against up to three targets within Close range. Targets the Mage succeeds against take 2d8 direct magic damage.],
     feature("Feel My Pain", kind: feature-kind.reaction)[When the Mage marks HP, roll a number of d6s equal to the number of Stress the Mage has marked. The Mage deals direct magic damage equal to the total result to all PCs within Very Close range.],
   ),
   flags: source(110),

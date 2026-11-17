@@ -42,10 +42,13 @@
   evasion: field(int, function),
   hp: field(int, function),
   stress: field(int, function),
-  proficiency: field(int, function),
+  proficiency: field(int),
   armor-score: field(int, function),
   thresholds: field(int, function),
+  major: field(int, function),
+  severe: field(int, function),
   attack: field(int, function),
+  primary-attack: field(int, function),
   ..trait.keys().map(k => (k, field(int))).to-dict(),
 )
 
@@ -65,7 +68,9 @@
 #let weapon-schema = (
   tier: field(int, required: true, one-of: (1, 2, 3, 4)),
   category: field(str, required: true, one-of: weapon-category.values()),
-  trait: field(str, required: true, one-of: trait.values()),
+  // "Spellcast": attack with the wielder's Spellcast trait (Arcane-Frame
+  // wheelchairs, p. 71).
+  trait: field(str, required: true, one-of: trait.values() + ("Spellcast",)),
   range: field(str, required: true, one-of: attack-range.values()),
   damage: field(str, required: true),
   damage-type: field(str, required: true, one-of: damage-type.values()),
@@ -98,6 +103,8 @@
   evasion: field(int, required: true),
   hp: field(int, required: true),
   items: field(str, content),
+  background-questions: field(array, default: (), items: str),
+  connections: field(array, default: (), items: str),
   hope-feature: field(dictionary, required: true, keys: player-feature-schema),
   features: features-field(required: true),
 )
@@ -118,6 +125,9 @@
   recall-cost: field(int, required: true),
   text: field(str, content),
   features: features-field(),
+  // Effects of a card whose text is not split into named features.
+  modifiers: field(dictionary, keys: modifier-schema),
+  grants: field(dictionary, keys: grant-schema),
 )
 
 #let weapon(id: none, name: none, tags: none, flags: none, tier: none, category: none, trait: none, range: none, damage: none, damage-type: none, burden: none, features: none, ..unknown) = core.entity("weapon", weapon-schema, id: id, name: name, tags: tags, flags: flags, tier: tier, category: category, trait: trait, range: range, damage: damage, damage-type: damage-type, burden: burden, features: features, ..unknown)
@@ -128,11 +138,11 @@
 
 #let community(id: none, name: none, tags: none, flags: none, description: none, features: none, ..unknown) = core.entity("community", community-schema, id: id, name: name, tags: tags, flags: flags, description: description, features: features, ..unknown)
 
-#let class(id: none, name: none, tags: none, flags: none, description: none, domains: none, evasion: none, hp: none, items: none, hope-feature: none, features: none, ..unknown) = core.entity("class", class-schema, id: id, name: name, tags: tags, flags: flags, description: description, domains: domains, evasion: evasion, hp: hp, items: items, hope-feature: hope-feature, features: features, ..unknown)
+#let class(id: none, name: none, tags: none, flags: none, description: none, domains: none, evasion: none, hp: none, items: none, background-questions: none, connections: none, hope-feature: none, features: none, ..unknown) = core.entity("class", class-schema, id: id, name: name, tags: tags, flags: flags, description: description, domains: domains, evasion: evasion, hp: hp, items: items, background-questions: background-questions, connections: connections, hope-feature: hope-feature, features: features, ..unknown)
 
 #let subclass(id: none, name: none, tags: none, flags: none, description: none, class: none, spellcast-trait: none, foundation: none, specialization: none, mastery: none, ..unknown) = core.entity("subclass", subclass-schema, id: id, name: name, tags: tags, flags: flags, description: description, class: class, spellcast-trait: spellcast-trait, foundation: foundation, specialization: specialization, mastery: mastery, ..unknown)
 
-#let domain-card(id: none, name: none, tags: none, flags: none, domain: none, level: none, type: none, recall-cost: none, text: none, features: none, ..unknown) = core.entity("domain-card", domain-card-schema, id: id, name: name, tags: tags, flags: flags, domain: domain, level: level, type: type, recall-cost: recall-cost, text: text, features: features, ..unknown)
+#let domain-card(id: none, name: none, tags: none, flags: none, domain: none, level: none, type: none, recall-cost: none, text: none, features: none, modifiers: none, grants: none, ..unknown) = core.entity("domain-card", domain-card-schema, id: id, name: name, tags: tags, flags: flags, domain: domain, level: level, type: type, recall-cost: recall-cost, text: text, features: features, modifiers: modifiers, grants: grants, ..unknown)
 
 /// A mixed ancestry (p. 4): the first feature of `top` and the second of
 /// `bottom`. `mixed-ancestry(ancestries.elf, ancestries.fungril)`.

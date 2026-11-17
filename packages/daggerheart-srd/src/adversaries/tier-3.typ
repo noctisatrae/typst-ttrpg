@@ -771,9 +771,10 @@
     feature("Bird of Prey", kind: feature-kind.passive)[Once per GM turn, the Roc can move up to Very Far range before or after it takes an action.],
     feature("Here Comes the Boom", kind: feature-kind.action)[Spend a Fear to have the Roc unleash a storm of lightning and thunder. Make an attack roll against 1d4+1 targets within Far range. Targets the Roc succeeds against take 3d12 magic damage. Then each target within Far range of the Roc must make an Agility Reaction Roll (20). Targets who fail take 3d8 physical damage and are pushed back to Close range. Targets who succeed must mark a Stress.],
     feature("Crushing Grasp", kind: feature-kind.reaction)[When the Roc makes a successful standard attack, you can mark a Stress to have the Roc crush the target with its talons, forcing them to mark 1d4 Stress and Restraining them until they succeed on a Strength Roll (20).],
-    feature("Nest Warden", kind: feature-kind.evolution)[When the Roc’s eggs are threatened, it gains the following features:],
-    feature("Wrathful", kind: feature-kind.passive)[The Roc gains a +2 bonus to its Difficulty and a bonus to damage rolls equal to the number of Stress it has marked.],
-    feature("Electrifying Aura", kind: feature-kind.passive)[The Roc has resistance to magic damage. PCs who fail a roll within Very Close range must spend a Hope or mark 1d4 Stress.],
+    feature("Nest Warden", kind: feature-kind.evolution, features: (
+        feature("Wrathful", kind: feature-kind.passive)[The Roc gains a +2 bonus to its Difficulty and a bonus to damage rolls equal to the number of Stress it has marked.],
+        feature("Electrifying Aura", kind: feature-kind.passive)[The Roc has resistance to magic damage. PCs who fail a roll within Very Close range must spend a Hope or mark 1d4 Stress.],
+    ))[When the Roc’s eggs are threatened, it gains the following features:],
   ),
   flags: source(139),
 )

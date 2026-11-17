@@ -8,8 +8,12 @@
 #   python -I emit.py environments <in.json> <tier> > tier-N.typ
 #   python -I emit.py items|consumables <in.json> > items.typ
 import json
+import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import structure  # noqa: E402
 
 HEADER = """// {title}, transcribed from the Daggerheart SRD 2.0
 // (DH_SRD_2_2026_08_25.pdf). Public Game Content © Critical Role, LLC,
@@ -41,9 +45,22 @@ def ident(name):
     return s if not s[0].isdigit() else 'n-' + s
 
 
+def option_lines(text, pad):
+    """Markup lines for a paragraph; numbered options and roll-table rows
+    (structure.py) become a list after their intro, words unchanged."""
+    o = structure.options(text)
+    if not o:
+        return [pad + '  #' + lit(text)]
+    kind, intro, items = o
+    lines = [pad + '  #' + lit(intro), ''] if intro else []
+    for label, t in items:
+        lines.append(pad + (f'  {label}. #' + lit(t) if kind == 'numbered' else '  - #' + lit(f'{label}: {t}')))
+    return lines
+
+
 def body(blocks, indent):
     """One string, or a content block with paragraphs and lists."""
-    if len(blocks) == 1 and 'text' in blocks[0]:
+    if len(blocks) == 1 and 'text' in blocks[0] and not structure.options(blocks[0]['text']):
         return None, lit(blocks[0]['text'])
     pad = ' ' * indent
     lines = ['[']
@@ -51,7 +68,7 @@ def body(blocks, indent):
         if i:
             lines.append('')
         if 'text' in b:
-            lines.append(pad + '  #' + lit(b['text']))
+            lines += option_lines(b['text'], pad)
         else:
             lines += [pad + '  - #' + lit(x) for x in b['bullets']]
     lines.append(pad + ']')
@@ -109,7 +126,7 @@ def loot(data, kind):
         out.append(f'  id: {lit(slug(r["name"]))},')
         out.append(f'  name: {lit(r["name"])},')
         out.append(f'  collection: loot-collection.{coll[r["collection"]]},')
-        out.append(f'  roll: {r["roll"]},')
+        out.append(f'  roll: {lit(r["roll-text"])},')
         out.append(f'  description: {desc},')
         out.append(f'  flags: source({r["page"]}),')
         out.append(')\n')

@@ -98,16 +98,25 @@
 /// A named entry with a hanging indent: *_Name - Tag:_* body. The body may
 /// hold several paragraphs and lists (a set rule, not `par(...)`, which
 /// can't contain them).
-#let entry(name, tag: none, body) = {
+#let entry(name, tag: none, children: (), body) = {
   let head = if tag == none { name } else { name + " - " + tag }
-  block(above: 0.6em, below: 0.6em, {
+  let parent = block(above: 0.6em, below: 0.6em, {
     set par(hanging-indent: 0.9em, spacing: 0.45em)
     set list(indent: 0.9em, spacing: 0.45em)
+    set enum(indent: 0.9em, spacing: 0.45em)
     // The trailing parbreak makes even a one-line body a paragraph, so
     // the hanging indent applies (inline text alone forms no paragraph).
     [*_#head;:_* #body]
     parbreak()
   })
+  if children.len() == 0 { return parent }
+  // Children (entries) indented under their parent, with a thin rule.
+  parent
+  context pad(left: 0.9em, block(
+    stroke: (left: 1.2pt + current-theme().colors.rule),
+    inset: (left: 0.7em, y: 0.1em),
+    children.join(),
+  ))
 }
 
 /// A generic stat block: title, a few header lines, bands of stats and
