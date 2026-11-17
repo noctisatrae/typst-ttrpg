@@ -10,6 +10,7 @@
 #import "adversary.typ": adversary, adversary-schema, adversary-type, feature-kind, attack-range, damage-type, extend, statblock, signed, format-thresholds, format-damage
 #import "attribution.typ": attribution, attribution-text
 #import "theme.typ": book-theme, summary
+#import "system.typ": system
 
 #let package-info = (
   name: "heartweaver",
