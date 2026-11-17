@@ -107,7 +107,9 @@
   let vault-ids = c.vault.map(v => v.id)
   let loadout = acquired.filter(k => k.id not in vault-ids)
   let features = active-features(c + (loadout: loadout), subclass-cards)
-  let mods(key) = features.filter(((_, f)) => key in f.at("modifiers", default: (:))).map(((src, f)) => (src + ": " + f.name, f.modifiers.at(key)))
+  // Modifiers for `key` from every active feature, except those of the
+  // sources named in `except` (a weapon's attack bonus is its own).
+  let mods(key, except: ()) = features.filter(((src, f)) => key in f.at("modifiers", default: (:)) and src not in except).map(((src, f)) => (src + ": " + f.name, f.modifiers.at(key)))
 
   // Traits first: other modifiers may depend on them.
   let traits = (:)
@@ -147,8 +149,8 @@
   let (major, severe) = if armor != none {
     (stat(armor.name, armor.thresholds.major), stat(armor.name, armor.thresholds.severe))
   } else { (stat("unarmored", 0), stat("unarmored", lvl)) }
-  major = apply(bump(major, "level", lvl), "thresholds")
-  severe = apply(bump(severe, "level", lvl), "thresholds")
+  major = apply(apply(bump(major, "level", lvl), "thresholds"), "major")
+  severe = apply(apply(bump(severe, "level", lvl), "thresholds"), "severe")
   let armor-score = apply(stat(if armor != none { armor.name } else { "unarmored" }, if armor != none { armor.score } else { 0 }), "armor-score")
   armor-score = (value: calc.min(armor-score.value, 12), parts: armor-score.parts)
 
@@ -164,12 +166,24 @@
     (name: n, bonus: s)
   })
 
-  let attack-bonus = apply(stat("base", 0), "attack")
-  let attacks = c.weapons.map(w => (
+  // Attack bonuses: a weapon's own features ("Reliable: +1 to attack
+  // rolls") count for that weapon only; other sources for every attack;
+  // `primary-attack` ("Trusty", p. 68) for primary weapon attacks.
+  let value(m) = if type(m) == function { m(ctx) } else { m }
+  let weapon-names = c.weapons.map(w => w.name)
+  let attack-bonus = mods("attack", except: weapon-names).map(((_, m)) => value(m)).sum(default: 0)
+  let primary-bonus = mods("primary-attack").map(((_, m)) => value(m)).sum(default: 0)
+  let attacks = c.weapons.map(w => {
+    let own = w.features.map(f => f.at("modifiers", default: (:)).at("attack", default: 0)).map(value).sum(default: 0)
+    (
       weapon: w,
-      modifier: traits.at(trait-key(w.trait)).value + attack-bonus.value,
+      // "Spellcast" weapons use the Spellcast trait (p. 71).
+      // Without a Spellcast trait it counts as 0; `character` reports it.
+      modifier: (if w.trait != "Spellcast" { traits.at(trait-key(w.trait)).value } else if spellcast != none { traits.at(trait-key(spellcast)).value } else { 0 })
+        + attack-bonus + own + if w.category == "Primary" { primary-bonus } else { 0 },
       damage: str(proficiency.value) + w.damage,
-    ))
+    )
+  })
 
   (
     level: lvl,
@@ -267,7 +281,7 @@
   if hands > 2 { errors.push("`weapons`: maximum burden is 2 hands, these take " + str(hands) + " (p. 55)") }
   for w in c.weapons {
     if w.tier > d.tier { errors.push("`weapons`: " + w.name + " is tier " + str(w.tier) + ", above the character's tier " + str(d.tier) + " (p. 55)") }
-    if w.damage-type != "phy" and d.spellcast-trait == none { errors.push("`weapons`: " + w.name + " deals magic damage and needs a Spellcast trait (p. 55)") }
+    if (w.damage-type != "phy" or w.trait == "Spellcast") and d.spellcast-trait == none { errors.push("`weapons`: " + w.name + " deals magic damage and needs a Spellcast trait (p. 55)") }
   }
   if c.at("armor", default: none) != none and c.armor.tier > d.tier {
     errors.push("`armor`: " + c.armor.name + " is tier " + str(c.armor.tier) + ", above the character's tier " + str(d.tier) + " (p. 55)")

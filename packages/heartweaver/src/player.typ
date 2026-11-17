@@ -45,7 +45,10 @@
   proficiency: field(int, function),
   armor-score: field(int, function),
   thresholds: field(int, function),
+  major: field(int, function),
+  severe: field(int, function),
   attack: field(int, function),
+  primary-attack: field(int, function),
   ..trait.keys().map(k => (k, field(int))).to-dict(),
 )
 
@@ -65,7 +68,9 @@
 #let weapon-schema = (
   tier: field(int, required: true, one-of: (1, 2, 3, 4)),
   category: field(str, required: true, one-of: weapon-category.values()),
-  trait: field(str, required: true, one-of: trait.values()),
+  // "Spellcast": attack with the wielder's Spellcast trait (Arcane-Frame
+  // wheelchairs, p. 71).
+  trait: field(str, required: true, one-of: trait.values() + ("Spellcast",)),
   range: field(str, required: true, one-of: attack-range.values()),
   damage: field(str, required: true),
   damage-type: field(str, required: true, one-of: damage-type.values()),
@@ -98,6 +103,8 @@
   evasion: field(int, required: true),
   hp: field(int, required: true),
   items: field(str, content),
+  background-questions: field(array, default: (), items: str),
+  connections: field(array, default: (), items: str),
   hope-feature: field(dictionary, required: true, keys: player-feature-schema),
   features: features-field(required: true),
 )
@@ -128,7 +135,7 @@
 
 #let community(id: none, name: none, tags: none, flags: none, description: none, features: none, ..unknown) = core.entity("community", community-schema, id: id, name: name, tags: tags, flags: flags, description: description, features: features, ..unknown)
 
-#let class(id: none, name: none, tags: none, flags: none, description: none, domains: none, evasion: none, hp: none, items: none, hope-feature: none, features: none, ..unknown) = core.entity("class", class-schema, id: id, name: name, tags: tags, flags: flags, description: description, domains: domains, evasion: evasion, hp: hp, items: items, hope-feature: hope-feature, features: features, ..unknown)
+#let class(id: none, name: none, tags: none, flags: none, description: none, domains: none, evasion: none, hp: none, items: none, background-questions: none, connections: none, hope-feature: none, features: none, ..unknown) = core.entity("class", class-schema, id: id, name: name, tags: tags, flags: flags, description: description, domains: domains, evasion: evasion, hp: hp, items: items, background-questions: background-questions, connections: connections, hope-feature: hope-feature, features: features, ..unknown)
 
 #let subclass(id: none, name: none, tags: none, flags: none, description: none, class: none, spellcast-trait: none, foundation: none, specialization: none, mastery: none, ..unknown) = core.entity("subclass", subclass-schema, id: id, name: name, tags: tags, flags: flags, description: description, class: class, spellcast-trait: spellcast-trait, foundation: foundation, specialization: specialization, mastery: mastery, ..unknown)
 
