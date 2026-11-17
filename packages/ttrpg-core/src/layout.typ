@@ -17,7 +17,8 @@
 /// font inside bands.
 #let number-pattern = regex("[+\-−]?\d+(?:/\d+)?")
 
-/// A themed box holding one stat block. It does not break across columns.
+/// A themed box holding one stat block. It stays in one piece, unless it is
+/// taller than a whole column or page: then it breaks rather than overflow.
 #let card(body) = context {
   let theme = current-theme()
   // Bold as an absolute weight, not "+300": otherwise dice inside bold text
@@ -25,9 +26,9 @@
   show strong: it => text(weight: "bold", it.body)
   show dice-pattern: it => text(font: theme.fonts.mono, weight: "semibold", size: 0.95em, it)
   set text(font: theme.fonts.body, size: theme.sizes.body)
-  block(
+  let card-block(breakable) = block(
     width: 100%,
-    breakable: false,
+    breakable: breakable,
     fill: theme.colors.card,
     stroke: 0.6pt + theme.colors.card-stroke,
     radius: 5pt,
@@ -35,6 +36,7 @@
     below: 1.2em,
     body,
   )
+  layout(size => card-block(measure(card-block(false), width: size.width).height > size.height))
 }
 
 /// The big all-caps name at the top of a card.
