@@ -17,45 +17,16 @@
   box(stack(dir: ltr, spacing: 0.25em, ..range(n).map(_ => one)))
 }
 
-/// The sources of a tracked number, when there is more than one, e.g.
-/// "Wizard +11, Gambeson Armor: Flexible +1". `skip-first` drops the base
-/// (e.g. a trait's chosen value) and shows only the changes.
-#let sources(s, skip-first: false) = {
-  let parts = if skip-first { s.parts.slice(1) } else { s.parts }
-  if parts.len() > (if skip-first { 0 } else { 1 }) {
-    parts.map(((l, v)) => l + " " + signed(v)).join(", ")
+/// "11" plus its sources in small text when there is more than one.
+#let with-sources(s) = {
+  str(s.value)
+  if s.parts.len() > 1 {
+    text(size: 0.75em)[ (#s.parts.map(((l, v)) => l + " " + signed(v)).join(", "))]
   }
 }
 
-/// A row of equal tiles: (label, value, note) each; note may be none.
-#let tiles(..items) = context {
-  let theme = core.current-theme()
-  grid(
-    columns: (1fr,) * items.pos().len(),
-    column-gutter: 6pt,
-    ..items.pos().map(((label, value, note)) => block(
-      width: 100%,
-      inset: (x: 6pt, top: 7pt, bottom: 8pt),
-      radius: 3pt,
-      stroke: 0.6pt + theme.colors.rule,
-      fill: theme.colors.band,
-      align(center, {
-        text(size: 0.8em, tracking: 0.04em, strong(upper(label)))
-        v(0.45em)
-        // Words (e.g. a Spellcast trait) are set smaller than numbers so
-        // they fit the tile.
-        let long = type(value) == str and value.len() > 4
-        box(height: 1.6em, align(horizon, text(size: if long { 1.1em } else { 1.6em }, weight: "bold", value)))
-        // Every tile reserves a note line, so a row's tiles are equal height.
-        v(0.35em)
-        box(height: 0.9em, text(size: 0.7em, if note != none { note } else { [] }))
-      }),
-    )),
-  )
-}
-
-#let track(label, n, shape: "square", note: none) = block(above: 0.9em, below: 0pt, grid(
-  columns: (7em, 1fr),
+#let track(label, n, shape: "square", note: none) = block(above: 0.5em, below: 0pt, grid(
+  columns: (6.5em, 1fr),
   align: horizon,
   strong(label), [#boxes(n, shape: shape)#if note != none { h(0.6em); text(size: 0.8em, emph(note)) }],
 ))
@@ -66,21 +37,26 @@
   let d = derive(c)
   let entries(source, fs, tag: none) = fs.map(f => core.entry(f.name, tag: tag, f.body))
   core.card({
-    set par(leading: 0.75em)
     core.card-title(c.name)
     block(below: 0.4em, text(weight: "bold", style: "italic", size: 1.1em)[Level #d.level #c.class.name · #c.subclass.name])
     block(below: 0.6em)[#c.ancestry.name · #c.community.name#if c.at("pronouns", default: none) != none [ · #c.pronouns]]
 
-    // Core numbers, then traits: padded tiles, label over value.
-    block(above: 1em, below: 0.6em, tiles(
-      ("Evasion", str(d.evasion.value), sources(d.evasion)),
-      ("Armor Score", str(d.armor-score.value), sources(d.armor-score)),
-      ("Thresholds", [#d.thresholds.major.value #text(size: 0.6em)[/] #d.thresholds.severe.value], [Major / Severe]),
-      ("Proficiency", str(d.proficiency.value), sources(d.proficiency)),
-      ..if d.spellcast-trait != none { (("Spellcast", d.spellcast-trait, none),) },
-    ))
-    block(above: 0.6em, below: 1.2em, tiles(
-      ..trait.pairs().map(((k, printed)) => (printed, signed(d.traits.at(k).value), sources(d.traits.at(k), skip-first: true))),
+    core.band(
+      core.stat-line(
+        ("Evasion", with-sources(d.evasion)),
+        ("Armor Score", with-sources(d.armor-score)),
+        ("Thresholds", str(d.thresholds.major.value) + "/" + str(d.thresholds.severe.value)),
+        ("Proficiency", str(d.proficiency.value)),
+      ),
+      if d.spellcast-trait != none { core.stat-line(("Spellcast", d.spellcast-trait)) },
+    )
+    // The six traits side by side, name over modifier.
+    block(above: 0.6em, below: 0.2em, grid(
+      columns: (1fr,) * 6,
+      align: center,
+      row-gutter: 0.35em,
+      ..trait.values().map(t => text(size: 0.85em, strong(t))),
+      ..trait.keys().map(k => text(size: 1.2em, signed(d.traits.at(k).value))),
     ))
 
     track("HP", d.hp.value)
