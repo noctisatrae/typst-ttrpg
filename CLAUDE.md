@@ -229,11 +229,31 @@ Foundryborne clone, exported fixtures in `fixtures/`.
    adversaries transcribed and cross-checked.
 4. ✓ Screenplay notes (`ttrpg-script`): scenes, dialogue, open play,
    inline stat blocks, cast appendix, music cues, session sheet.
-5. Extract the full adversary section of the SRD PDF into `daggerheart-srd`.
-6. Characters: `character(...)`, derivation, `sheet(...)`. Authoring path
-   is an open question (see below).
-7. Discord helpers: export handouts / single stat blocks as PNG.
-8. Domain cards, print layouts (3x3 card sheets, crop marks), themes.
+5. Kinds are generic in the script: the system describes each entity kind
+   once (section title, summary, renderer, whether it is listed in the
+   session outline); `intro` for characters, `mention` for anything else;
+   session sheet and appendix group by kind.
+6. Characters: `character(...)`, derivation, `sheet(...)`, built around ONE
+   complete character first, transcribing only the data it needs (class,
+   subclass, ancestry, community, domain cards, weapon, armor); then widen.
+7. Environments, items, loot, consumables (small schemas, session-critical).
+8. Full SRD extraction of every block type (adversaries, environments,
+   equipment incl. campaign-frame tables, loot, domain cards, classes, ...),
+   cross-checked; good work for background agents once schemas exist.
+9. Colossal adversaries: framework + segment stat blocks (SRD p.198),
+   one outline entry, a linked group in the appendix.
+10. Discord helpers: export handouts / single stat blocks as PNG.
+11. Domain card print layouts (3x3 sheets, crop marks), more themes.
+
+## Block types (SRD 2.0) and where they show up
+- Session OUTLINE + appendix (needed during play): adversaries, colossal
+  adversaries, environments, weapons, armor, combat wheelchair, loot,
+  items, consumables. Feast ingredients (p.192, optional cooking campaign
+  mode) count as loot if that mode is used.
+- APPENDIX only (reference, clickable/printable when mentioned): classes,
+  subclasses, ancestries, communities, transformations (p.42), domain cards.
+- Optional campaign mechanics (p.190+): factions, feasts, campaign frames
+  with their own equipment tables (tag those items with the frame).
 
 Parked (Foundry): adapter v0 (one adversary -> Actor JSON), roll macros,
 compendium links, CLI wrapper (dedupe, IDs, packing).
