@@ -18,6 +18,11 @@
 
 #let all-traits(n) = (agility: n, strength: n, finesse: n, instinct: n, presence: n, knowledge: n)
 
+// "-Touched" cards: "When 4 or more of the domain cards in your loadout are
+// from the <domain> domain, gain the following benefits" (pp. 207-223).
+// The card counts itself.
+#let touched(domain, n) = c => if c.loadout-domains.at(domain, default: 0) >= 4 { n } else { 0 }
+
 #let effects = (
   // Weapon features, while equipped (pp. 56-71).
   "weapon:Reliable": (modifiers: (attack: 1)),               // "+1 to attack rolls"
@@ -62,13 +67,13 @@
   "armor:Enchanted": (modifiers: (thresholds: spellcast-bonus)),  // Mage Robes, p. 72
   "bellamoi-fine-armor/Gilded": (modifiers: (presence: 1)),      // "+1 to Presence" p. 73
   "skywardens-lamellar/Vigilant": (modifiers: (evasion: 2)),      // "+2 to Evasion" p. 73
+  "channeling-armor/Channeling": (modifiers: (spellcast: 1)),    // "+1 to Spellcast Rolls" p. 74
 
   "spidersilk-tunic/Wall-Crawling": (modifiers: (evasion: 1)),   // "+1 Evasion; you can walk on walls ..." p. 72
   "granminsters-finery/Magnificent": (modifiers: (armor-score: c => c.traits.presence)), // "bonus to your Armor Score equal to your Presence" p. 73
   // "The maximum number of domain cards in your loadout is reduced by one,
-  // but you gain a bonus to your damage thresholds equal to your tier."
-  // (p. 74); the loadout part is not modelled yet.
-  "rune-forged-exosuit/Attuned": (modifiers: (thresholds: c => c.tier)),
+  // but you gain a bonus to your damage thresholds equal to your tier." p. 74
+  "rune-forged-exosuit/Attuned": (modifiers: (thresholds: c => c.tier, loadout: -1)),
 
   // Heritage (pp. 32-42): "at character creation" slots are permanent.
   "giant/Endurance": (modifiers: (hp: 1)),          // "Gain an additional Hit Point slot at character creation." p. 36
@@ -83,6 +88,21 @@
   "untouchable/Untouchable": (modifiers: (evasion: c => calc.ceil(c.traits.agility / 2))), // "bonus to your Evasion equal to half your Agility" p. 209
   "armorer/Armorer": (modifiers: (armor-score: c => if c.armored { 1 } else { 0 })),          // "While you’re wearing armor, gain a +1 bonus to your Armor Score." p. 223
   "fortified-armor/Fortified Armor": (modifiers: (thresholds: c => if c.armored { 2 } else { 0 })), // "While you are wearing armor, gain a +2 bonus to your damage thresholds." p. 208
+  "rise-up/Rise Up": (modifiers: (severe: c => c.proficiency)),  // "Gain a bonus to your Severe threshold equal to your Proficiency." p. 223
+  // "When you choose not to equip armor, you have a base Armor Score of 3 +
+  // your Strength and use the following as your base damage thresholds:
+  // Tier 1: 9/19, Tier 2: 11/24, Tier 3: 13/31, Tier 4: 15/38" p. 222.
+  "bare-bones/Bare Bones": (modifiers: (base-armor: c => (
+    score: 3 + c.traits.strength,
+    major: (9, 11, 13, 15).at(c.tier - 1),
+    severe: (19, 24, 31, 38).at(c.tier - 1),
+  ))),
+  // Only the unconditional benefit of each "-Touched" card is listed.
+  "arcana-touched/Arcana-Touched": (modifiers: (spellcast: touched("Arcana", 1))),          // "+1 bonus to your Spellcast Rolls" p. 207
+  "blade-touched/Blade-Touched": (modifiers: (attack: touched("Blade", 2), severe: touched("Blade", 4))), // "+2 bonus to your attack rolls; +4 bonus to your Severe damage threshold" p. 208
+  "bone-touched/Bone-Touched": (modifiers: (agility: touched("Bone", 1))),                  // "+1 bonus to Agility" p. 210
+  "splendor-touched/Splendor-Touched": (modifiers: (severe: touched("Splendor", 3))),       // "+3 bonus to your Severe damage threshold" p. 222
+  "valor-touched/Valor-Touched": (modifiers: (armor-score: touched("Valor", 1))),           // "+1 bonus to your Armor Score" p. 223
 
   // Subclasses (pp. 9-31).
   "school-of-knowledge/Prepared": (grants: (domain-cards: 1)),     // p. 31

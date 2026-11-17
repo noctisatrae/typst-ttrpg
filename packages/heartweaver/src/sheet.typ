@@ -91,7 +91,7 @@
         ("Thresholds", str(d.thresholds.major.value) + "/" + str(d.thresholds.severe.value)),
         ("Proficiency", str(d.proficiency.value)),
       ),
-      if d.spellcast-trait != none { core.stat-line(("Spellcast", d.spellcast-trait)) },
+      if d.spellcast-trait != none { core.stat-line(("Spellcast", if d.spellcast-bonus.value == 0 { d.spellcast-trait } else [#d.spellcast-trait, #signed(d.spellcast-bonus.value) to rolls])) },
     ))
     // The six traits, each in its own small box: name over modifier.
     block(above: gap, below: gap, context {

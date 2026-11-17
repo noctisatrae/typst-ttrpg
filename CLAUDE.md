@@ -168,8 +168,20 @@ thresholds, max HP are computed at runtime and exported as 0/null).
   (Shadowblade phy/mag, Arcane-Frame Wheelchair Spellcast/mag): SRD wins.
 - Not yet kinds: transformations (pp. 42-45; proposed schema in the merge
   report), Druid Beastforms, Brawler Martial Stances, Ranger companion,
-  campaign-frame equipment (p.190+). Rune-Forged Exosuit "loadout reduced
-  by one" not modeled; grants after creation not checked at level-up.
+  campaign-frame equipment (p.190+). Grants after creation not checked at
+  level-up. Vitality (choose two benefits, card goes to the vault) not
+  modeled.
+- Every flagged PDF spot was checked against the rendered page
+  (2026-11-17): "cliffside", "2-foot-deep", "Secret-Keeper", the p. 22
+  arrow, the p. 99 en dash, "Corrupter", the Bard "." names are all as
+  printed. To look at a page: Typst renders PDF pages as images
+  (`image("srd.pdf", page: n)`, compile to PNG in the scratchpad).
+- Effect suggestions a human found situational go in `SITUATIONAL` in
+  build.py so they stop resurfacing. Effects may depend on
+  `loadout-domains` ("-Touched" cards), replace the unarmored base
+  (`base-armor`, Bare Bones), add to Spellcast Rolls (`spellcast`, shown
+  next to the Spellcast trait; weapon attacks are not Spellcast Rolls,
+  p. 47) or change the loadout size (`loadout`).
 - Slug scheme for SRD entities: kebab-case of the SRD name.
 
 ## Licensing and sources of truth
@@ -299,18 +311,22 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   hence `attack-range`, `adversary-type`.
 
 ## Next up (as of 2026-11-17)
-1. Ranger (Beastbound) companion: read SRD pp. 21-22 first, then design
-   with the owner (a second entity attached to a character; Inskel is the
-   test case).
+1. Ranger (Beastbound) companion: SRD pp. 20-22 read. The SRD does NOT
+   state the starting Stress slots or how often each level-up option can
+   be taken (both are on the printed companion sheet). Foundryborne:
+   Stress 3; Intelligent, Vicious, Resilient, Aware x3; Light in the Dark,
+   Creature Comfort, Armored, Bonded x1; a new Experience at levels 2, 5,
+   8 (follows the character). Inskel's Foundry export has no companion.
+   Waiting on the owner's answers (see Pending).
 2. New kinds: transformations (pp. 42-45), Druid Beastforms (pp. 15-18),
    Brawler Martial Stances (p. 13).
 3. Rules gaps: grants gained after creation (Accomplished, Brilliant) at
-   level-up; Rune-Forged Exosuit "loadout reduced by one".
+   level-up; Vitality (a choice on a card).
 
 ## Pending with the owner
-- Check in the SRD PDF whether two joined words are printed that way:
-  "cliffside" (Cliffside Ascent, p. 162, description and feature) and
-  "2-foot-deep" (Stonemason's Fortune, p. 82).
+- Companion: Inskel's companion (animal, name, two Experiences,
+  physical or magic damage) and the numbers the SRD leaves to the printed
+  sheet (starting Stress, option limits).
 - Owner uses Zed (Typst extension = Tinymist). Check field completion there.
 
 ## Tooling setup (recreate per session)

@@ -36,8 +36,13 @@
 #let card-type = (ability: "Ability", spell: "Spell", grimoire: "Grimoire")
 
 /// What a modifier may change. Each value is a number or a function
-/// `c => number` of the partly derived character (traits, level,
-/// spellcast trait), for effects that depend on other stats.
+/// `c => number` of the partly derived character, for effects that depend
+/// on other stats: `level`, `tier`, `armored`, `loadout-domains` (cards per
+/// domain in the loadout) everywhere; `traits`, `spellcast-trait` and
+/// `proficiency` too, except in trait modifiers. `base-armor` is
+/// `c => (score:, major:, severe:)`: an unarmored base used like armor
+/// ("Bare Bones", p. 222). `spellcast` is a bonus to Spellcast Rolls;
+/// `loadout` changes the maximum loadout size.
 #let modifier-schema = (
   evasion: field(int, function),
   hp: field(int, function),
@@ -49,7 +54,10 @@
   severe: field(int, function),
   attack: field(int, function),
   primary-attack: field(int, function),
-  ..trait.keys().map(k => (k, field(int))).to-dict(),
+  spellcast: field(int, function),
+  base-armor: field(function),
+  loadout: field(int),
+  ..trait.keys().map(k => (k, field(int, function))).to-dict(),
 )
 
 /// What a feature may grant.

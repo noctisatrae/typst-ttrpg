@@ -257,6 +257,22 @@ SUGGEST = [
 ]
 
 
+# Suggestions a human read in the SRD and found situational (a cost, a
+# trigger or "for that attack"), so they stay text only. Keyed like the
+# overlay, "<owner>/<Feature>". Reviewed 2026-11-17 against SRD 2.0.
+SITUATIONAL = {
+    'juggernaut/Pummeljoy', 'martial-artist/Keen Defenses',
+    'warden-of-the-elements/Elemental Incarnation', 'warden-of-the-elements/Elemental Dominion',
+    'vengeance/Act of Reprisal', 'wayfinder/Ruthless Predator', 'elemental-origin/Transcendence',
+    'pact-of-the-endless/Patron’s Mantle', 'moon/Lunar Phases',
+    'deadly-focus/Deadly Focus', 'i-see-it-coming/I See It Coming', 'deathrun/Deathrun',
+    'siphon-essence/Siphon Essence', 'voice-of-reason/Voice of Reason',
+    'blitz-hammer/Accelerator', 'midas-scythe/Greedy', 'hatchet/Follow-Up',
+    'improved-hatchet/Follow-Up', 'advanced-hatchet/Follow-Up', 'legendary-hatchet/Follow-Up',
+    'eldritch-vambrace/Deflecting', 'buckler/Deflecting', 'powered-gauntlet/Charged',
+}
+
+
 def overlay_keys():
     text = open(os.path.join(SRD, 'effects.typ'), encoding='utf-8').read()
     return set(re.findall(r'^\s*"([^"]+)":', text, re.M))
@@ -308,7 +324,7 @@ def check_overlay(out):
             note('effects overlay', [f'kind-wide entry {k!r} covers different texts: {sorted(by_kind_name[k])}'])
     suggestions = []
     for kind, owner, name, text, page in feats:
-        if f'{owner}/{name}' in keys or f'{kind}:{name}' in keys:
+        if f'{owner}/{name}' in keys or f'{kind}:{name}' in keys or f'{owner}/{name}' in SITUATIONAL:
             continue
         for pat, what in SUGGEST:
             m = re.search(pat, text)

@@ -119,6 +119,13 @@
   // sources named in `except` (a weapon's attack bonus is its own).
   let mods(key, except: ()) = features.filter(((src, f)) => key in f.at("modifiers", default: (:)) and src not in except).map(((src, f)) => (src + ": " + f.name, f.modifiers.at(key)))
 
+  // What effects may depend on before traits exist: "-Touched" cards count
+  // the loadout's domains (pp. 207-223).
+  let armor = c.at("armor", default: none)
+  let loadout-domains = (:)
+  for k in loadout { loadout-domains.insert(k.domain, loadout-domains.at(k.domain, default: 0) + 1) }
+  let early = (level: lvl, tier: tier, loadout-domains: loadout-domains, armored: armor != none)
+
   // Traits first: other modifiers may depend on them.
   let traits = (:)
   for k in trait-keys {
@@ -128,7 +135,7 @@
         if a.traits.map(trait-key).contains(k) { s = bump(s, "level " + str(i + 2), 1) }
       }
     }
-    for (label, m) in mods(k) { s = bump(s, label, m) }
+    for (label, m) in mods(k) { s = bump(s, label, if type(m) == function { m(early) } else { m }) }
     traits.insert(k, s)
   }
   let spellcast = c.subclass.at("spellcast-trait", default: none)
@@ -144,7 +151,7 @@
   for n in (2, 5, 8) { if lvl >= n { proficiency = bump(proficiency, "tier achievement, level " + str(n), 1) } }
   proficiency = by-level(proficiency, "proficiency")
   for (label, m) in mods("proficiency") { proficiency = bump(proficiency, label, m) }
-  let ctx = (level: lvl, tier: tier, traits: traits.pairs().map(((k, s)) => (k, s.value)).to-dict(), spellcast-trait: spellcast, proficiency: proficiency.value, armored: c.at("armor", default: none) != none)
+  let ctx = early + (traits: traits.pairs().map(((k, s)) => (k, s.value)).to-dict(), spellcast-trait: spellcast, proficiency: proficiency.value)
   let apply(s, key) = {
     for (label, m) in mods(key) { s = bump(s, label, if type(m) == function { m(ctx) } else { m }) }
     s
@@ -154,14 +161,20 @@
   let hp = apply(by-level(stat(c.class.name, c.class.hp), "hp"), "hp")
   let stress = apply(by-level(stat("start", 6), "stress"), "stress")
 
-  // Thresholds: armor's base + level; unarmored, level and twice level.
-  let armor = c.at("armor", default: none)
-  let (major, severe) = if armor != none {
-    (stat(armor.name, armor.thresholds.major), stat(armor.name, armor.thresholds.severe))
-  } else { (stat("unarmored", 0), stat("unarmored", lvl)) }
+  // Thresholds: armor's base + level; unarmored, level and twice level,
+  // unless a feature gives an unarmored base (`base-armor`, "Bare Bones",
+  // p. 222), which then counts like armor.
+  let base-armor = if armor != none { none } else {
+    mods("base-armor").map(((label, m)) => (label: label, ..m(ctx))).at(0, default: none)
+  }
+  let (major, severe, armor-score) = if armor != none {
+    (stat(armor.name, armor.thresholds.major), stat(armor.name, armor.thresholds.severe), stat(armor.name, armor.score))
+  } else if base-armor != none {
+    (stat(base-armor.label, base-armor.major), stat(base-armor.label, base-armor.severe), stat(base-armor.label, base-armor.score))
+  } else { (stat("unarmored", 0), stat("unarmored", lvl), stat("unarmored", 0)) }
   major = apply(apply(bump(major, "level", lvl), "thresholds"), "major")
   severe = apply(apply(bump(severe, "level", lvl), "thresholds"), "severe")
-  let armor-score = apply(stat(if armor != none { armor.name } else { "unarmored" }, if armor != none { armor.score } else { 0 }), "armor-score")
+  armor-score = apply(armor-score, "armor-score")
   armor-score = (value: calc.min(armor-score.value, 12), parts: armor-score.parts)
 
   // Experiences: +2 each; +1 per "increase experiences" naming them.
@@ -200,6 +213,8 @@
     tier: tier,
     traits: traits,
     spellcast-trait: spellcast,
+    // Bonus to Spellcast Rolls on top of the trait ("Channeling", p. 74).
+    spellcast-bonus: apply((value: 0, parts: ()), "spellcast"),
     proficiency: proficiency,
     evasion: evasion,
     hp: hp,
@@ -315,7 +330,9 @@
   let ids = acquired.map(k => k.id)
   if ids.dedup().len() != ids.len() { errors.push("`cards`: the same card is taken twice") }
   for v in c.vault { if v.id not in ids { errors.push("`vault`: " + v.name + " is not among the character's cards") } }
-  if d.loadout.len() > 5 { errors.push("loadout holds at most 5 cards; move " + str(d.loadout.len() - 5) + " to `vault:`") }
+  // Loadout size (p. 3), changed by `loadout` modifiers ("Attuned", p. 74).
+  let max-loadout = 5 + d.features.filter(((_, f)) => "loadout" in f.at("modifiers", default: (:))).map(((_, f)) => f.modifiers.loadout).sum(default: 0)
+  if d.loadout.len() > max-loadout { errors.push("loadout holds at most " + str(max-loadout) + " cards; move " + str(d.loadout.len() - max-loadout) + " to `vault:`") }
   errors
 }
 
