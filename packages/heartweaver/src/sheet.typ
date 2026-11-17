@@ -13,11 +13,11 @@
 #import "character.typ": derive
 #import "companion.typ": derive-companion
 
-/// "11" plus its sources in small text when there is more than one.
+/// "11" plus its sources, at the same size, when there is more than one.
 #let with-sources(s) = {
   str(s.value)
   if s.parts.len() > 1 {
-    text(size: 0.75em)[ (#s.parts.map(((l, v)) => l + " " + signed(v)).join(", "))]
+    [ (#s.parts.map(((l, v)) => l + " " + signed(v)).join(", "))]
   }
 }
 
@@ -127,8 +127,8 @@
         ("Armor Score", with-sources(d.armor-score)),
         ("Thresholds", str(d.thresholds.major.value) + "/" + str(d.thresholds.severe.value)),
         ("Proficiency", str(d.proficiency.value)),
+        ..if d.spellcast-trait != none { (("Spellcast", if d.spellcast-bonus.value == 0 { d.spellcast-trait } else [#d.spellcast-trait, #signed(d.spellcast-bonus.value) to rolls]),) },
       ),
-      if d.spellcast-trait != none { core.stat-line(("Spellcast", if d.spellcast-bonus.value == 0 { d.spellcast-trait } else [#d.spellcast-trait, #signed(d.spellcast-bonus.value) to rolls])) },
     ))
     // The six traits, each in its own small box: name over modifier.
     block(above: gap, below: gap, context {
