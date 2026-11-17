@@ -4,7 +4,7 @@
 #import "@local/ttrpg-script:0.1.0": *
 #import "support/creature.typ": goblin
 
-#show: setup.with(summary: e => [HP #e.hp])
+#show: setup.with(system: (kinds: (creature: (section: "Creatures", summary: e => [HP #e.hp]))))
 
 #scene("INT.", "Cave", "Day")
 A #intro(goblin) waits. A #intro("Rat") squeaks.
@@ -13,6 +13,6 @@ A #intro(goblin) waits. A #intro("Rat") squeaks.
 #say("Rat")[Squeak.]
 #leads-to("The Tunnel")
 #transition("Cut to:")
-#cast()
+#appendix()
 
 #context assert.eq(core.registered().keys(), ("goblin",))

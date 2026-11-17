@@ -3,9 +3,9 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 // ttrpg-script: campaign notes in screenplay format. Scenes, action lines,
-// dialogue and open play, with characters taken from ttrpg-core entities.
-// System-agnostic: a system package supplies the one-line summary and the
-// stat block renderer.
+// dialogue and open play, with characters and other entities taken from
+// ttrpg-core. System-agnostic: a system package describes its entity kinds
+// (section title, summary, renderer, outline) in one `system` dictionary.
 
 #import "@local/ttrpg-core:0.1.0" as core
 
@@ -38,8 +38,59 @@
   sizes: (body: 9.5pt, title: 12pt, heading: 12pt, section: 9.5pt),
 )
 
-/// Script settings read by `intro`, `stats` and `cast`; set through `setup`.
-#let config = state("ttrpg-script:config", (summary: none, stats: none))
+/// Script settings read by `intro`, `mention`, `stats`, the session sheet
+/// and the appendix; set through `setup`.
+#let config = state("ttrpg-script:config", (system: none))
+
+/// What a system may say about one entity kind.
+/// - section: title used in the session sheet and the appendix.
+/// - outline: listed in the session sheet (false = appendix only).
+/// - summary: entity -> short content for `intro` / `mention`.
+/// - render: entity -> full block for `stats` and the appendix.
+#let kind-schema = (
+  section: core.field(str),
+  outline: core.field(bool, default: true),
+  summary: core.field(function),
+  render: core.field(function),
+)
+
+/// Checks a `system` dictionary given to `setup`: it needs `kinds`, a
+/// dictionary of kind name -> description (see `kind-schema`).
+#let check-system(system) = {
+  if type(system) != dictionary or type(system.at("kinds", default: none)) != dictionary {
+    panic("setup: `system` must be a dictionary with `kinds`, e.g. `(kinds: (adversary: (section: \"Cast\")))`, got " + repr(system))
+  }
+  for (name, info) in system.kinds {
+    if type(info) != dictionary {
+      panic("setup: system kind " + repr(name) + " must be a dictionary, got " + repr(info))
+    }
+    let _ = core.validate("system kind " + repr(name), kind-schema, info)
+  }
+}
+
+/// The compact entry used when a kind has no renderer: name in caps with its
+/// kind and id.
+#let default-entry(e) = block(below: 0.8em)[*#upper(e.name)* --- #e.kind (#raw(e.id))]
+
+/// Everything known about entity kind `name`, with defaults filled in. Kinds
+/// missing from the system still work: titled by their name, no summary,
+/// compact render, listed in the outline.
+#let kind-info(system, name) = {
+  let info = if system != none { system.kinds.at(name, default: (:)) } else { (:) }
+  (
+    section: info.at("section", default: upper(name.first()) + name.slice(name.first().len())),
+    outline: info.at("outline", default: true),
+    summary: info.at("summary", default: none),
+    render: info.at("render", default: default-entry),
+  )
+}
+
+/// Kind names in display order: the system's order first, then any others
+/// in the order given.
+#let kind-order(system, names) = {
+  let known = if system != none { system.kinds.keys() } else { () }
+  known.filter(k => k in names) + names.filter(k => k not in known).dedup()
+}
 
 /// The name of a character given as an entity or a plain string.
 #let name-of(who, caller) = {
@@ -57,8 +108,8 @@
 /// are not registered.
 #let register-if-entity(who) = if type(who) == dictionary { core.register(who) }
 
-/// The label of an entity's entry in the cast appendix.
-#let cast-label(e) = label("ttrpg-script-cast:" + e.id)
+/// The label of an entity's entry in the appendix.
+#let entry-label(e) = label("ttrpg-script-entry:" + e.id)
 
 /// The location of the scene in progress, so cues, exits and appearances
 /// can be grouped by scene in the session sheet.
@@ -68,17 +119,18 @@
 /// sheet: `kind` is "appearance", "music" or "leads-to".
 #let event(kind, data) = context [#metadata((kind: kind, scene: current-scene.get()) + data) <ttrpg-script-event>]
 
-/// Document template for a script:
-/// `#show: setup.with(summary: hw.summary, stats: hw.statblock)`.
+/// Records that entity `e` appears in the current scene.
+#let appearance(e) = event("appearance", (id: e.id, entity-kind: e.kind))
+
+/// Document template for a script: `#show: setup.with(system: hw.system)`.
 ///
-/// - summary: function from an entity to short content shown by `intro`,
-///   or none for names only.
-/// - stats: function rendering an entity's full stat block, used by
-///   `stats` and `cast`. System packages provide both.
+/// - system: the system package's description of its entity kinds, or none
+///   (names only, compact appendix entries).
 /// - font: fallback list for the screenplay font.
-/// - stats-font: fallback list for stat blocks (`stats`, `cast`).
-#let setup(summary: none, stats: none, font: default-fonts, stats-font: default-stats-fonts, body) = {
-  config.update(c => c + (summary: summary, stats: stats))
+/// - stats-font: fallback list for stat blocks (`stats`, `appendix`).
+#let setup(system: none, font: default-fonts, stats-font: default-stats-fonts, body) = {
+  if system != none { check-system(system) }
+  config.update(c => c + (system: system))
   core.use-theme(script-theme(stats-font))
   set page(
     paper: "us-letter",
@@ -106,33 +158,52 @@
   })
 }
 
-/// Introduces a character inside an action line: the name in caps, then the
-/// summary from `setup` and the page of its cast entry, if any. The name
-/// links to the cast entry. Registers the entity.
+/// An inline reference: `name` linked to the appendix entry, then the kind's
+/// summary and the entry's page, if any.
+#let inline-ref(e, name) = context {
+  let summary = kind-info(config.get().system, e.kind).summary
+  let target = entry-label(e)
+  let found = query(target)
+  if found.len() > 0 { link(target, name) } else { name }
+  let notes = ()
+  if summary != none { notes.push(summary(e)) }
+  if found.len() > 0 { notes.push[p.~#found.first().location().page()] }
+  // A box keeps the notes on one line.
+  if notes.len() > 0 [ #box[(#notes.join[ · ])]]
+}
+
+/// Introduces a character inside an action line: the name in caps, linked
+/// to its appendix entry, with summary and page. Registers the entity. A
+/// plain string is a minor character: name only, not registered.
 #let intro(who) = {
   let name = upper(name-of(who, "intro"))
-  register-if-entity(who)
   if type(who) != dictionary { return name }
-  event("appearance", (id: who.id))
-  context {
-    let summary = config.get().summary
-    let target = cast-label(who)
-    let found = query(target)
-    if found.len() > 0 { link(target, name) } else { name }
-    let notes = ()
-    if summary != none { notes.push(summary(who)) }
-    if found.len() > 0 { notes.push[p.~#found.first().location().page()] }
-    // A box keeps the notes on one line.
-    if notes.len() > 0 [ #box[(#notes.join[ · ])]]
+  core.register(who)
+  appearance(who)
+  inline-ref(who, name)
+}
+
+/// Mentions any other entity (an item, a place, ...) inside an action line:
+/// its name linked to its appendix entry, with summary and page. Registers
+/// the entity: `the Lieutenant wears a #mention(ring)`.
+#let mention(e) = {
+  if type(e) != dictionary {
+    panic("mention: expected an entity, got " + str(type(e)) + " " + repr(e) + "; for a plain name, just write the text")
   }
+  let name = name-of(e, "mention")
+  core.register(e)
+  appearance(e)
+  inline-ref(e, name)
 }
 
 /// A line of dialogue: `say(boss, paren: "too loud")[Who let them in?!]`.
 /// Registers the entity. The cue, parenthetical and line stay together.
 #let say(who, paren: none, line) = {
   let name = name-of(who, "say")
-  register-if-entity(who)
-  if type(who) == dictionary { event("appearance", (id: who.id)) }
+  if type(who) == dictionary {
+    core.register(who)
+    appearance(who)
+  }
   let parts = (pad(left: indents.cue, upper(name)),)
   if paren != none {
     parts.push(pad(left: indents.paren, block(width: indents.paren-width, emph("(" + paren + ")"))))
@@ -141,14 +212,17 @@
   block(breakable: false, above: 2em, below: 2em, stack(spacing: 0.55em, ..parts))
 }
 
-/// The full stat block of an entity, right here in the scene, rendered by
-/// the `stats` function given to `setup`. Registers the entity.
-#let stats(e) = context {
-  let render = config.get().stats
-  if render == none {
-    panic("stats: no stat block renderer; pass one to setup, e.g. `setup.with(stats: hw.statblock)`")
+/// The full block of an entity right here in the scene, rendered by its
+/// kind's `render` (or a compact entry). Registers the entity.
+#let stats(e) = {
+  if type(e) != dictionary or "id" not in e or "kind" not in e {
+    panic("stats: expected an entity with `id` and `kind`, got " + repr(e))
   }
-  block(above: 1.5em, below: 1.5em, render(e))
+  core.register(e)
+  context {
+    let render = kind-info(config.get().system, e.kind).render
+    block(above: 1.5em, below: 1.5em, render(e))
+  }
 }
 
 /// Marks where the script stops and the players take over. The body holds
@@ -228,30 +302,43 @@
   pad(left: 1.5em, stack(spacing: 0.45em, ..items))
 })
 
+/// The session sheet groups for one scene's events: one per kind listed in
+/// the outline, in system order, as `(section:, ids:)`.
+#let outline-groups(system, events) = {
+  let shown = events.filter(e => e.kind == "appearance")
+  kind-order(system, shown.map(e => e.entity-kind).dedup())
+    .filter(k => kind-info(system, k).outline)
+    .map(k => (
+      section: kind-info(system, k).section,
+      ids: shown.filter(e => e.entity-kind == k).map(e => e.id).dedup(),
+    ))
+}
+
 /// A one-page overview for the table: every scene with its page, the
-/// characters in it (with summary and cast page), its music cues and where
-/// it leads. Place it anywhere; it reads the whole document.
+/// entities in it grouped by kind (with summary and appendix page), its
+/// music cues and where it leads. Place it anywhere; it reads the whole
+/// document.
 #let session-sheet(title: "Session Sheet") = {
   block(below: 0.6em, strong(upper(title)))
   line(length: 100%, stroke: 1.2pt)
   context {
-    let summary = config.get().summary
+    let system = config.get().system
     let entities = core.registered()
     let events = query(<ttrpg-script-event>).map(m => m.value)
+    let entity-line(e) = {
+      let summary = kind-info(system, e.kind).summary
+      let notes = ()
+      if summary != none { notes.push(summary(e)) }
+      let entry = query(entry-label(e))
+      if entry.len() > 0 { notes.push[p.~#entry.first().location().page()] }
+      let name = if entry.len() > 0 { link(entry-label(e), e.name) } else { e.name }
+      [#name#if notes.len() > 0 [ (#notes.join[ · ])]]
+    }
     set text(size: 10pt)
     set par(spacing: 0.5em)
     for (i, s) in query(<ttrpg-script-scene>).enumerate() {
       let here = events.filter(e => e.scene == s.value.location)
-      let ids = here.filter(e => e.kind == "appearance").map(e => e.id).dedup()
-      let cast-lines = ids.map(id => {
-          let e = entities.at(id)
-          let notes = ()
-          if summary != none { notes.push(summary(e)) }
-          let cast = query(cast-label(e))
-          if cast.len() > 0 { notes.push[p.~#cast.first().location().page()] }
-          let name = if cast.len() > 0 { link(cast-label(e), e.name) } else { e.name }
-          [#name#if notes.len() > 0 [ (#notes.join[ · ])]]
-        })
+      let groups = outline-groups(system, here)
       let music-lines = here.filter(e => e.kind == "music").map(cue-line)
       let exits = here.filter(e => e.kind == "leads-to").map(e => e.scenes).flatten().dedup()
       block(above: 1.6em, below: 0pt, breakable: false, grid(
@@ -259,7 +346,7 @@
         row-gutter: 0.8em,
         strong(str(i + 1)), link(s.location(), strong(s.value.heading)), [p.~#s.location().page()],
         [], {
-          if cast-lines.len() > 0 { sheet-group("Cast", cast-lines) }
+          for g in groups { sheet-group(g.section, g.ids.map(id => entity-line(entities.at(id)))) }
           if music-lines.len() > 0 { sheet-group("Music", music-lines) }
           if exits.len() > 0 { sheet-group("Leads to", (scene-links(exits),)) }
         }, [],
@@ -268,24 +355,24 @@
   }
 }
 
-/// The default cast entry without a stat block renderer: name in caps with
-/// its kind and id.
-#let default-cast-entry(e) = block(below: 0.8em)[*#upper(e.name)* --- #e.kind (#raw(e.id))]
-
-/// The cast appendix: a new page, a separator and every registered entity
-/// in order of first appearance, each with the full stat block from
-/// `setup(stats:)` (or `render`, or a compact entry). `intro` links here.
-#let cast(title: "Cast", render: auto) = {
+/// The appendix: a new page, a separator, then one section per kind (in
+/// system order) with the full block of every registered entity of that
+/// kind, in order of first appearance. `intro`, `mention` and the session
+/// sheet link here. Kinds with `outline: false` appear here too.
+#let appendix() = {
   pagebreak(weak: true)
   line(length: 100%, stroke: 1.2pt)
-  block(above: 1em, below: 1.5em, strong(upper(title)))
   context {
-    let render = if render != auto { render } else if config.get().stats != none { config.get().stats } else { default-cast-entry }
+    let system = config.get().system
     let entities = core.registered().values()
-    if entities.len() == 0 { emph[No characters registered.] }
-    for e in entities {
-      [#metadata(e.id) #cast-label(e)]
-      render(e)
+    if entities.len() == 0 { block(above: 1em, emph[Nothing registered.]) }
+    for k in kind-order(system, entities.map(e => e.kind).dedup()) {
+      let info = kind-info(system, k)
+      block(above: 1.5em, below: 1.2em, sticky: true, strong(upper(info.section)))
+      for e in entities.filter(e => e.kind == k) {
+        [#metadata(e.id) #entry-label(e)]
+        (info.render)(e)
+      }
     }
   }
 }

@@ -4,7 +4,7 @@
 #import "@local/ttrpg-script:0.1.0": *
 
 #let lackey = adversaries.tier-1.jagged-knife-lackey
-#show: setup.with(summary: hw.summary, stats: hw.statblock)
+#show: setup.with(system: hw.system)
 
 #session-sheet()
 

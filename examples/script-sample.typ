@@ -8,7 +8,7 @@
 #let lieutenant = adversaries.tier-1.jagged-knife-lieutenant
 #let lackey = adversaries.tier-1.jagged-knife-lackey
 
-#show: setup.with(summary: hw.summary, stats: hw.statblock)
+#show: setup.with(system: hw.system)
 
 #session-sheet()
 #pagebreak()
@@ -57,7 +57,7 @@ bell rings, every bandit in the valley hears it.
 
 #leads-to("Ruined Chapel")
 
-#cast()
+#appendix()
 
 #v(1fr)
 #text(size: 8pt, hw.attribution())
