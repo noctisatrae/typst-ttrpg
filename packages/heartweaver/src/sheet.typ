@@ -11,6 +11,7 @@
 #import "adversary.typ": signed
 #import "player.typ": trait
 #import "character.typ": derive
+#import "companion.typ": derive-companion
 
 /// "11" plus its sources in small text when there is more than one.
 #let with-sources(s) = {
@@ -70,8 +71,44 @@
   })
 }
 
-/// The sheet for character `c`. Registers it. `state` sets how play state
-/// is printed: "field" (default), "boxes" or "none".
+/// The companion sheet (Beastbound, p. 21): its own card after the
+/// character's, with the companion's numbers, the training marked so far
+/// and the SRD's rules for playing it.
+#let companion-sheet(c, d, state) = {
+  let comp = c.companion
+  let k = derive-companion(c, d)
+  core.card({
+    core.card-title(comp.name)
+    block(below: 1.2em, text(weight: "bold", style: "italic", size: 1.1em)[#comp.animal · #c.name's companion#if comp.at("pronouns", default: none) != none [ · #comp.pronouns]])
+    block(above: 0pt, below: gap, core.band(
+      core.stat-line(
+        ("Evasion", with-sources(k.evasion)),
+        ("Stress", if state == "boxes" { tick-boxes(k.stress.value) } else if state == "field" { field(0, with-sources(k.stress)) } else { with-sources(k.stress) }),
+      ),
+      core.stat-line(("Attack", [#k.attack.name · #k.attack.range · #k.attack.damage #k.attack.damage-type])),
+      if k.command != none { core.stat-line(("Command", [Spellcast Roll, #k.command.trait #signed(k.command.modifier)])) },
+    ))
+    if comp.at("description", default: none) != none { block(above: gap, comp.description) }
+
+    section("Experiences")
+    k.experiences.map(e => [#e.name #signed(e.bonus.value)]).join[ · ]
+
+    if k.training.len() > 0 {
+      section("Training")
+      for t in k.training {
+        let levels = t.marks.map(m => str(m.level)).join(", ")
+        let what = t.marks.map(m => m.at("experience", default: m.at("step", default: none))).filter(x => x != none)
+        entry(t.feature.name, tag: (if t.marks.len() > 1 { "×" + str(t.marks.len()) + ", levels " } else { "level " }) + levels + if what.len() > 0 { ": " + what.join(", ") }, t.feature.body)
+      }
+    }
+    section("Working with your companion")
+    for f in comp.rules.rules { entry(f.name, f.body) }
+  })
+}
+
+/// The sheet for character `c`, followed by its companion's when it has
+/// one. Registers it. `state` sets how play state is printed: "field"
+/// (default), "boxes" or "none".
 #let sheet(c, state: "field", register: true) = {
   if state not in state-options {
     panic("sheet: `state` must be one of " + state-options.map(repr).join(", ") + ", got " + repr(state))
@@ -155,6 +192,8 @@
       body
     }
   })
+  // A separate sheet in print (it "can be tucked beneath" the character's, p. 21).
+  if c.at("companion", default: none) != none { pagebreak(weak: true); companion-sheet(c, d, state) }
 }
 
 /// One line for inline mentions: Level 1 Wizard · Evasion 11 · HP 5.

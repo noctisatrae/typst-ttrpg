@@ -88,6 +88,12 @@
   "untouchable/Untouchable": (modifiers: (evasion: c => calc.ceil(c.traits.agility / 2))), // "bonus to your Evasion equal to half your Agility" p. 209
   "armorer/Armorer": (modifiers: (armor-score: c => if c.armored { 1 } else { 0 })),          // "While you’re wearing armor, gain a +1 bonus to your Armor Score." p. 223
   "fortified-armor/Fortified Armor": (modifiers: (thresholds: c => if c.armored { 2 } else { 0 })), // "While you are wearing armor, gain a +2 bonus to your damage thresholds." p. 208
+  // "When you choose this card, permanently gain two of the following
+  // benefits: One Stress slot; One Hit Point slot; +2 bonus to your damage
+  // thresholds. Then place this card in your vault permanently." p. 208
+  "vitality/Vitality": (permanent-vault: true, choices: (pick: 2, options: (
+    stress: (stress: 1), hp: (hp: 1), thresholds: (thresholds: 2),
+  ))),
   "rise-up/Rise Up": (modifiers: (severe: c => c.proficiency)),  // "Gain a bonus to your Severe threshold equal to your Proficiency." p. 223
   // "When you choose not to equip armor, you have a base Armor Score of 3 +
   // your Strength and use the following as your base damage thresholds:
@@ -105,6 +111,9 @@
   "valor-touched/Valor-Touched": (modifiers: (armor-score: touched("Valor", 1))),           // "+1 bonus to your Armor Score" p. 223
 
   // Subclasses (pp. 9-31).
+  "beastbound/Companion": (grants: (companion: 1)),                   // p. 20 "You have an animal companion"
+  "beastbound/Expert Training": (grants: (companion-training: 1)),    // p. 20 "Choose an additional level-up option for your companion."
+  "beastbound/Advanced Training": (grants: (companion-training: 2)),  // p. 20 "Choose two additional level-up options ..."
   "school-of-knowledge/Prepared": (grants: (domain-cards: 1)),     // p. 31
   "school-of-knowledge/Accomplished": (grants: (domain-cards: 1)), // p. 31
   "school-of-knowledge/Brilliant": (grants: (domain-cards: 1)),    // p. 31
@@ -119,5 +128,5 @@
 )
 
 /// The effects of `kind` entity `id`'s feature `name`, as named arguments
-/// for `feature`, or none.
+/// for `feature` (or `domain-card`), or none.
 #let fx(kind, id, name) = effects.at(id + "/" + name, default: effects.at(kind + ":" + name, default: (:)))

@@ -113,6 +113,9 @@ def build_player(data, rg, kinds, out):
         note('classes', rev)
         out['classes'] = (cls, subs)
         write(os.path.join(SRD, 'player', 'classes.typ'), emit_player.classes(cls, subs))
+        comp, rev = player.companion(pages(data, *rg['classes']))
+        note('companion', rev)
+        write(os.path.join(SRD, 'player', 'companion.typ'), emit_player.companion(comp))
     for kind, label, key in (('ancestry', 'ANCESTRY FEATURE', 'ancestries'), ('community', 'COMMUNITY FEATURE', 'communities')):
         if key not in kinds:
             continue
@@ -359,6 +362,12 @@ EXPORT = r'''
   cards: srd.cards.values().map(clean),
   weapons: srd.weapons.values().map(clean),
   armors: srd.armors.values().map(clean),
+  companion: (
+    name: "Ranger Companion", flags: srd.ranger-companion.flags,
+    rules: feats(srd.ranger-companion.rules),
+    training: feats(srd.ranger-companion.training.values()),
+    examples: srd.ranger-companion.example-experiences,
+  ),
 )) <export>
 '''
 
@@ -420,6 +429,9 @@ def check_player(data, work):
     for e in ex['armors']:
         feat = fparts(e['features'])[0] if e['features'] else '—'
         want('armor', e, f'{e["name"]} {e["thresholds"]["major"]} / {e["thresholds"]["severe"]} {e["score"]} {feat}')
+    e = ex['companion']
+    want('companion', e, ', '.join(e['examples']), *[f['name'] + ' ' + f['body'] for f in e['rules']],
+         *fparts(e['training']))
     return counts, misses
 
 

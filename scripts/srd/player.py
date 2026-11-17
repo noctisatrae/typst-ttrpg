@@ -23,7 +23,7 @@ BURDENS = ('One-Handed', 'Two-Handed')
 DAMAGE = re.compile(r'^(d\d+(?:[+−-]\d+)?) (phy|mag|phy/mag)$')
 CARD_LINE = re.compile(r'^Level (\d+) (\w+) (Ability|Spell|Grimoire)$')
 RECALL = re.compile(r'^Recall Cost: (\d+)$')
-SMALL = {'of', 'the', 'a', 'an', 'and', 'or', 'to', 'in', 'on', 'at', 'for', 'by', 'from', 'with', 'into'}
+SMALL = {'of', 'the', 'a', 'an', 'and', 'or', 'to', 'in', 'on', 'at', 'for', 'by', 'from', 'with', 'into', 'as'}
 
 
 def norm(s):
@@ -386,7 +386,12 @@ def classes(rs, names):
             cls['cq-raw'] += t
     close_class()
 
+    # The Ranger's companion section is read by companion().
+    companion_heads = {'RANGER COMPANION', 'WORKING WITH', 'YOUR COMPANION', 'LEVELING UP YOUR', 'COMPANION'}
+    skipped = {n: [x for x in secs if caps(x[1]) not in companion_heads] for n, secs in skipped.items()}
     for name, secs in skipped.items():
+        if not secs:
+            continue
         pp = sorted({p for p, _ in secs})
         review.append(f'pp.{pp[0]}-{pp[-1]}: {name}: sections not parsed (class extras, not a kind yet): '
                       + ', '.join(t for _, t in secs[:6]) + (f', … ({len(secs)} in all)' if len(secs) > 6 else ''))
@@ -413,6 +418,51 @@ def classes(rs, names):
         if len(per.get(c['name'], [])) != 2:
             review.append(f'{c["name"]}: subclasses found {per.get(c["name"], [])}')
     return out, subs, review
+
+
+def companion(rs):
+    """The Ranger companion (Beastbound, pp. 21-22): the sections under
+    "WORKING WITH YOUR COMPANION" become rules, the bullets under "LEVELING
+    UP YOUR COMPANION" the level-up options, plus the example Experiences.
+    The section ends at the next class heading (ROGUE)."""
+    review = []
+    text, pages = '', []
+    for page, font, t in rs:
+        text += t
+        pages.append((len(text), page))
+    def page_at(i):
+        return next(p for end, p in pages if end > i)
+    def find(heading, after=0):
+        m = re.compile(r'\s+'.join(map(re.escape, heading.split()))).search(text, after)
+        if not m:
+            raise SystemExit(f'companion: heading {heading!r} not found')
+        return m
+    start = find('RANGER COMPANION')
+    end = find('ROGUE', start.end())
+    examples = find('Example Companion Experiences', start.end())
+    step4 = find('STEP 4:', examples.end())
+    rules_at = [find(h, start.end()) for h in ('USING SPELLCAST ROLLS, HOPE, AND EXPERIENCES',
+                                                 'ATTACKING WITH YOUR COMPANION', 'TAKING DAMAGE AS STRESS')]
+    leveling = find('LEVELING UP YOUR COMPANION', rules_at[-1].end())
+    out = {'page': page_at(start.start()), 'rules': [], 'options': []}
+    out['examples'] = [x.strip() for x in norm(text[examples.end():step4.start()]).split(',')]
+    bounds = rules_at + [leveling]
+    for a, b in zip(bounds, bounds[1:]):
+        out['rules'].append({'name': title_case(a.group(0).replace('\n', ' ')), 'page': page_at(a.start()),
+                             'body': body_blocks(text[a.end():b.start()])})
+    blocks = body_blocks(text[leveling.end():end.start()])
+    if not blocks or 'text' not in blocks[0] or len(blocks) != 2:
+        review.append(f'p.{page_at(leveling.start())}: companion: expected an intro and one list of options')
+    for item in (blocks[-1].get('bullets', []) if blocks else []):
+        m = re.match(r'([A-Z][\w ’\']+?): (.+)$', item)
+        if not m:
+            review.append(f'companion: option without a name: {item[:40]!r}')
+            continue
+        out['options'].append({'name': m.group(1), 'page': page_at(leveling.start()),
+                               'body': [{'text': m.group(2)}]})
+    review.append(f'p.{out["page"]}: companion: {len(out["rules"])} rules, {len(out["options"])} level-up options, '
+                  f'{len(out["examples"])} example Experiences')
+    return out, review
 
 
 def cards(rs):

@@ -34,8 +34,8 @@ children, overlay problems, and effect SUGGESTIONS (never applied).
 
 Generated files say GENERATED at the top: fix a parser or the overlay and
 rebuild instead of editing them. Modules: `player.py` (classes, subclasses,
-ancestries, communities, domain cards, weapons incl. combat wheelchairs,
-armor), `emit_player.py`, `structure.py` (numbered options and roll-table
+the Ranger companion, ancestries, communities, domain cards, weapons incl.
+combat wheelchairs, armor), `emit_player.py`, `structure.py` (numbered options and roll-table
 rows become lists; a feature ending in ":" takes the following features as
 children), `foundryborne.py`, plus the tools below.
 

@@ -16,7 +16,9 @@
 #import "player.typ" as player
 #import "player.typ": weapon, armor, ancestry, community, class, subclass, domain-card, mixed-ancestry, trait, weapon-category, burden, card-type
 #import "sheet.typ": sheet, character-summary
-#import "character.typ": character, derive, level, increase-traits, add-hit-point, add-stress, increase-experiences, extra-card, increase-evasion, upgrade-subclass, increase-proficiency, multiclass
+#import "companion.typ": companion, companion-rules, derive-companion
+#import "training.typ" as train
+#import "character.typ": character, derive, cards-due, training-due, level, increase-traits, add-hit-point, add-stress, increase-experiences, extra-card, increase-evasion, upgrade-subclass, increase-proficiency, multiclass
 
 /// `extend` that knows every heartweaver kind, so homebrew variants of
 /// environments and loot are re-validated too.

@@ -175,3 +175,22 @@ def armor(records):
         out.append(f'  flags: source({r["page"]}),')
         out.append(')\n')
     return '\n'.join(out) + entries(names)
+
+
+def companion(r):
+    """The Ranger companion rules as one `companion-rules` record; options
+    are keyed by the slug of their name (`training.light-in-the-dark`)."""
+    out = [HEADER.format(title='Ranger companion (Beastbound)', imports='companion-rules, feature')]
+    out.append('#let ranger-companion = companion-rules(')
+    out.append('  rules: (')
+    for f in r['rules']:
+        out.append(f'    feature({lit(f["name"])}, {body(f["body"], 4)}),')
+    out.append('  ),')
+    out.append('  training: (')
+    for f in r['options']:
+        out.append(f'    {slug(f["name"])}: feature({lit(f["name"])}, {body(f["body"], 4)}),')
+    out.append('  ),')
+    out.append('  example-experiences: (' + ', '.join(lit(x) for x in r['examples']) + ',),')
+    out.append(f'  flags: source({r["page"]}),')
+    out.append(')')
+    return '\n'.join(out) + '\n'

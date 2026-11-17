@@ -15,6 +15,7 @@
 #import "@local/ttrpg-core:0.1.0" as core
 #import core: field
 #import "player.typ": trait
+#import "companion.typ": check-companion, trainings
 
 /// Traits as keys (`agility`) and as printed (`Agility`).
 #let trait-keys = trait.keys()
@@ -32,8 +33,14 @@
 #let add-stress() = (advancement: "stress", slots: 1)
 /// +1 to two Experiences, by name.
 #let increase-experiences(a, b) = (advancement: "experiences", experiences: (a, b), slots: 1)
+/// A card with choices ("Vitality", p. 208) is written as a pair:
+/// `(cards.vitality, ("hp", "stress"))`; the choices are kept on the card.
+#let with-choices(k) = if type(k) == array and k.len() == 2 and type(k.at(0)) == dictionary and type(k.at(1)) == array {
+  k.at(0) + (chosen: k.at(1))
+} else { k }
+
 /// An additional domain card.
-#let extra-card(card) = (advancement: "card", card: card, slots: 1)
+#let extra-card(card) = (advancement: "card", card: with-choices(card), slots: 1)
 /// +1 Evasion.
 #let increase-evasion() = (advancement: "evasion", slots: 1)
 /// The next subclass card: specialization, then mastery.
@@ -48,8 +55,13 @@
 /// One level-up (p. 53): a new Experience at levels 2, 5 and 8 (tier
 /// achievements), two advancements, and the new domain card (step four).
 /// `level(2, experience: "Survivalist", card: cards.x, advancements: (...))`
-#let level(n, experience: none, card: none, advancements: ()) = (
-  level: n, experience: experience, card: card, advancements: advancements,
+/// When a feature grants cards at this level ("Accomplished"), `card:`
+/// takes a list. With a companion: its training marks (`companion:`, see
+/// `train`) and, at levels 2, 5 and 8, its new Experience.
+#let level(n, experience: none, card: none, advancements: (), companion: (), companion-experience: none) = (
+  level: n, experience: experience,
+  cards: if card == none { () } else if type(card) == dictionary or with-choices(card) != card { (with-choices(card),) } else { card.map(with-choices) },
+  advancements: advancements, companion: companion, companion-experience: companion-experience,
 )
 
 #let character-schema = (
@@ -63,6 +75,7 @@
   weapons: field(array, default: (), items: dictionary),
   armor: field(dictionary),
   cards: field(array, required: true, items: dictionary),
+  companion: field(dictionary),
   vault: field(array, default: (), items: dictionary),
   inventory: field(array, default: ()),
   story: field(dictionary, default: (:)),
@@ -90,7 +103,16 @@
   for f in c.community.features { out.push((c.community.name, f)) }
   for w in c.weapons { for f in w.features { out.push((w.name, f)) } }
   if c.at("armor", default: none) != none { for f in c.armor.features { out.push((c.armor.name, f)) } }
-  for card in c.loadout {
+  // Cards whose choices are permanent ("Vitality") count from the vault too.
+  for card in c.loadout + c.vault.filter(k => k.at("permanent-vault", default: false)) {
+    if "choices" in card {
+      let mods = (:)
+      for o in card.at("chosen", default: ()) {
+        for (key, v) in card.choices.options.at(o, default: (:)) { mods.insert(key, mods.at(key, default: 0) + v) }
+      }
+      out.push((card.name, (name: card.name, body: card.at("text", default: []), modifiers: mods)))
+      continue
+    }
     for f in card.features { out.push((card.name, f)) }
     // A card with plain text may carry its effects on the card itself.
     if "modifiers" in card or "grants" in card {
@@ -111,10 +133,11 @@
   let count(name) = ups.filter(a => a.advancement == name).len()
   let subclass-cards = 1 + count("subclass")
 
-  let acquired = c.cards + c.levels.map(l => l.card).filter(x => x != none) + ups.filter(a => a.advancement == "card").map(a => a.card)
-  let vault-ids = c.vault.map(v => v.id)
+  let acquired = c.cards + c.levels.map(l => l.cards).flatten() + ups.filter(a => a.advancement == "card").map(a => a.card)
+  let vault-ids = c.vault.map(v => v.id) + acquired.filter(k => k.at("permanent-vault", default: false)).map(k => k.id)
   let loadout = acquired.filter(k => k.id not in vault-ids)
-  let features = active-features(c + (loadout: loadout), subclass-cards)
+  let vault = acquired.filter(k => k.id in vault-ids)
+  let features = active-features(c + (loadout: loadout, vault: vault), subclass-cards)
   // Modifiers for `key` from every active feature, except those of the
   // sources named in `except` (a weapon's attack bonus is its own).
   let mods(key, except: ()) = features.filter(((src, f)) => key in f.at("modifiers", default: (:)) and src not in except).map(((src, f)) => (src + ": " + f.name, f.modifiers.at(key)))
@@ -219,18 +242,41 @@
     evasion: evasion,
     hp: hp,
     stress: stress,
-    hope: (start: 2, max: 6),
+    // Hope max 6 (p. 5); a companion's "Light in the Dark" adds a slot.
+    hope: (start: 2, max: 6 + trainings(c).filter(t => t.training == "light-in-the-dark").len()),
     thresholds: (major: major, severe: severe),
     armor-score: armor-score,
     experiences: experiences,
     attacks: attacks,
     loadout: loadout,
-    vault: acquired.filter(k => k.id in vault-ids),
+    vault: vault,
     features: features,
     subclass-cards: subclass-cards,
-    grants: features.map(((_, f)) => f.at("grants", default: (:)).at("domain-cards", default: 0)).sum(default: 0),
+    grants: ("domain-cards", "companion", "companion-training").map(k => (k, features.map(((_, f)) => f.at("grants", default: (:)).at(k, default: 0)).sum(default: 0))).to-dict(),
   )
 }
+
+// ---------------------------------------------------------------------
+// What is due by a level, from the history up to it.
+
+/// Domain cards a character must have taken by level `n` (pp. 6, 54): two
+/// at creation, one per level-up, one per "extra card" advancement, plus
+/// what features grant by then ("Prepared", "Accomplished"). Returns
+/// `(total:, why:)`.
+#let cards-due(c, n) = {
+  let ls = c.levels.slice(0, n - 1)
+  let d = derive(c + (levels: ls))
+  let extra = ls.map(l => l.advancements.filter(a => a.advancement == "card")).flatten().len()
+  let granted = d.features.filter(((_, f)) => f.at("grants", default: (:)).at("domain-cards", default: 0) > 0).map(((_, f)) => f.name)
+  (
+    total: 2 + (n - 1) + extra + d.grants.domain-cards,
+    why: ("2 at creation",) + if n > 1 { ("1 per level-up",) } + if extra > 0 { (str(extra) + " extra card",) } + granted.map(g => "+ " + g),
+  )
+}
+
+/// Companion training marks due by level `n` (p. 22): one per level-up,
+/// plus "Expert Training" (+1) and "Advanced Training" (+2) once taken.
+#let training-due(c, n) = (n - 1) + derive(c + (levels: c.levels.slice(0, n - 1))).grants.companion-training
 
 // ---------------------------------------------------------------------
 // Rules. Each returns error messages; `character` reports them all at once.
@@ -269,7 +315,6 @@
     if l.level != n { errors.push("`levels` must go 2, 3, 4, ... in order; entry " + str(i + 1) + " is level " + str(l.level)); continue }
     if n in (2, 5, 8) and l.experience == none { errors.push(at + ": tier achievement, needs a new `experience:` (p. 53)") }
     if n not in (2, 5, 8) and l.experience != none { errors.push(at + ": new Experiences come only at levels 2, 5 and 8 (p. 53)") }
-    if l.card == none { errors.push(at + ": needs the new domain card, `card:` (p. 54, step four)") }
     let slots = l.advancements.map(a => a.slots).sum(default: 0)
     if slots != 2 { errors.push(at + ": choose advancements worth exactly 2 slots (Proficiency and multiclass take both), got " + str(slots) + " (p. 54)") }
     for a in l.advancements.filter(a => a.advancement == "multiclass") {
@@ -319,13 +364,47 @@
     if k.domain not in c.class.domains { errors.push("`cards`: " + k.name + " is a " + k.domain + " card; " + c.class.name + " has " + c.class.domains.join(" and ") + " (p. 6)") }
     if k.level > d.level { errors.push("`cards`: " + k.name + " is level " + str(k.level) + ", above the character's level " + str(d.level)) }
   }
-  // Grants in effect at creation (e.g. a foundation card's "Prepared").
-  // Grants gained later (specialization, mastery) are not checked yet.
-  let start = derive(c + (levels: ()))
-  let expected-start = 2 + start.grants
-  if c.cards.len() != expected-start {
-    let why = if start.grants > 0 { " (2, plus " + str(start.grants) + " from " + start.features.filter(((_, f)) => "grants" in f).map(((s, f)) => f.name).join(", ") + ")" } else { " (p. 6)" }
-    errors.push("`cards`: a new character takes " + str(expected-start) + " level-1 domain cards" + why + ", got " + str(c.cards.len()))
+  // Cards and companion training due at each level (`cards-due`,
+  // `training-due`), so grants gained later ("Accomplished", "Expert
+  // Training") are checked where they are gained.
+  let has-companion = d.grants.companion > 0
+  if has-companion and c.at("companion", default: none) == none {
+    errors.push("`companion`: " + d.features.filter(((_, f)) => "companion" in f.at("grants", default: (:))).map(((_, f)) => f.name).join(", ") + " gives this character an animal companion; add `companion: companion(...)` (p. 21)")
+  }
+  if not has-companion and c.at("companion", default: none) != none {
+    errors.push("`companion`: only a character with a companion feature (Beastbound, p. 20) has one")
+  }
+  for n in range(1, d.level + 1) {
+    let at = if n == 1 { "creation" } else { "level " + str(n) }
+    let ls = c.levels.slice(0, n - 1)
+    let taken = c.cards.len() + ls.map(l => l.cards.len() + l.advancements.filter(a => a.advancement == "card").len()).sum(default: 0)
+    let due = cards-due(c, n)
+    if taken != due.total {
+      errors.push(at + ": " + str(due.total) + " domain cards due by now (" + due.why.join(", ") + "), got " + str(taken)
+        + if n == 1 { "; write them in `cards:`" } else { "; give level " + str(n) + " `card:` (a list when it gets more than one)" })
+    }
+    if has-companion and n > 1 {
+      let marked = ls.map(l => l.companion.len()).sum(default: 0)
+      let due = training-due(c, n)
+      if marked != due { errors.push(at + ": " + str(due) + " companion training marks due by now (one per level-up, plus Expert/Advanced Training), got " + str(marked) + "; use `companion:` in `level(...)`") }
+      let l = ls.last()
+      if n in (2, 5, 8) and l.companion-experience == none { errors.push(at + ": your companion gains an Experience with yours; add `companion-experience:` (p. 21)") }
+      if n not in (2, 5, 8) and l.companion-experience != none { errors.push(at + ": a companion's new Experiences come with yours, at levels 2, 5 and 8 (p. 21)") }
+    }
+    if not has-companion and n > 1 {
+      let l = ls.last()
+      if l.companion.len() > 0 or l.companion-experience != none { errors.push(at + ": `companion:` and `companion-experience:` need a companion") }
+    }
+  }
+  if has-companion and c.at("companion", default: none) != none { errors += check-companion(c) }
+  // Cards with choices ("Vitality", p. 208): exactly `pick` different options.
+  for k in acquired.filter(k => "choices" in k) {
+    let opts = k.choices.options.keys()
+    let chosen = k.at("chosen", default: ())
+    let bad = chosen.filter(o => o not in opts)
+    if chosen.len() != k.choices.pick or bad.len() > 0 or chosen.dedup().len() != chosen.len() {
+      errors.push("`cards`: " + k.name + " needs " + str(k.choices.pick) + " different choices, written `(cards." + k.id + ", (" + opts.slice(0, k.choices.pick).map(repr).join(", ") + "))`; options: " + opts.map(repr).join(", ") + if bad.len() > 0 { "; unknown: " + bad.map(repr).join(", ") })
+    }
   }
   let ids = acquired.map(k => k.id)
   if ids.dedup().len() != ids.len() { errors.push("`cards`: the same card is taken twice") }
@@ -350,13 +429,15 @@
   class: none, subclass: none, ancestry: none, community: none,
   traits: none, experiences: none, weapons: none, armor: none,
   cards: none, vault: none, inventory: none, story: none, levels: none,
+  companion: none,
   ..unknown,
 ) = {
   let c = core.entity("character", character-schema,
     id: id, name: name, tags: tags, flags: flags, pronouns: pronouns,
     class: class, subclass: subclass, ancestry: ancestry, community: community,
     traits: traits, experiences: experiences, weapons: weapons, armor: armor,
-    cards: cards, vault: vault, inventory: inventory, story: story, levels: levels,
+    cards: if type(cards) == array { cards.map(with-choices) } else { cards },
+    vault: vault, inventory: inventory, story: story, levels: levels, companion: companion,
     ..unknown)
   core.report("character " + repr(c.id), check-rules(c))
   c

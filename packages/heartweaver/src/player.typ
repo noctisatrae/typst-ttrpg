@@ -63,12 +63,22 @@
 /// What a feature may grant.
 #let grant-schema = (
   domain-cards: field(int),
+  // An animal companion ("Companion", Beastbound p. 20) and extra companion
+  // training marks ("Expert Training", "Advanced Training").
+  companion: field(int),
+  companion-training: field(int),
 )
 
 /// Features of player-facing kinds: name and text, plus optional effects.
 #let player-feature-schema = core.feature-schema + (
   modifiers: field(dictionary, keys: modifier-schema),
   grants: field(dictionary, keys: grant-schema),
+  // A choice made when taking the card ("Vitality", p. 208): pick `pick`
+  // different keys of `options`, each a modifiers dictionary.
+  choices: field(dictionary, keys: (pick: field(int, required: true), options: field(dictionary, required: true))),
+  // "Then place this card in your vault permanently": never in the
+  // loadout, its chosen effects stay.
+  permanent-vault: field(bool),
 )
 
 #let features-field(..args) = field(array, default: (), items: player-feature-schema, unique: "name", ..args)
@@ -136,6 +146,12 @@
   // Effects of a card whose text is not split into named features.
   modifiers: field(dictionary, keys: modifier-schema),
   grants: field(dictionary, keys: grant-schema),
+  // A choice made when taking the card ("Vitality", p. 208): pick `pick`
+  // different keys of `options`, each a modifiers dictionary.
+  choices: field(dictionary, keys: (pick: field(int, required: true), options: field(dictionary, required: true))),
+  // "Then place this card in your vault permanently": never in the
+  // loadout, its chosen effects stay.
+  permanent-vault: field(bool),
 )
 
 #let weapon(id: none, name: none, tags: none, flags: none, tier: none, category: none, trait: none, range: none, damage: none, damage-type: none, burden: none, features: none, ..unknown) = core.entity("weapon", weapon-schema, id: id, name: name, tags: tags, flags: flags, tier: tier, category: category, trait: trait, range: range, damage: damage, damage-type: damage-type, burden: burden, features: features, ..unknown)
@@ -150,7 +166,7 @@
 
 #let subclass(id: none, name: none, tags: none, flags: none, description: none, class: none, spellcast-trait: none, foundation: none, specialization: none, mastery: none, ..unknown) = core.entity("subclass", subclass-schema, id: id, name: name, tags: tags, flags: flags, description: description, class: class, spellcast-trait: spellcast-trait, foundation: foundation, specialization: specialization, mastery: mastery, ..unknown)
 
-#let domain-card(id: none, name: none, tags: none, flags: none, domain: none, level: none, type: none, recall-cost: none, text: none, features: none, modifiers: none, grants: none, ..unknown) = core.entity("domain-card", domain-card-schema, id: id, name: name, tags: tags, flags: flags, domain: domain, level: level, type: type, recall-cost: recall-cost, text: text, features: features, modifiers: modifiers, grants: grants, ..unknown)
+#let domain-card(id: none, name: none, tags: none, flags: none, domain: none, level: none, type: none, recall-cost: none, text: none, features: none, modifiers: none, grants: none, choices: none, permanent-vault: none, ..unknown) = core.entity("domain-card", domain-card-schema, id: id, name: name, tags: tags, flags: flags, domain: domain, level: level, type: type, recall-cost: recall-cost, text: text, features: features, modifiers: modifiers, grants: grants, choices: choices, permanent-vault: permanent-vault, ..unknown)
 
 /// A mixed ancestry (p. 4): the first feature of `top` and the second of
 /// `bottom`. `mixed-ancestry(ancestries.elf, ancestries.fungril)`.

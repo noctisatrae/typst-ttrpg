@@ -1,8 +1,9 @@
 // Inskel, a level 1 human ranger in a combat wheelchair: a real player
 // character used to test the character API. Rules and text come from the
-// SRD 2.0. The Beastbound companion (pp. 20-22) is not modelled yet.
+// SRD 2.0. The companion (Beastbound, pp. 20-22) was never designed at the
+// table; Brindille is a made-up example to test the companion API.
 #import "@local/heartweaver:0.1.0": character
-#import "@local/daggerheart-srd:0.1.0": classes, subclasses, ancestries, communities, cards, weapons, armors
+#import "@local/daggerheart-srd:0.1.0": companion, classes, subclasses, ancestries, communities, cards, weapons, armors
 
 #let inskel = character(
   id: "inskel",
@@ -16,6 +17,14 @@
   weapons: (weapons.light-frame-wheelchair, weapons.hand-crossbow),
   armor: armors.gambeson-armor,
   cards: (cards.vicious-entangle, cards.gifted-tracker),
+  companion: companion(
+    id: "brindille",
+    name: "Brindille",
+    animal: "Red fox",
+    experiences: ("Scout", "Bold Distraction"),
+    attack: "Bite",
+    damage-type: "phy",
+  ),
   inventory: ("Broken Compass", "Minor Health Potion", "Torch", "50 feet of rope", "Basic supplies"),
   story: (
     background: include "background.typ",

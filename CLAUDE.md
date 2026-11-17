@@ -167,10 +167,13 @@ thresholds, max HP are computed at runtime and exported as 0/null).
 - Foundryborne v2.12.9 packs follow SRD 2.0; 12 modeling disagreements
   (Shadowblade phy/mag, Arcane-Frame Wheelchair Spellcast/mag): SRD wins.
 - Not yet kinds: transformations (pp. 42-45; proposed schema in the merge
-  report), Druid Beastforms, Brawler Martial Stances, Ranger companion,
-  campaign-frame equipment (p.190+). Grants after creation not checked at
-  level-up. Vitality (choose two benefits, card goes to the vault) not
-  modeled.
+  report), Druid Beastforms, Brawler Martial Stances,
+  campaign-frame equipment (p.190+).
+- Ranger companion text (pp. 21-22) is generated into
+  `player/companion.typ` (`ranger-companion`, cross-checked); its numbers
+  live in heartweaver `companion.typ`. Starting Stress 3 and the per-option
+  limits are NOT in the SRD text (printed companion sheet, as in
+  Foundryborne); flagged there.
 - Every flagged PDF spot was checked against the rendered page
   (2026-11-17): "cliffside", "2-foot-deep", "Secret-Keeper", the p. 22
   arrow, the p. 99 en dash, "Corrupter", the Bard "." names are all as
@@ -311,22 +314,14 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   hence `attack-range`, `adversary-type`.
 
 ## Next up (as of 2026-11-17)
-1. Ranger (Beastbound) companion: SRD pp. 20-22 read. The SRD does NOT
-   state the starting Stress slots or how often each level-up option can
-   be taken (both are on the printed companion sheet). Foundryborne:
-   Stress 3; Intelligent, Vicious, Resilient, Aware x3; Light in the Dark,
-   Creature Comfort, Armored, Bonded x1; a new Experience at levels 2, 5,
-   8 (follows the character). Inskel's Foundry export has no companion.
-   Waiting on the owner's answers (see Pending).
-2. New kinds: transformations (pp. 42-45), Druid Beastforms (pp. 15-18),
+1. New kinds: transformations (pp. 42-45), Druid Beastforms (pp. 15-18),
    Brawler Martial Stances (p. 13).
-3. Rules gaps: grants gained after creation (Accomplished, Brilliant) at
-   level-up; Vitality (a choice on a card).
+2. Multiclass derivation.
 
 ## Pending with the owner
-- Companion: Inskel's companion (animal, name, two Experiences,
-  physical or magic damage) and the numbers the SRD leaves to the printed
-  sheet (starting Stress, option limits).
+- Inskel's companion Brindille (red fox) is a made-up example; the owner
+  may redesign it. Confirm against a printed companion sheet: starting
+  Stress 3 and the option limits.
 - Owner uses Zed (Typst extension = Tinymist). Check field completion there.
 
 ## Tooling setup (recreate per session)
@@ -394,8 +389,20 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   advancements (Brawler "Increase Dice Size", Combo Die), so advancements
   must stay extensible per class; per-tier advancement slot counts come
   from the printed sheet, not the SRD text, so they are not validated.
-- Not yet: grants gained after creation (specialization/mastery extra
-  cards), multiclass derivation, companions (Beastbound), wheelchair.
+- Due per level (checked level by level): `cards-due(c, n)` (2 + 1 per
+  level-up + extra cards + grants in effect by then, e.g. Accomplished;
+  `level(n, card:)` takes a list when more are due) and `training-due(c,
+  n)` for a companion.
+- Card choices are a pair in the cards list: `(cards.vitality, ("hp",
+  "stress"))`; `choices:`/`permanent-vault:` come from effects.typ.
+- Companions (decided 2026-11-17): `character(..., companion:
+  companion(...))` (daggerheart-srd's `companion` binds the SRD text);
+  choices only (name, animal, 2 Experiences, attack name, damage type).
+  Training is written in the character's level history:
+  `level(n, companion: (train.aware(),), companion-experience: "...")`.
+  `sheet` adds the companion sheet on its own page. Light in the Dark
+  raises the character's Hope max.
+- Not yet: multiclass derivation, wheelchair.
 - First character: a real player character from the owner's Foundry export
   (fixtures/, kept out of git unless the owner says otherwise); its current
   Foundry values serve as a check for our derivation.

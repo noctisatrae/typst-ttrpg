@@ -58,6 +58,11 @@
 #import "player/weapons.typ" as player-weapons
 #import "player/armor.typ" as player-armor
 
+#import "player/companion.typ": ranger-companion
+#import "@local/heartweaver:0.1.0" as hw
+/// A Beastbound Ranger's companion, with the SRD's rules text bound.
+#let companion = hw.companion.with(rules: ranger-companion)
+
 #let by-kind(module, kind) = module.entries.filter(e => e.kind == kind).map(e => (e.id, e)).to-dict()
 #let classes = by-kind(player-classes, "class")
 #let subclasses = by-kind(player-classes, "subclass")
