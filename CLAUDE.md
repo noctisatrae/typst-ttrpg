@@ -174,9 +174,13 @@ thresholds, max HP are computed at runtime and exported as 0/null).
   packages are not listed; private use is not "Sharing". Check before
   publishing the SRD data package.
 - Content comes ONLY from the official SRD, transcribed by us.
-- Foundryborne is used ONLY as a reference for Foundry document shape (field
-  names, structure). Do NOT copy its compendium content (src/packs) or other
-  non-code material into this repo.
+- Foundryborne (decided 2026-11-17, owner: "whatever is most faithful to
+  the original ruleset"): the SRD PDF is the ONLY source of text and values.
+  Foundryborne's packs may be READ as an independent cross-check (any
+  disagreement goes to human review; the SRD text decides) and as hints for
+  `effects.typ` (added only when the SRD wording states a permanent,
+  unconditional effect). Never copy its text or data files into this repo.
+  Its MIT code may be read to compare derivation logic.
 - Foundryborne's README rejects AI-generated contributions: never open PRs or
   issues against it using generated code.
 
