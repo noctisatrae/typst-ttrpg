@@ -23,6 +23,7 @@
 // Events whose Difficulty depends on the adversaries keep the SRD's words.
 #assert.eq(t1.ambushed.difficulty, "Special (see “Relative Strength”)")
 #assert.eq(hw.environment-summary(grove), "Tier 1 Exploration · Difficulty 11")
+#assert.eq(hw.environment-summary(t1.ambushed), "Tier 1 Event")
 
 // Homebrew variant: replace a scalar, drop a feature.
 #let overgrown = hw.extend(grove, id: "overgrown-grove", name: "Overgrown Grove",

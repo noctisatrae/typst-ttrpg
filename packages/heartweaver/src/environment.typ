@@ -72,8 +72,13 @@
   difficulty: difficulty, potential-adversaries: potential-adversaries,
   ..unknown)
 
-/// One line for inline mentions: Tier 1 Exploration · Difficulty 11.
-#let environment-summary(e) = "Tier " + str(e.tier) + " " + e.type + " · Difficulty " + str(e.difficulty)
+/// One line for inline mentions: "Tier 1 Exploration · Difficulty 11".
+/// A text Difficulty ("Special (see ...)") is too long to quote inline, so
+/// those show only "Tier 1 Event"; the stat block has the full text.
+#let environment-summary(e) = {
+  let kind = "Tier " + str(e.tier) + " " + e.type
+  if type(e.difficulty) == int { kind + " · Difficulty " + str(e.difficulty) } else { kind }
+}
 
 /// A feature's body followed by its questions, in italics on their own
 /// lines, indented with the body so they don't read as the next feature.
