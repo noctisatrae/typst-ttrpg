@@ -73,15 +73,15 @@
   ..unknown)
 
 /// One line for inline mentions: Tier 1 Exploration · Difficulty 11.
-#let environment-summary(e) = [Tier #e.tier #e.type · Difficulty #e.difficulty]
+#let environment-summary(e) = "Tier " + str(e.tier) + " " + e.type + " · Difficulty " + str(e.difficulty)
 
-/// A feature's body followed by its questions in italics, as printed.
+/// A feature's body followed by its questions, in italics on their own
+/// lines, indented with the body so they don't read as the next feature.
 #let feature-text(f) = {
   f.body
   let q = f.at("questions", default: none)
   if q != none and q != "" {
-    linebreak()
-    emph(q)
+    block(above: 0.45em, pad(left: 0.9em, emph(q)))
   }
 }
 
