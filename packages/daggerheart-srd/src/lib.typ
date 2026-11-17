@@ -15,10 +15,17 @@
 )
 
 #import "adversaries/tier-1.typ" as tier-1
+#import "adversaries/tier-2.typ" as tier-2
+#import "adversaries/tier-3.typ" as tier-3
+#import "adversaries/tier-4.typ" as tier-4
 
-/// Adversaries by tier, each a dictionary of id -> adversary.
+/// Adversaries by tier, each a dictionary of id -> adversary, in the order
+/// of the SRD's tier lists (pp. 95-96).
 #let adversaries = (
   tier-1: tier-1.entries.map(a => (a.id, a)).to-dict(),
+  tier-2: tier-2.entries.map(a => (a.id, a)).to-dict(),
+  tier-3: tier-3.entries.map(a => (a.id, a)).to-dict(),
+  tier-4: tier-4.entries.map(a => (a.id, a)).to-dict(),
 )
 
 #let package-info = (name: "daggerheart-srd", version: version(0, 1, 0), srd: srd)
