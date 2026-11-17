@@ -287,6 +287,10 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
 - Owner uses Zed (Typst extension = Tinymist). Check field completion there.
 
 ## Design notes
+- LAYOUT RULE (owner, 2026-11-17): boxes hug their text (small inner
+  padding); the space goes BETWEEN elements (generous outer margins). Inline
+  boxes wrap content with inset, never fixed sizes, so text stays on its
+  line. One spacing constant per layout (e.g. `gap` in sheet.typ).
 - Stat block style is decoupled from document style: renderers draw with
   the active core theme. Core's default theme is neutral; heartweaver's
   `book-theme` is the optional book-inspired look

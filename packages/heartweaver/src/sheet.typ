@@ -33,14 +33,16 @@
 #let state-options = ("field", "boxes", "none")
 
 /// Starting value in a faint box, then "/ total". The box hugs the number
-/// (padding, not a fixed size), so the number stays on the text line.
+/// (padding, not a fixed size), so the number stays on the text line. The
+/// slash is raised slightly: mono fonts draw it dipping below the line,
+/// which made "/ 5" look low next to the box.
 #let field(start, total) = [#box(
   inset: (x: 0.55em, y: 0.15em),
   outset: (y: 0.1em),
   stroke: 0.6pt + luma(120),
   radius: 2pt,
   text(fill: luma(185), str(start)),
-)~/~#total]
+)~#text(baseline: -0.08em)[/]~#total]
 
 // The sheet's boxes hug their text; the space goes BETWEEN elements.
 #let gap = 1.3em
