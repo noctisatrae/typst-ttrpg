@@ -290,10 +290,33 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   left, odd right), page number on an ochre tab, running title = latest
   level-1 heading.
 
+## Characters (decided 2026-11-17)
+- Players write Typst (with AI help; homebrew from a git compendium);
+  a web GUI is not planned unless players struggle.
+- A character stores CHOICES and LEVEL HISTORY, never derived numbers:
+  `character(..., levels: (level(2, ...), ...))`. The sheet is a fold over
+  the history (base |> level 2 |> level 3 ...), carrying provenance
+  ("+1 Evasion, level 4"). Every SRD level-up rule is validated (two
+  advancements per level, tier limits, marked traits, Proficiency and
+  multiclass cost two slots, multiclass from level 5, card levels).
+- Book engine, not game engine: derive only what is known at compile time
+  (Evasion, HP/Stress/Hope slots, Proficiency, thresholds, Armor Score,
+  damage rolls). Play state (marked HP/Stress/Hope, gold) prints as empty
+  boxes; it is never stored.
+- Feature effects: transcribed entries may carry structured PERMANENT,
+  UNCONDITIONAL numeric modifiers next to their text (e.g. armor
+  "Flexible: +1 to Evasion" -> `(evasion: 1)`); situational effects stay
+  text only.
+- Sheets: the black-and-white screenplay-style sheet first (owner's
+  everyday print version); a book-inspired sheet later (inspired by, not
+  copying, Darrington Press's sheet design).
+- Multiclassing: allowed by the data format from the start, implemented
+  once a second class's data exists.
+- First character: a real player character from the owner's Foundry export
+  (fixtures/, kept out of git unless the owner says otherwise); its current
+  Foundry values serve as a check for our derivation.
+
 ## Open questions
-- Character creation without Foundry: players write Typst themselves (with
-  AI help, homebrew from a git compendium) vs a web GUI that generates the
-  Typst call. See the discussion of 2026-11-17.
 - Foundry (parked): target version, Foundryborne data-model fields, which
   SRD version it implements, creation path (macro vs compendium packing).
 
