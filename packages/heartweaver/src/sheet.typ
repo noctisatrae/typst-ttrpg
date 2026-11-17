@@ -12,8 +12,19 @@
 #import "player.typ": trait
 #import "character.typ": derive
 
-#let boxes(n, shape: "square") = {
-  let one = if shape == "circle" { circle(radius: 0.38em, stroke: 0.6pt) } else { box(width: 0.8em, height: 0.8em, stroke: 0.6pt) }
+/// How play state (HP, Stress, Hope, Armor slots) is printed:
+/// - "faint": very light boxes, easy to write over or to ignore when
+///   playing online.
+/// - "boxes": dark boxes for pencil-and-paper play.
+/// - "none": no boxes, just the number of slots.
+#let state-styles = (
+  faint: 0.5pt + luma(205),
+  boxes: 0.7pt + luma(40),
+)
+
+#let boxes(n, shape: "square", state: "faint") = {
+  let stroke = state-styles.at(state)
+  let one = if shape == "circle" { circle(radius: 0.38em, stroke: stroke) } else { box(width: 0.8em, height: 0.8em, stroke: stroke) }
   box(stack(dir: ltr, spacing: 0.25em, ..range(n).map(_ => one)))
 }
 
@@ -30,14 +41,19 @@
 #let section(title) = block(above: 2em, below: 0.9em, core.section(title))
 #let entry(..args) = block(above: 1em, below: 1em, core.entry(..args))
 
-#let track(label, n, shape: "square", note: none) = block(above: 0.8em, below: 0pt, grid(
+#let track(label, n, shape: "square", note: none, state: "faint") = block(above: 0.8em, below: 0pt, grid(
   columns: (6.5em, 1fr),
   align: horizon,
-  strong(label), [#boxes(n, shape: shape)#if note != none { h(0.6em); text(size: 0.8em, emph(note)) }],
+  strong(label),
+  [#if state == "none" [#n slots] else { boxes(n, shape: shape, state: state) }#if note != none { h(0.6em); text(size: 0.8em, emph(note)) }],
 ))
 
-/// The sheet for character `c`. Registers it.
-#let sheet(c, register: true) = {
+/// The sheet for character `c`. Registers it. `state` sets how play state
+/// is printed: "faint" (default), "boxes" or "none".
+#let sheet(c, state: "faint", register: true) = {
+  if state not in ("faint", "boxes", "none") {
+    panic("sheet: `state` must be \"faint\", \"boxes\" or \"none\", got " + repr(state))
+  }
   if register { core.register(c) }
   let d = derive(c)
   let entries(source, fs, tag: none) = fs.map(f => entry(f.name, tag: tag, f.body))
@@ -65,10 +81,10 @@
     ))
 
     v(0.8em)
-    track("HP", d.hp.value)
-    track("Stress", d.stress.value)
-    track("Hope", d.hope.max, shape: "circle", note: [start with #d.hope.start])
-    track("Armor", d.armor-score.value)
+    track("HP", d.hp.value, state: state)
+    track("Stress", d.stress.value, state: state)
+    track("Hope", d.hope.max, shape: "circle", note: [start with #d.hope.start], state: state)
+    track("Armor", d.armor-score.value, state: state)
 
     section("Experiences")
     d.experiences.map(e => [#e.name #signed(e.bonus.value)]).join[ · ]
