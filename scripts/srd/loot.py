@@ -27,14 +27,21 @@ STOP = ('CONSUMABLES', 'GOLD')  # section headings that end a table
 
 
 def norm(s):
+    # A line that ends in a hyphen continues a compound ("2-foot-" / "deep").
+    s = re.sub(r'-[ \t]*\n\s*', '-', s)
     return re.sub(r'\s+', ' ', s).strip()
 
 
 def parse(pdf, first, last):
     rows, table, row, expect_name = [], None, None, False
-    seq = [r for r in runs(pdf, first, last) if r[2].strip()]
+    seq = runs(pdf, first, last)
     for i, (page, font, text) in enumerate(seq):
         t = text.strip()
+        if not t:
+            # Whitespace runs carry line breaks: keep them as text.
+            if row is not None and not expect_name:
+                row['paragraphs'][-1] += text
+            continue
         if font == 'QuestaSans-Bold' and t in TABLES:
             table, row = TABLES[t], None
             continue
@@ -44,7 +51,7 @@ def parse(pdf, first, last):
             continue  # ROLL / LOOT / description column headers
         if table is None:
             continue
-        nxt = seq[i + 1] if i + 1 < len(seq) else None
+        nxt = next((r for r in seq[i + 1:] if r[2].strip()), None)
         if (font == 'QuestaSans-Regular' and re.fullmatch(r'\d{1,2}', t)
                 and nxt and nxt[1] == 'QuestaSans-Bold'):
             row = {'roll': int(t), 'roll-text': t, 'name': '', 'paragraphs': [''],

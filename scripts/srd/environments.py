@@ -25,7 +25,13 @@ FEATURE = re.compile(r'^(.*) - (Passive|Action|Reaction):$')
 
 
 def norm(s):
+    # A line that ends in a hyphen continues a compound ("sucker-" / "bearing").
+    s = re.sub(r'-[ \t]*\n\s*', '-', s)
     return re.sub(r'\s+', ' ', s).strip()
+
+
+def join(a, b):
+    return a + b if a.rstrip().endswith('-') else a + ' ' + b
 
 
 def body_blocks(text):
@@ -42,9 +48,9 @@ def body_blocks(text):
             else:
                 blocks.append({'bullets': [item]})
         elif blocks and 'bullets' in blocks[-1]:
-            blocks[-1]['bullets'][-1] += ' ' + line
+            blocks[-1]['bullets'][-1] = join(blocks[-1]['bullets'][-1].rstrip(), line)
         elif blocks:
-            blocks[-1]['text'] += ' ' + line
+            blocks[-1]['text'] = join(blocks[-1]['text'].rstrip(), line)
         else:
             blocks.append({'text': line})
     for b in blocks:

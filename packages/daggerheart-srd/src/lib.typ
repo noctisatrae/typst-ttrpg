@@ -28,4 +28,19 @@
   tier-4: tier-4.entries.map(a => (a.id, a)).to-dict(),
 )
 
+#import "environments/tier-1.typ" as env-tier-1
+#import "loot/items.typ" as loot-items
+#import "loot/consumables.typ" as loot-consumables
+
+/// Environments by tier, each a dictionary of id -> environment, in SRD
+/// order (pp. 160-166 for Tier 1).
+#let environments = (
+  tier-1: env-tier-1.entries.map(e => (e.id, e)).to-dict(),
+)
+
+/// Loot from the SRD's roll tables (pp. 75-84), id -> entity, in table
+/// order: the Core Set table, then the Hope & Fear Expansion Set table.
+#let items = loot-items.entries.map(e => (e.id, e)).to-dict()
+#let consumables = loot-consumables.entries.map(e => (e.id, e)).to-dict()
+
 #let package-info = (name: "daggerheart-srd", version: version(0, 1, 0), srd: srd)

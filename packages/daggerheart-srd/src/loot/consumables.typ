@@ -484,7 +484,7 @@
   name: "Shrinking Potion",
   collection: loot-collection.core-set,
   roll: 53,
-  description: "You can drink this potion to halve your size until you choose to drop this form or your next rest. While in this form, you have a +2 bonus to Agility and a−1 penalty to your Proficiency.",
+  description: "You can drink this potion to halve your size until you choose to drop this form or your next rest. While in this form, you have a +2 bonus to Agility and a −1 penalty to your Proficiency.",
   flags: source(81),
 )
 
@@ -493,7 +493,7 @@
   name: "Growing Potion",
   collection: loot-collection.core-set,
   roll: 54,
-  description: "You can drink this potion to double your size until you choose to drop this form or your next rest. While in this form, you have a +2 bonus to Strength and a+1 bonus to your Proficiency.",
+  description: "You can drink this potion to double your size until you choose to drop this form or your next rest. While in this form, you have a +2 bonus to Strength and a +1 bonus to your Proficiency.",
   flags: source(81),
 )
 
@@ -682,7 +682,7 @@
   name: "Red Ooze Oil",
   collection: loot-collection.hope-and-fear,
   roll: 15,
-  description: "You can coat your weapon in this oil. The next successful attack you make with this weapon deals an extra 1d8 magic damage and temporarily Ignitesthe target. While Ignited, the target takes 1d4 magic damage when they take the spotlight.",
+  description: "You can coat your weapon in this oil. The next successful attack you make with this weapon deals an extra 1d8 magic damage and temporarily Ignites the target. While Ignited, the target takes 1d4 magic damage when they take the spotlight.",
   flags: source(82),
 )
 
@@ -808,7 +808,7 @@
   name: "Green Ooze Oil",
   collection: loot-collection.hope-and-fear,
   roll: 29,
-  description: "You can coat your weapon in this oil. The next successful attack you make with this weapon deals an extra 1d8 magic damage and temporarily Corrodes the target. While Corroded,the target gains a −2 penalty to their damage thresholds.",
+  description: "You can coat your weapon in this oil. The next successful attack you make with this weapon deals an extra 1d8 magic damage and temporarily Corrodes the target. While Corroded, the target gains a −2 penalty to their damage thresholds.",
   flags: source(83),
 )
 
@@ -862,7 +862,7 @@
   name: "Emberite Shard",
   collection: loot-collection.hope-and-fear,
   roll: 35,
-  description: "Choose a point within Far range. All targets within Close range of that point must succeed on a Reaction Roll (16) or take 3d6 magic damage and become temporarily Ablaze. While Ablaze, a creature must roll a d4 whenever they make an action roll. On a result of 1, they mark a Hit Point. On a result of 4, they clear the Ablazecondition.",
+  description: "Choose a point within Far range. All targets within Close range of that point must succeed on a Reaction Roll (16) or take 3d6 magic damage and become temporarily Ablaze. While Ablaze, a creature must roll a d4 whenever they make an action roll. On a result of 1, they mark a Hit Point. On a result of 4, they clear the Ablaze condition.",
   flags: source(83),
 )
 

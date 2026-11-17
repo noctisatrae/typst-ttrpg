@@ -19,24 +19,26 @@ LIGATURES = (('ﬃ', 'ffi'), ('ﬄ', 'ffl'), ('ﬁ', 'fi'), ('ﬂ', 'fl'), ('ﬀ
 # ("oﬀ  the") or plain letters ("Diffi  culty", "fi ght", "cliff ."). "fi",
 # "fl", "ffi" and "ffl" never end a word in SRD 2.0, so those always rejoin.
 # "ff" does end words ("off the", "Staff of"), so those rejoin unless the
-# pair is a real word break. The tables below are every such break in SRD
-# 2.0 (surveyed over the whole text); clean.py rejoins them all, which turns
-# "Staff of" into "Staffof".
+# pair is a real word break: followed by two spaces (clean.py's rule), or
+# one of the single-space breaks below, every one in SRD 2.0 (surveyed over
+# the whole text); clean.py alone would turn "Staff of" into "Staffof".
 FF_WORDS = {'off', 'staff', 'sniff', 'cliff'}
 FF_NEXT = {'the', 'their', 'your', 'course', 'a', 'to', 'or', 'narrow', 'light',
            'in', 'boxes', 'from', 'without', 'of', 'against', 'member', 'out', 'faces'}
 
 
 def rejoin_ff(m):
-    word, nxt = m.group(1), m.group(3)
-    if word.lower() in FF_WORDS and nxt.lower() in FF_NEXT:
+    word, spaces, nxt = m.group(1), m.group(2), m.group(3)
+    # Two spaces mark a real break (clean.py's rule); the table covers the
+    # real breaks the PDF prints with a single space ("Staff of").
+    if len(spaces) >= 2 or (word.lower() in FF_WORDS and nxt.lower() in FF_NEXT):
         return word + ' '
     return word
 
 
 def clean(text):
     """Like clean.py, for one run of text, with the ligature rejoining
-    above (clean.py also glues "Staff of" into "Staffof")."""
+    above."""
     text = text.translate(DIGITS)
     text = re.sub(r'/(zero|one|two|three|four|five|six|seven|eight|nine)\.tnum',
                   lambda m: str(NAMES.index(m.group(1))), text)
