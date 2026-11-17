@@ -43,4 +43,19 @@
 #let items = loot-items.entries.map(e => (e.id, e)).to-dict()
 #let consumables = loot-consumables.entries.map(e => (e.id, e)).to-dict()
 
+#import "player/classes.typ" as player-classes
+#import "player/heritage.typ" as player-heritage
+#import "player/domain-cards.typ" as player-cards
+#import "player/equipment.typ" as player-equipment
+
+// Player-facing entities, by id: `classes.wizard`, `cards.book-of-ava`.
+#let by-kind(module, kind) = dictionary(module).values().filter(v => type(v) == dictionary and v.at("kind", default: none) == kind).map(e => (e.id, e)).to-dict()
+#let classes = by-kind(player-classes, "class")
+#let subclasses = by-kind(player-classes, "subclass")
+#let ancestries = by-kind(player-heritage, "ancestry")
+#let communities = by-kind(player-heritage, "community")
+#let cards = by-kind(player-cards, "domain-card")
+#let weapons = by-kind(player-equipment, "weapon")
+#let armors = by-kind(player-equipment, "armor")
+
 #let package-info = (name: "daggerheart-srd", version: version(0, 1, 0), srd: srd)

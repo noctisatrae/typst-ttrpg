@@ -315,6 +315,26 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   copying, Darrington Press's sheet design).
 - Multiclassing: allowed by the data format from the start, implemented
   once a second class's data exists.
+- API (heartweaver): `character(...)` takes ENTITIES, not strings
+  (`class: classes.wizard`, `cards: (cards.book-of-ava, ...)` from
+  daggerheart-srd), `experiences` as names (+2 each, derived), `story:` an
+  open dictionary of sections (`include "background.typ"`, `read(...)`;
+  include/read must live in the player's file, packages can't read the
+  project). `derive(c)` returns the sheet's numbers as `(value:, parts:)`;
+  `sheet(c)` renders it with the active theme. Advancements:
+  `increase-traits`, `add-hit-point`, `add-stress`, `increase-experiences`,
+  `extra-card`, `increase-evasion`, `upgrade-subclass`,
+  `increase-proficiency`, `multiclass` (format only). Features carry
+  `modifiers:` (number or `ctx => number`) and `grants: (domain-cards:)`.
+- Checked against Foundryborne v2.12.9 `module/data/actor/character.mjs`
+  (2026-11-17): Evasion, HP, Proficiency, thresholds (unarmored: level /
+  2×level), Armor Score, Hope max 6 all agree. Differences: Foundry's Hope
+  max subtracts scars (play state, not ours); Foundry has class-specific
+  advancements (Brawler "Increase Dice Size", Combo Die), so advancements
+  must stay extensible per class; per-tier advancement slot counts come
+  from the printed sheet, not the SRD text, so they are not validated.
+- Not yet: grants gained after creation (specialization/mastery extra
+  cards), multiclass derivation, companions (Beastbound), wheelchair.
 - First character: a real player character from the owner's Foundry export
   (fixtures/, kept out of git unless the owner says otherwise); its current
   Foundry values serve as a check for our derivation.
