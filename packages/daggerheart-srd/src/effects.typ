@@ -63,9 +63,26 @@
   "bellamoi-fine-armor/Gilded": (modifiers: (presence: 1)),      // "+1 to Presence" p. 73
   "skywardens-lamellar/Vigilant": (modifiers: (evasion: 2)),      // "+2 to Evasion" p. 73
 
+  "spidersilk-tunic/Wall-Crawling": (modifiers: (evasion: 1)),   // "+1 Evasion; you can walk on walls ..." p. 72
+  "granminsters-finery/Magnificent": (modifiers: (armor-score: c => c.traits.presence)), // "bonus to your Armor Score equal to your Presence" p. 73
+  // "The maximum number of domain cards in your loadout is reduced by one,
+  // but you gain a bonus to your damage thresholds equal to your tier."
+  // (p. 74); the loadout part is not modelled yet.
+  "rune-forged-exosuit/Attuned": (modifiers: (thresholds: c => c.tier)),
+
   // Heritage (pp. 32-42): "at character creation" slots are permanent.
   "giant/Endurance": (modifiers: (hp: 1)),          // "Gain an additional Hit Point slot at character creation." p. 36
   "human/High Stamina": (modifiers: (stress: 1)),   // "Gain an additional Stress slot at character creation." p. 36
+  "simiah/Nimble": (modifiers: (evasion: 1)),       // "Gain a permanent +1 bonus to your Evasion at character creation." p. 38
+  "earthkin/Stoneskin": (modifiers: (armor-score: 1, thresholds: 1)), // "permanent +1 bonus to your Armor Score and damage thresholds" p. 33
+  "galapa/Shell": (modifiers: (thresholds: c => c.proficiency)),       // "bonus to your damage thresholds equal to your Proficiency" p. 35
+
+  // Domain cards in the loadout (pp. 206-224). Text-only cards use their
+  // own name as the feature name. "Round up unless otherwise specified"
+  // (p. 53).
+  "untouchable/Untouchable": (modifiers: (evasion: c => calc.ceil(c.traits.agility / 2))), // "bonus to your Evasion equal to half your Agility" p. 209
+  "armorer/Armorer": (modifiers: (armor-score: c => if c.armored { 1 } else { 0 })),          // "While you’re wearing armor, gain a +1 bonus to your Armor Score." p. 223
+  "fortified-armor/Fortified Armor": (modifiers: (thresholds: c => if c.armored { 2 } else { 0 })), // "While you are wearing armor, gain a +2 bonus to your damage thresholds." p. 208
 
   // Subclasses (pp. 9-31).
   "school-of-knowledge/Prepared": (grants: (domain-cards: 1)),     // p. 31
@@ -73,6 +90,12 @@
   "school-of-knowledge/Brilliant": (grants: (domain-cards: 1)),    // p. 31
   "school-of-war/Battlemage": (modifiers: (hp: 1)),                // p. 31 "Gain an additional Hit Point slot."
   "vengeance/At Ease": (modifiers: (stress: 1)),                   // p. 19 "Gain an additional Stress slot."
+  "stalwart/Unwavering": (modifiers: (thresholds: 1)),             // p. 19 "Gain a permanent +1 bonus to your damage thresholds."
+  "stalwart/Unrelenting": (modifiers: (thresholds: 2)),            // p. 19 "... +2 ..."
+  "stalwart/Undaunted": (modifiers: (thresholds: 3)),              // p. 19 "... +3 ..."
+  "juggernaut/Rugged": (modifiers: (severe: 3)),                   // p. 12 "Gain a permanent +3 bonus to your Severe damage threshold."
+  "nightwalker/Fleeting Shadow": (modifiers: (evasion: 1)),        // p. 23 "Gain a permanent +1 bonus to your Evasion. ..."
+  "winged-sentinel/Ascendant": (modifiers: (severe: 4)),           // p. 24 "Gain a permanent +4 bonus to your Severe damage threshold."
 )
 
 /// The effects of `kind` entity `id`'s feature `name`, as named arguments

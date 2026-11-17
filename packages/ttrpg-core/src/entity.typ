@@ -11,6 +11,9 @@
 #let feature-schema = (
   name: field(str, required: true),
   body: field(str, content, required: true),
+  // Features that belong to this one, e.g. the forms a feature introduces
+  // ("... gain the following features:"), in order.
+  features: field(array, items: dictionary),
 )
 
 /// Fields every entity has. A system schema is merged on top of this, so a

@@ -3,7 +3,8 @@
 # literals, so no SRD wording can be read as markup; bullet lists become
 # Typst lists. Feature effects come from the hand-curated overlay
 # (packages/daggerheart-srd/src/effects.typ) through `fx(kind, id, name)`.
-from emit import lit, slug
+from emit import lit, option_lines, slug
+import structure
 
 HEADER = """// {title}, transcribed from the Daggerheart SRD 2.0
 // (DH_SRD_2_2026_08_25.pdf). Public Game Content © Critical Role, LLC,
@@ -30,7 +31,7 @@ def body(blocks, indent=4):
     """A string literal for one paragraph, else a content block."""
     if not blocks:
         return '""'
-    if len(blocks) == 1 and 'text' in blocks[0]:
+    if len(blocks) == 1 and 'text' in blocks[0] and not structure.options(blocks[0]['text']):
         return lit(blocks[0]['text'])
     pad = ' ' * indent
     lines = ['[']
@@ -38,7 +39,7 @@ def body(blocks, indent=4):
         if i:
             lines.append('')
         if 'text' in b:
-            lines.append(pad + '  #' + lit(b['text']))
+            lines += option_lines(b['text'], pad)
         else:
             lines += [pad + '  - #' + lit(x) for x in b['bullets']]
     lines.append(pad + ']')
@@ -128,6 +129,8 @@ def cards(records):
         out.append(f'  domain: {lit(r["domain"])}, level: {r["level"]}, type: {lit(r["type"])}, recall-cost: {r["recall-cost"]},')
         if r['text']:
             out.append(f'  text: {body(r["text"], 2)},')
+            if not r['features']:
+                out.append(f'  ..fx("domain-card", {lit(cid)}, {lit(r["name"])}),')
         if r['features']:
             out.append(f'  features: {features("domain-card", cid, r["features"], 2)},')
         out.append(f'  flags: source({r["page"]}),')

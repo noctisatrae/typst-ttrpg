@@ -37,6 +37,7 @@ import pypdf  # noqa: E402
 import emit  # noqa: E402
 import emit_player  # noqa: E402
 import player  # noqa: E402
+import structure  # noqa: E402
 from runs import clean, runs  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -201,10 +202,47 @@ def build_loot(pdf, rg, work):
 
 
 # ----------------------------------------------------------------------
+# Structures stored as flat text, pending a decision on how to model them:
+# numbered options and roll tables inside a feature, and features that
+# introduce others (forms, "while Channeling" lists).
+
+NUMBERED = re.compile(r'(^|[\s:.])1\.\s.+?\s2\.\s')
+ROLL_ROWS = re.compile(r'\b\d+\s*[–-]\s*\d+\s*:|(^|\s)\d+\s*:\s')
+
+
+def scan_structures(work, out):
+    found = []
+
+    def look(where, page, name, text):
+        o = structure.options(text)
+        if o:
+            found.append(f'p.{page}: {where} {name!r}: {o[0]} options -> a list of {len(o[2])} items')
+        if structure.introduces(name, text):
+            found.append(f'p.{page}: {where} {name!r}: introduces the features after it -> children')
+
+    adv = os.path.join(work, 'adversaries.json')
+    if os.path.exists(adv):
+        for a in json.load(open(adv, encoding='utf-8')).get('blocks', []):
+            for f in a.get('features', []):
+                look('adversary ' + a['name'], a['page'], f['name'], f.get('body') or '')
+    env = os.path.join(work, 'environments.json')
+    if os.path.exists(env):
+        for e in json.load(open(env, encoding='utf-8')):
+            for f in e.get('features', []):
+                text = ' '.join(b.get('text', '') or ' '.join(b.get('bullets', [])) for b in f.get('body', []))
+                look('environment ' + e['name'], e['page'], f['name'], text)
+    for kind, owner, name, text, page in all_features(out):
+        look(f'{kind} {owner}', page, name, text)
+    return found
+
+
+# ----------------------------------------------------------------------
 # Effects overlay: stale entries and suggestions.
 
 SUGGEST = [
-    (r'[+−-]\d+ to Evasion', 'evasion'),
+    (r'[+−-]\d+ (to )?Evasion', 'evasion'),
+    (r'permanent [+−-]\d+ bonus to your (Evasion|Armor Score|damage thresholds|Severe damage threshold|Major damage threshold)', 'permanent'),
+    (r'bonus to your (Evasion|Armor Score|damage thresholds) equal to', 'derived'),
     (r'[+−-]\d+ to (Agility|Strength|Finesse|Instinct|Presence|Knowledge)', 'trait'),
     (r'[+−-]\d+ to all character traits', 'traits'),
     (r'[+−-]\d+ to Armor Score', 'armor-score'),
@@ -244,7 +282,7 @@ def all_features(out):
         for f in r['features']:
             feats.append(('domain-card', player.slug(r['name']), f['name'], txt(f), f['page']))
         if r['text']:
-            feats.append(('domain-card', player.slug(r['name']), '(text)', txt({'body': r['text']}), r['page']))
+            feats.append(('domain-card', player.slug(r['name']), r['name'], txt({'body': r['text']}), r['page']))
     for key, kind in (('weapons', 'weapon'), ('armor', 'armor')):
         for r in out.get(key, []):
             if r['feature']:
@@ -283,7 +321,7 @@ def check_overlay(out):
 
 EXPORT = r'''
 #import "@local/daggerheart-srd:0.1.0" as srd
-#let plain(c) = if c == none { "" } else if type(c) == str { c } else if c.has("text") { c.text } else if c.has("children") { c.children.map(plain).join(" ") } else if c.has("body") { plain(c.body) } else if c.has("child") { plain(c.child) } else { " " }
+#let plain(c) = if c == none { "" } else if type(c) == str { c } else if c.func() == enum.item { str(c.number) + ". " + plain(c.body) } else if c.has("text") { c.text } else if c.has("children") { c.children.map(plain).join(" ") } else if c.has("body") { plain(c.body) } else if c.has("child") { plain(c.child) } else { " " }
 #let feats(fs) = fs.map(f => (name: f.name, body: plain(f.body)))
 #let clean(e) = {
   let out = (:)
@@ -374,8 +412,11 @@ def check_others(work, kinds):
     if 'adversaries' in kinds:
         path = os.path.join(work, 'export-adv.typ')
         open(path, 'w', encoding='utf-8').write('''#import "@local/daggerheart-srd:0.1.0": adversaries
-#let plain(c) = if type(c) == str { c } else if c.has("text") { c.text } else if c.has("children") { c.children.map(plain).join() } else if c == [ ] { " " } else { panic(repr(c)) }
-#metadata(adversaries.values().map(t => t.values()).flatten().map(a => a + (features: a.features.map(f => f + (body: plain(f.body)))))) <data>
+// Text as printed: list items get their own spacing, numbered items their
+// number; a parent's children follow it (crosscheck.py reads a flat list).
+#let plain(c) = if type(c) == str { c } else if c.func() == enum.item { " " + str(c.number) + ". " + plain(c.body) + " " } else if c.func() == list.item { " " + plain(c.body) + " " } else if c.has("text") { c.text } else if c.has("children") { c.children.map(plain).join() } else if c.func() == parbreak or c == [ ] { " " } else { panic(repr(c)) }
+#let flat(fs) = fs.map(f => ((f + (body: plain(f.body))),) + flat(f.at("features", default: ()))).flatten()
+#metadata(adversaries.values().map(t => t.values()).flatten().map(a => a + (features: flat(a.features)))) <data>
 ''')
         r = subprocess.run(['typst', 'query', '--root', '/', path, '<data>', '--field', 'value', '--one'],
                            capture_output=True, text=True, env=os.environ)
@@ -387,7 +428,7 @@ def check_others(work, kinds):
     if kinds & {'environments', 'loot'}:
         path = os.path.join(work, 'export-env.typ')
         open(path, 'w', encoding='utf-8').write('''#import "@local/daggerheart-srd:0.1.0" as srd
-#let plain(c) = if type(c) == str { c } else if c.func() == list.item { "• " + plain(c.body) } else if c.has("text") { c.text } else if c.has("children") { c.children.map(plain).join(" ") } else if c.has("body") { plain(c.body) } else { " " }
+#let plain(c) = if type(c) == str { c } else if c.func() == enum.item { str(c.number) + ". " + plain(c.body) } else if c.func() == list.item { "• " + plain(c.body) } else if c.has("text") { c.text } else if c.has("children") { c.children.map(plain).join(" ") } else if c.has("body") { plain(c.body) } else { " " }
 #let flat(e) = e + (features: e.at("features", default: ()).map(f => f + (body: plain(f.body))), description: plain(e.description))
 #metadata((
   environments: srd.environments.values().map(t => t.values()).flatten().map(flat),
@@ -439,6 +480,8 @@ def main():
         if 'loot' in kinds:
             build_loot(a.pdf, rg, a.work)
     suggestions = check_overlay(out) if out else []
+    if not a.check_only:
+        note('structures (options become lists, introduced features become children)', scan_structures(a.work, out))
 
     lines = ['# SRD build review', '']
     counts = {k: (len(v) if not isinstance(v, tuple) else f'{len(v[0])} + {len(v[1])} subclasses') for k, v in out.items()}
@@ -454,7 +497,9 @@ def main():
             note('cross-check ' + name, [l for l in res.splitlines() if l.strip() and not l.startswith('OK')][:-1])
     if a.foundryborne:
         import foundryborne
-        fb_info, fb_notes, fb_suggest = foundryborne.compare(a.foundryborne, out)
+        keys = overlay_keys()
+        fb_info, fb_notes, fb_suggest = foundryborne.compare(
+            a.foundryborne, out, lambda kind, owner, name: f'{owner}/{name}' in keys or f'{kind}:{name}' in keys)
         lines.append('Foundryborne: ' + fb_info)
         note('foundryborne', fb_notes)
         suggestions += fb_suggest

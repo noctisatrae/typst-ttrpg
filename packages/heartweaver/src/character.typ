@@ -90,7 +90,15 @@
   for f in c.community.features { out.push((c.community.name, f)) }
   for w in c.weapons { for f in w.features { out.push((w.name, f)) } }
   if c.at("armor", default: none) != none { for f in c.armor.features { out.push((c.armor.name, f)) } }
-  for card in c.loadout { for f in card.features { out.push((card.name, f)) } }
+  for card in c.loadout {
+    for f in card.features { out.push((card.name, f)) }
+    // A card with plain text may carry its effects on the card itself.
+    if "modifiers" in card or "grants" in card {
+      out.push((card.name, (name: card.name, body: card.at("text", default: []))
+        + if "modifiers" in card { (modifiers: card.modifiers) } else { (:) }
+        + if "grants" in card { (grants: card.grants) } else { (:) }))
+    }
+  }
   out
 }
 
@@ -124,21 +132,23 @@
     traits.insert(k, s)
   }
   let spellcast = c.subclass.at("spellcast-trait", default: none)
-  let ctx = (level: lvl, tier: tier, traits: traits.pairs().map(((k, s)) => (k, s.value)).to-dict(), spellcast-trait: spellcast)
-  let apply(s, key) = {
-    for (label, m) in mods(key) { s = bump(s, label, if type(m) == function { m(ctx) } else { m }) }
-    s
-  }
   let by-level(s, name) = {
     for (i, l) in c.levels.enumerate() {
       for a in l.advancements.filter(a => a.advancement == name) { s = bump(s, "level " + str(i + 2), 1) }
     }
     s
   }
-
+  // Proficiency before the context, so effects can depend on it (Galapa
+  // "Shell": thresholds + Proficiency); its own modifiers are numbers.
   let proficiency = stat("level 1", 1)
   for n in (2, 5, 8) { if lvl >= n { proficiency = bump(proficiency, "tier achievement, level " + str(n), 1) } }
-  proficiency = apply(by-level(proficiency, "proficiency"), "proficiency")
+  proficiency = by-level(proficiency, "proficiency")
+  for (label, m) in mods("proficiency") { proficiency = bump(proficiency, label, m) }
+  let ctx = (level: lvl, tier: tier, traits: traits.pairs().map(((k, s)) => (k, s.value)).to-dict(), spellcast-trait: spellcast, proficiency: proficiency.value, armored: c.at("armor", default: none) != none)
+  let apply(s, key) = {
+    for (label, m) in mods(key) { s = bump(s, label, if type(m) == function { m(ctx) } else { m }) }
+    s
+  }
 
   let evasion = apply(by-level(stat(c.class.name, c.class.evasion), "evasion"), "evasion")
   let hp = apply(by-level(stat(c.class.name, c.class.hp), "hp"), "hp")

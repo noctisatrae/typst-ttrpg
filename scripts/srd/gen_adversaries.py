@@ -8,6 +8,8 @@
 # it verbatim, so hand-checked entries stay byte-identical. Run crosscheck.py
 # on the result before committing.
 import sys, re, json, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import structure  # noqa: E402
 
 parsed = json.load(open(sys.argv[1], encoding='utf-8'))
 tier = int(sys.argv[2])
@@ -33,6 +35,26 @@ def markup(s):
     # A list, enum or term marker at the start would turn the body into a list.
     s = re.sub(r'^([-+/]|\d+\.)', r'\\\1', s)
     return s
+
+def body_markup(s):
+    """The body as markup; numbered options and roll-table rows become a
+    list after their intro (structure.py), words unchanged."""
+    o = structure.options(s)
+    if not o:
+        return markup(s)
+    kind, intro, items = o
+    lines = [markup(intro), ''] if intro else []
+    for label, text in items:
+        lines.append(f'{label}. ' + markup(text) if kind == 'numbered' else '- ' + markup(f'{label}: {text}'))
+    return '\n'.join(lines)
+
+def feature_call(f, indent):
+    pad = ' ' * indent
+    head = f'{pad}feature({string(f["name"])}, kind: feature-kind.{KIND[f["kind"]]}'
+    if f.get('children'):
+        kids = '\n'.join(feature_call(c, indent + 4) for c in f['children'])
+        head += f', features: (\n{kids}\n{pad})'
+    return head + f')[{body_markup(f["body"])}],'
 
 TYPE = {'Bruiser': 'bruiser', 'Horde': 'horde', 'Leader': 'leader', 'Minion': 'minion', 'Ranged': 'ranged',
         'Skulk': 'skulk', 'Social': 'social', 'Solo': 'solo', 'Standard': 'standard', 'Support': 'support'}
@@ -69,8 +91,8 @@ def entry(a):
         xs = ', '.join(f'(name: {string(x["name"])}, bonus: {x["bonus"]})' for x in a['experiences'])
         lines.append(f'  experiences: ({xs}{"," if len(a["experiences"]) == 1 else ""}),')
     lines.append('  features: (')
-    for f in a['features']:
-        lines.append(f'    feature({string(f["name"])}, kind: feature-kind.{KIND[f["kind"]]})[{markup(f["body"])}],')
+    for f in structure.nest(a['features'])[0]:
+        lines.append(feature_call(f, 4))
     lines += ['  ),', f'  flags: source({a["page"]}),', ')']
     return id, '\n'.join(lines)
 

@@ -175,7 +175,8 @@
       },
     ),
     sections: if e.features.len() > 0 {
-      ((title: "Features", entries: e.features.map(f => core.entry(f.name, tag: f.kind, f.body))),)
+      ((title: "Features", entries: e.features.map(f => core.entry(f.name, tag: f.kind, f.body,
+        children: f.at("features", default: ()).map(c => core.entry(c.name, tag: c.at("kind", default: none), c.body))))),)
     } else { () },
   )
 }

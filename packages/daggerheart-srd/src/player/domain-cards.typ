@@ -16,6 +16,7 @@
   id: "rune-ward", name: "Rune Ward",
   domain: "Arcana", level: 1, type: "Spell", recall-cost: 0,
   text: "You have a deeply personal trinket that can be infused with protective magic and held as a ward by you or an ally. Describe what it is and why it’s important to you. The ward’s holder can spend a Hope to reduce incoming damage by 1d8. If the Ward Die result is 8, the ward’s power ends after it reduces damage this turn. It can be recharged for free on your next rest.",
+  ..fx("domain-card", "rune-ward", "Rune Ward"),
   flags: source(206),
 )
 
@@ -23,6 +24,7 @@
   id: "unleash-chaos", name: "Unleash Chaos",
   domain: "Arcana", level: 1, type: "Spell", recall-cost: 1,
   text: "At the beginning of a session, place a number of tokens equal to your Spellcast trait on this card. Make a Spellcast Roll against a target within Far range and spend any number of tokens to channel raw energy from within yourself to unleash against them. On a success, roll a number of d10s equal to the tokens you spent and deal that much magic damage to the target. Mark a Stress to replenish this card with tokens (up to your Spellcast trait). At the end of each session, clear all unspent tokens.",
+  ..fx("domain-card", "unleash-chaos", "Unleash Chaos"),
   flags: source(206),
 )
 
@@ -30,6 +32,7 @@
   id: "wall-walk", name: "Wall Walk",
   domain: "Arcana", level: 1, type: "Spell", recall-cost: 1,
   text: "Spend a Hope to allow a creature you can touch to climb on walls and ceilings as easily as walking on the ground. This lasts until the end of the scene or you cast Wall Walk again",
+  ..fx("domain-card", "wall-walk", "Wall Walk"),
   flags: source(206),
 )
 
@@ -37,6 +40,7 @@
   id: "cinder-grasp", name: "Cinder Grasp",
   domain: "Arcana", level: 2, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against a target within Melee range. On a success, the target instantly bursts into flames, takes 1d20+3 magic damage, and is temporarily lit On Fire. When a creature acts while On Fire, they must take an extra 2d6 magic damage if they are still On Fire at the end of their action.",
+  ..fx("domain-card", "cinder-grasp", "Cinder Grasp"),
   flags: source(206),
 )
 
@@ -44,6 +48,7 @@
   id: "floating-eye", name: "Floating Eye",
   domain: "Arcana", level: 2, type: "Spell", recall-cost: 0,
   text: "Spend a Hope to create a single, small floating orb that you can move anywhere within Very Far range. While this spell is active, you can see through the orb as though you’re looking out from its position. You can transition between using your own senses and seeing through the orb freely. If the orb takes damage or moves out of range, the spell ends.",
+  ..fx("domain-card", "floating-eye", "Floating Eye"),
   flags: source(206),
 )
 
@@ -51,6 +56,7 @@
   id: "counterspell", name: "Counterspell",
   domain: "Arcana", level: 3, type: "Spell", recall-cost: 2,
   text: "You can interrupt a magical effect taking place by making a reaction roll using your Spellcast trait. On a success, the effect stops and any consequences are avoided, and this card is placed in your vault.",
+  ..fx("domain-card", "counterspell", "Counterspell"),
   flags: source(206),
 )
 
@@ -58,6 +64,7 @@
   id: "flight", name: "Flight",
   domain: "Arcana", level: 3, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll (15). On a success, place a number of tokens equal to your Agility on this card (minimum 1). When you make an action roll while flying, spend a token from this card. After the action that spends the last token is resolved, you descend to the ground directly below you.",
+  ..fx("domain-card", "flight", "Flight"),
   flags: source(206),
 )
 
@@ -65,6 +72,7 @@
   id: "blink-out", name: "Blink Out",
   domain: "Arcana", level: 4, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll (12). On a success, spend a Hope to teleport to another point you can see within Far range. If any willing creatures are within Very Close range, spend an additional Hope for each creature to bring them with you.",
+  ..fx("domain-card", "blink-out", "Blink Out"),
   flags: source(206),
 )
 
@@ -72,6 +80,7 @@
   id: "preservation-blast", name: "Preservation Blast",
   domain: "Arcana", level: 4, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll against all targets within Melee range. Targets you succeed against are forced back to Far range and take d8+3 magic damage using your Spellcast trait.",
+  ..fx("domain-card", "preservation-blast", "Preservation Blast"),
   flags: source(206),
 )
 
@@ -79,6 +88,7 @@
   id: "chain-lightning", name: "Chain Lightning",
   domain: "Arcana", level: 5, type: "Spell", recall-cost: 1,
   text: "Mark 2 Stress to make a Spellcast Roll, unleashing lightning on all targets within Close range. Targets you succeed against must make a reaction roll with a Difficulty equal to the result of your Spellcast Roll. Targets who fail take 2d8+4 magic damage. Additional adversaries not already targeted by Chain Lightning and within Close range of previous targets who took damage must also make the reaction roll. Targets who fail take 2d8+4 magic damage. This chain continues until there are no more adversaries within range.",
+  ..fx("domain-card", "chain-lightning", "Chain Lightning"),
   flags: source(206),
 )
 
@@ -86,6 +96,7 @@
   id: "premonition", name: "Premonition",
   domain: "Arcana", level: 5, type: "Spell", recall-cost: 2,
   text: "You can channel arcane energy to have visions of the future. Once per long rest, immediately after the GM conveys the consequences of a roll you made, you can rescind the move and consequences like they never happened and make another move instead.",
+  ..fx("domain-card", "premonition", "Premonition"),
   flags: source(207),
 )
 
@@ -93,6 +104,7 @@
   id: "rift-walker", name: "Rift Walker",
   domain: "Arcana", level: 6, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (15). On a success, you place an arcane marking on the ground where you currently stand. The next time you successfully cast Rift Walker, a rift in space opens up, providing safe passage back to the exact spot where the marking was placed. This rift stays open until you choose to close it or you cast another spell. You can drop the spell at any time to cast Rift Walker again and place the marking somewhere new.",
+  ..fx("domain-card", "rift-walker", "Rift Walker"),
   flags: source(207),
 )
 
@@ -100,6 +112,7 @@
   id: "telekinesis", name: "Telekinesis",
   domain: "Arcana", level: 6, type: "Spell", recall-cost: 0,
   text: "Make a Spellcast Roll against a target within Far range. On a success, you can use your mind to move them anywhere within Far range of their original position. You can throw the lifted target as an attack by making an additional Spellcast Roll against the second target you’re trying to attack. On a success, deal d12+4 physical damage to the second target using your Proficiency. This spell then ends.",
+  ..fx("domain-card", "telekinesis", "Telekinesis"),
   flags: source(207),
 )
 
@@ -112,6 +125,7 @@
     - #"+1 bonus to your Spellcast Rolls"
     - #"Once per rest, you can switch the results of your Hope and Fear Dice."
   ],
+  ..fx("domain-card", "arcana-touched", "Arcana-Touched"),
   flags: source(207),
 )
 
@@ -119,6 +133,7 @@
   id: "cloaking-blast", name: "Cloaking Blast",
   domain: "Arcana", level: 7, type: "Spell", recall-cost: 2,
   text: "When you make a successful Spellcast Roll to cast a different spell, you can spend a Hope to become Cloaked. While Cloaked, you remain unseen if you are stationary when an adversary moves to where they would normally see you. When you move into or within an adversary’s line of sight or make an attack, you are no longer Cloaked.",
+  ..fx("domain-card", "cloaking-blast", "Cloaking Blast"),
   flags: source(207),
 )
 
@@ -126,6 +141,7 @@
   id: "arcane-reflection", name: "Arcane Reflection",
   domain: "Arcana", level: 8, type: "Spell", recall-cost: 1,
   text: "When you would take magic damage, you can spend any number of Hope to roll that many d6s. If any roll a 6, the attack is reflected back to the caster, dealing the damage to them instead.",
+  ..fx("domain-card", "arcane-reflection", "Arcane Reflection"),
   flags: source(207),
 )
 
@@ -133,6 +149,7 @@
   id: "confusing-aura", name: "Confusing Aura",
   domain: "Arcana", level: 8, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (14). Once per long rest on a success, you create a layer of illusion over your body that makes it hard to tell exactly where you are. Mark any number of Stress to make that many additional layers. When an adversary makes an attack against you, roll a number of d6s equal to the number of layers currently active. If any roll a 5 or higher, one layer of the aura is destroyed and the attack fails. If all the results are 4 or lower, you take the damage and this spell ends",
+  ..fx("domain-card", "confusing-aura", "Confusing Aura"),
   flags: source(207),
 )
 
@@ -140,6 +157,7 @@
   id: "earthquake", name: "Earthquake",
   domain: "Arcana", level: 9, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (16). Once per rest on a success, all targets within Very Far range who aren’t flying must make a Reaction Roll (18). Targets who fail take 3d10+8 physical damage and are temporarily Vulnerable. Targets who succeed take half damage. Additionally, when you succeed on the Spellcast Roll, all terrain within Very Far range becomes difficult to move through and structures within this range might sustain damage or crumble.",
+  ..fx("domain-card", "earthquake", "Earthquake"),
   flags: source(207),
 )
 
@@ -147,6 +165,7 @@
   id: "sensory-projection", name: "Sensory Projection",
   domain: "Arcana", level: 9, type: "Spell", recall-cost: 0,
   text: "Once per rest, make a Spellcast Roll (15). On a success, drop into a vision that lets you clearly see and hear any place you have been before as though you are standing there in this moment. You can move freely in this vision and are not constrained by the physics or impediments of a physical body. This spell cannot be detected by mundane or magical means. You drop out of this vision upon taking damage or casting another spell.",
+  ..fx("domain-card", "sensory-projection", "Sensory Projection"),
   flags: source(207),
 )
 
@@ -154,6 +173,7 @@
   id: "adjust-reality", name: "Adjust Reality",
   domain: "Arcana", level: 10, type: "Spell", recall-cost: 1,
   text: "After you or a willing ally make any roll, you can spend 5 Hope to change the numerical result of that roll to a result of your choice instead. The result must be plausible within the range of the dice.",
+  ..fx("domain-card", "adjust-reality", "Adjust Reality"),
   flags: source(207),
 )
 
@@ -161,6 +181,7 @@
   id: "falling-sky", name: "Falling Sky",
   domain: "Arcana", level: 10, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against all adversaries within Far range. Mark any number of Stress to make shards of arcana rain down from above. Targets you succeed against take 1d20+2 magic damage for each Stress marked.",
+  ..fx("domain-card", "falling-sky", "Falling Sky"),
   flags: source(207),
 )
 
@@ -168,6 +189,7 @@
   id: "get-back-up", name: "Get Back Up",
   domain: "Blade", level: 1, type: "Ability", recall-cost: 1,
   text: "When you take Severe damage, you can mark a Stress to reduce the severity by one threshold.",
+  ..fx("domain-card", "get-back-up", "Get Back Up"),
   flags: source(208),
 )
 
@@ -175,6 +197,7 @@
   id: "not-good-enough", name: "Not Good Enough",
   domain: "Blade", level: 1, type: "Ability", recall-cost: 1,
   text: "When you roll your damage dice, you can reroll any 1s or 2s.",
+  ..fx("domain-card", "not-good-enough", "Not Good Enough"),
   flags: source(208),
 )
 
@@ -182,6 +205,7 @@
   id: "whirlwind", name: "Whirlwind",
   domain: "Blade", level: 1, type: "Ability", recall-cost: 0,
   text: "When you make a successful attack against a target within Very Close range, you can spend a Hope to use the attack against all other targets within Very Close range. All additional adversaries you succeed against with this ability take half damage.",
+  ..fx("domain-card", "whirlwind", "Whirlwind"),
   flags: source(208),
 )
 
@@ -189,6 +213,7 @@
   id: "a-soldiers-bond", name: "A Soldier’s Bond",
   domain: "Blade", level: 2, type: "Ability", recall-cost: 1,
   text: "Once per long rest, when you compliment someone or ask them about something they’re good at, you can both gain 3 Hope.",
+  ..fx("domain-card", "a-soldiers-bond", "A Soldier’s Bond"),
   flags: source(208),
 )
 
@@ -196,6 +221,7 @@
   id: "reckless", name: "Reckless",
   domain: "Blade", level: 2, type: "Ability", recall-cost: 1,
   text: "Mark a Stress to gain advantage on an attack.",
+  ..fx("domain-card", "reckless", "Reckless"),
   flags: source(208),
 )
 
@@ -203,6 +229,7 @@
   id: "scramble", name: "Scramble",
   domain: "Blade", level: 3, type: "Ability", recall-cost: 1,
   text: "Once per rest, when a creature within Melee range would deal damage to you, you can avoid the attack and safely move out of Melee range of the enemy.",
+  ..fx("domain-card", "scramble", "Scramble"),
   flags: source(208),
 )
 
@@ -210,6 +237,7 @@
   id: "versatile-fighter", name: "Versatile Fighter",
   domain: "Blade", level: 3, type: "Ability", recall-cost: 1,
   text: "You can use a different character trait for an equipped weapon, rather than the trait the weapon calls for. When you deal damage, you can mark a Stress to use the maximum result of one of your damage dice instead of rolling it.",
+  ..fx("domain-card", "versatile-fighter", "Versatile Fighter"),
   flags: source(208),
 )
 
@@ -217,6 +245,7 @@
   id: "deadly-focus", name: "Deadly Focus",
   domain: "Blade", level: 4, type: "Ability", recall-cost: 2,
   text: "Once per rest, you can apply all your focus toward a target of your choice. Until you attack another creature, you defeat the target, or the battle ends, gain a +1 bonus to your Proficiency.",
+  ..fx("domain-card", "deadly-focus", "Deadly Focus"),
   flags: source(208),
 )
 
@@ -224,6 +253,7 @@
   id: "fortified-armor", name: "Fortified Armor",
   domain: "Blade", level: 4, type: "Ability", recall-cost: 0,
   text: "While you are wearing armor, gain a +2 bonus to your damage thresholds.",
+  ..fx("domain-card", "fortified-armor", "Fortified Armor"),
   flags: source(208),
 )
 
@@ -237,6 +267,7 @@
     - #"You clear an Armor Slot."
     - #"The target must mark an additional Hit Point. You can’t choose the same option more than once."
   ],
+  ..fx("domain-card", "champions-edge", "Champion’s Edge"),
   flags: source(208),
 )
 
@@ -250,6 +281,7 @@
     - #"One Hit Point slot"
     - #"+2 bonus to your damage thresholds Then place this card in your vault permanently."
   ],
+  ..fx("domain-card", "vitality", "Vitality"),
   flags: source(208),
 )
 
@@ -257,6 +289,7 @@
   id: "battle-hardened", name: "Battle-Hardened",
   domain: "Blade", level: 6, type: "Ability", recall-cost: 2,
   text: "Once per long rest when you would make a Death Move, you can spend a Hope to clear a Hit Point instead.",
+  ..fx("domain-card", "battle-hardened", "Battle-Hardened"),
   flags: source(208),
 )
 
@@ -264,6 +297,7 @@
   id: "rage-up", name: "Rage Up",
   domain: "Blade", level: 6, type: "Ability", recall-cost: 1,
   text: "Before you make an attack, you can mark a Stress to gain a bonus to your damage roll equal to twice your Strength. You can Rage Up twice per attack.",
+  ..fx("domain-card", "rage-up", "Rage Up"),
   flags: source(208),
 )
 
@@ -276,6 +310,7 @@
     - #"+2 bonus to your attack rolls"
     - #"+4 bonus to your Severe damage threshold"
   ],
+  ..fx("domain-card", "blade-touched", "Blade-Touched"),
   flags: source(208),
 )
 
@@ -283,6 +318,7 @@
   id: "glancing-blow", name: "Glancing Blow",
   domain: "Blade", level: 7, type: "Ability", recall-cost: 1,
   text: "When you fail an attack, you can mark a Stress to deal weapon damage using half your Proficiency.",
+  ..fx("domain-card", "glancing-blow", "Glancing Blow"),
   flags: source(208),
 )
 
@@ -290,6 +326,7 @@
   id: "battle-cry", name: "Battle Cry",
   domain: "Blade", level: 8, type: "Ability", recall-cost: 2,
   text: "Once per long rest, while you’re charging into danger, you can muster a rousing call that inspires your allies. All allies who can hear you each clear a Stress and gain a Hope. Additionally, your allies gain advantage on attack rolls until you or an ally rolls a failure with Fear.",
+  ..fx("domain-card", "battle-cry", "Battle Cry"),
   flags: source(208),
 )
 
@@ -297,6 +334,7 @@
   id: "frenzy", name: "Frenzy",
   domain: "Blade", level: 8, type: "Ability", recall-cost: 3,
   text: "Once per long rest, you can go into a Frenzy until there are no more adversaries within sight. While Frenzied, you can’t use Armor Slots, and you gain a +10 bonus to your damage rolls and a +8 bonus to your Severe damage threshold.",
+  ..fx("domain-card", "frenzy", "Frenzy"),
   flags: source(209),
 )
 
@@ -304,6 +342,7 @@
   id: "gore-and-glory", name: "Gore and Glory",
   domain: "Blade", level: 9, type: "Ability", recall-cost: 2,
   text: "When you critically succeed on a weapon attack, gain an additional Hope or clear an additional Stress. Additionally, when you deal enough damage to defeat an enemy, gain a Hope or clear a Stress.",
+  ..fx("domain-card", "gore-and-glory", "Gore and Glory"),
   flags: source(209),
 )
 
@@ -311,6 +350,7 @@
   id: "reapers-strike", name: "Reaper’s Strike",
   domain: "Blade", level: 9, type: "Ability", recall-cost: 3,
   text: "Once per long rest, spend a Hope to make an attack roll. The GM tells you which targets within range it would succeed against. Choose one of these targets and force them to mark 5 Hit Points.",
+  ..fx("domain-card", "reapers-strike", "Reaper’s Strike"),
   flags: source(209),
 )
 
@@ -318,6 +358,7 @@
   id: "battle-monster", name: "Battle Monster",
   domain: "Blade", level: 10, type: "Ability", recall-cost: 0,
   text: "When you make a successful attack against an adversary, you can mark 4 Stress to force the target to mark a number of Hit Points equal to the number of Hit Points you currently have marked instead of rolling for damage.",
+  ..fx("domain-card", "battle-monster", "Battle Monster"),
   flags: source(209),
 )
 
@@ -325,6 +366,7 @@
   id: "onslaught", name: "Onslaught",
   domain: "Blade", level: 10, type: "Ability", recall-cost: 3,
   text: "When you successfully make an attack with your weapon, you never deal damage beneath a target’s Major damage threshold (the target always marks a minimum of 2 Hit Points). Additionally, when a creature within your weapon’s range deals damage to an ally with an attack that doesn’t include you, you can mark a Stress to force them to make a Reaction Roll (15). On a failure, the target must mark a Hit Point.",
+  ..fx("domain-card", "onslaught", "Onslaught"),
   flags: source(209),
 )
 
@@ -332,6 +374,7 @@
   id: "deft-maneuvers", name: "Deft Maneuvers",
   domain: "Bone", level: 1, type: "Ability", recall-cost: 0,
   text: "Once per rest, mark a Stress to sprint anywhere within Far range without making an Agility Roll to get there. If you end this movement within Melee range of an adversary and immediately make an attack against them, gain a +1 bonus to the attack roll.",
+  ..fx("domain-card", "deft-maneuvers", "Deft Maneuvers"),
   flags: source(209),
 )
 
@@ -339,6 +382,7 @@
   id: "i-see-it-coming", name: "I See It Coming",
   domain: "Bone", level: 1, type: "Ability", recall-cost: 1,
   text: "When you’re targeted by an attack made from beyond Melee range, you can mark a Stress to roll a d4 and gain a bonus to your Evasion equal to the result against the attack.",
+  ..fx("domain-card", "i-see-it-coming", "I See It Coming"),
   flags: source(209),
 )
 
@@ -346,6 +390,7 @@
   id: "untouchable", name: "Untouchable",
   domain: "Bone", level: 1, type: "Ability", recall-cost: 1,
   text: "Gain a bonus to your Evasion equal to half your Agility.",
+  ..fx("domain-card", "untouchable", "Untouchable"),
   flags: source(209),
 )
 
@@ -353,6 +398,7 @@
   id: "ferocity", name: "Ferocity",
   domain: "Bone", level: 2, type: "Ability", recall-cost: 2,
   text: "When you cause an adversary to mark 1 or more Hit Points, you can spend 2 Hope to increase your Evasion by the number of Hit Points they marked. This bonus lasts until after the next attack made against you.",
+  ..fx("domain-card", "ferocity", "Ferocity"),
   flags: source(209),
 )
 
@@ -366,6 +412,7 @@
     - #"You clear a Stress on an ally within Melee range of the adversary."
     - #"You add a d8 to your damage roll. When you take a long rest, clear all unspent tokens."
   ],
+  ..fx("domain-card", "strategic-approach", "Strategic Approach"),
   flags: source(209),
 )
 
@@ -373,6 +420,7 @@
   id: "brace", name: "Brace",
   domain: "Bone", level: 3, type: "Ability", recall-cost: 1,
   text: "When you mark an Armor Slot to reduce incoming damage, you can mark a Stress to mark an additional Armor Slot.",
+  ..fx("domain-card", "brace", "Brace"),
   flags: source(209),
 )
 
@@ -380,6 +428,7 @@
   id: "tactician", name: "Tactician",
   domain: "Bone", level: 3, type: "Ability", recall-cost: 1,
   text: "When you Help an Ally, they can spend a Hope to add one of your Experiences to their roll alongside your advantage die. When making a Tag Team Roll, you can roll a d20 as your Hope Die.",
+  ..fx("domain-card", "tactician", "Tactician"),
   flags: source(209),
 )
 
@@ -387,6 +436,7 @@
   id: "boost", name: "Boost",
   domain: "Bone", level: 4, type: "Ability", recall-cost: 1,
   text: "Mark a Stress to boost off a willing ally within Close range, fling yourself into the air, and perform an aerial attack against a target within Far range. You have advantage on the attack, add a d10 to the damage roll, and end your move within Melee range of the target.",
+  ..fx("domain-card", "boost", "Boost"),
   flags: source(210),
 )
 
@@ -394,6 +444,7 @@
   id: "redirect", name: "Redirect",
   domain: "Bone", level: 4, type: "Ability", recall-cost: 1,
   text: "When an attack made against you from beyond Melee range fails, roll a number of d6s equal to your Proficiency. If any roll a 6, you can mark a Stress to redirect the attack to damage an adversary within Very Close range instead.",
+  ..fx("domain-card", "redirect", "Redirect"),
   flags: source(210),
 )
 
@@ -408,6 +459,7 @@
     - #"Their tactics and standard attack damage dice."
     - #"Their features and Experiences. Additionally on a success, you can mark a Stress to remove a Fear from the GM’s Fear Pool."
   ],
+  ..fx("domain-card", "know-thy-enemy", "Know Thy Enemy"),
   flags: source(210),
 )
 
@@ -415,6 +467,7 @@
   id: "signature-move", name: "Signature Move",
   domain: "Bone", level: 5, type: "Ability", recall-cost: 1,
   text: "Name and describe your signature combat move. Once per rest, when you perform this signature move as part of an action you’re taking, you can roll a d20 as your Hope Die. On a success, clear a Stress.",
+  ..fx("domain-card", "signature-move", "Signature Move"),
   flags: source(210),
 )
 
@@ -422,6 +475,7 @@
   id: "rapid-riposte", name: "Rapid Riposte",
   domain: "Bone", level: 6, type: "Ability", recall-cost: 0,
   text: "When an attack made against you from within Melee range fails, you can mark a Stress and seize the opportunity to deal the weapon damage of one of your active weapons to the attacker.",
+  ..fx("domain-card", "rapid-riposte", "Rapid Riposte"),
   flags: source(210),
 )
 
@@ -429,6 +483,7 @@
   id: "recovery", name: "Recovery",
   domain: "Bone", level: 6, type: "Ability", recall-cost: 1,
   text: "During a short rest, you can choose a long rest downtime move instead. You can spend a Hope to let an ally do the same.",
+  ..fx("domain-card", "recovery", "Recovery"),
   flags: source(210),
 )
 
@@ -441,6 +496,7 @@
     - #"+1 bonus to Agility"
     - #"Once per rest, you can spend 3 Hope to cause an attack that succeeded against you to fail instead."
   ],
+  ..fx("domain-card", "bone-touched", "Bone-Touched"),
   flags: source(210),
 )
 
@@ -448,6 +504,7 @@
   id: "cruel-precision", name: "Cruel Precision",
   domain: "Bone", level: 7, type: "Ability", recall-cost: 1,
   text: "When you make a successful attack with a weapon, gain a bonus to your damage roll equal to either your Finesse or Agility.",
+  ..fx("domain-card", "cruel-precision", "Cruel Precision"),
   flags: source(210),
 )
 
@@ -455,6 +512,7 @@
   id: "breaking-blow", name: "Breaking Blow",
   domain: "Bone", level: 8, type: "Ability", recall-cost: 3,
   text: "When you make a successful attack, you can mark a Stress to make the next successful attack against that same target deal an extra 2d12 damage.",
+  ..fx("domain-card", "breaking-blow", "Breaking Blow"),
   flags: source(210),
 )
 
@@ -462,6 +520,7 @@
   id: "wrangle", name: "Wrangle",
   domain: "Bone", level: 8, type: "Ability", recall-cost: 1,
   text: "Make an Agility Roll against all targets within Close range. Spend a Hope to move targets you succeed against, and any willing allies within Close range, to another point within Close range.",
+  ..fx("domain-card", "wrangle", "Wrangle"),
   flags: source(210),
 )
 
@@ -469,6 +528,7 @@
   id: "on-the-brink", name: "On the Brink",
   domain: "Bone", level: 9, type: "Ability", recall-cost: 1,
   text: "When you have 2 or fewer Hit Points unmarked, you don’t take Minor damage.",
+  ..fx("domain-card", "on-the-brink", "On the Brink"),
   flags: source(210),
 )
 
@@ -476,6 +536,7 @@
   id: "splintering-strike", name: "Splintering Strike",
   domain: "Bone", level: 9, type: "Ability", recall-cost: 3,
   text: "Spend a Hope and make an attack against all adversaries within your weapon’s range. Once per long rest, on a success against any targets, roll your weapon's damage and distribute that damage however you wish between the targets you succeeded against. Before you deal damage to each target, roll an additional damage die and add its result to the damage you deal to them.",
+  ..fx("domain-card", "splintering-strike", "Splintering Strike"),
   flags: source(210),
 )
 
@@ -483,6 +544,7 @@
   id: "deathrun", name: "Deathrun",
   domain: "Bone", level: 10, type: "Ability", recall-cost: 1,
   text: "Spend 3 Hope to run a straight path through the battlefield to a point within Far range, making an attack against all adversaries within your weapon’s range along that path. Choose the order in which you deal damage to the targets you succeeded against. For the first, roll your weapon damage with a +1 bonus to your Proficiency. Then remove a die from your damage roll and deal the remaining damage to the next target. Continue to remove a die for each subsequent target until you have no more damage dice or adversaries. You can’t target the same adversary more than once per attack.",
+  ..fx("domain-card", "deathrun", "Deathrun"),
   flags: source(210),
 )
 
@@ -490,6 +552,7 @@
   id: "swift-step", name: "Swift Step",
   domain: "Bone", level: 10, type: "Ability", recall-cost: 2,
   text: "When an attack made against you fails, clear a Stress. If you can’t clear a Stress, gain a Hope.",
+  ..fx("domain-card", "swift-step", "Swift Step"),
   flags: source(210),
 )
 
@@ -594,6 +657,7 @@
   id: "manifest-wall", name: "Manifest Wall",
   domain: "Codex", level: 5, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (15). Once per rest on a success, spend a Hope to create a temporary magical wall between two points within Far range. It can be up to 50 feet high and form at any angle. Creatures or objects in its path are shunted to a side of your choice. The wall stays up until your next rest or you cast Manifest Wall again.",
+  ..fx("domain-card", "manifest-wall", "Manifest Wall"),
   flags: source(212),
 )
 
@@ -608,6 +672,7 @@
     - #"If you’ve visited the place infrequently, gain no modifier."
     - #"If you’ve only been there once, gain a −2 penalty. On a success, you appear where you were intending to go. On a failure, you appear off course, with the range of failure determining how far off course."
   ],
+  ..fx("domain-card", "teleport", "Teleport"),
   flags: source(212),
 )
 
@@ -615,6 +680,7 @@
   id: "banish", name: "Banish",
   domain: "Codex", level: 6, type: "Spell", recall-cost: 0,
   text: "Make a Spellcast Roll against a target within Close range. On a success, roll a number of d20s equal to your Spellcast trait. The target must make a reaction roll with a Difficulty equal to your highest result. On a success, the target must mark a Stress but isn’t banished. Once per rest on a failure, they are banished from this realm. When the PCs roll with Fear, the Difficulty gains a −1 penalty and the target makes another reaction roll. On a success, they return from banishment.",
+  ..fx("domain-card", "banish", "Banish"),
   flags: source(212),
 )
 
@@ -622,6 +688,7 @@
   id: "sigil-of-retribution", name: "Sigil of Retribution",
   domain: "Codex", level: 6, type: "Spell", recall-cost: 2,
   text: "Mark an adversary within Close range with a sigil of retribution. The GM gains a Fear. When the marked adversary deals damage to you or your allies, place a d8 on this card. You can hold a number of d8s equal to your level. When you successfully attack the marked adversary, roll the dice on this card and add the total to your damage roll, then clear the dice. This effect ends when the marked adversary is defeated or you cast Sigil of Retribution again.",
+  ..fx("domain-card", "sigil-of-retribution", "Sigil of Retribution"),
   flags: source(212),
 )
 
@@ -644,6 +711,7 @@
     - #"You can mark a Stress to add your Proficiency to a Spellcast Roll."
     - #"Once per rest, replace this card with any card from your vault without paying its Recall Cost."
   ],
+  ..fx("domain-card", "codex-touched", "Codex-Touched"),
   flags: source(212),
 )
 
@@ -661,6 +729,7 @@
   id: "safe-haven", name: "Safe Haven",
   domain: "Codex", level: 8, type: "Spell", recall-cost: 3,
   text: "When you have a few minutes of calm to focus, you can spend 2 Hope to summon your Safe Haven, a large interdimensional home where you and your allies can take shelter. When you do, a magical door appears somewhere within Close range. Only creatures of your choice can enter. Once inside, you can make the entrance invisible. You and anyone else inside can always exit. Once you leave, the doorway must be summoned again. When you take a rest within your own Safe Haven, you can choose an additional downtime move.",
+  ..fx("domain-card", "safe-haven", "Safe Haven"),
   flags: source(212),
 )
 
@@ -678,6 +747,7 @@
   id: "disintegration-wave", name: "Disintegration Wave",
   domain: "Codex", level: 9, type: "Spell", recall-cost: 4,
   text: "Make a Spellcast Roll (18). Once per long rest on a success, the GM tells you which adversaries within Far range have a Difficulty of 18 or lower. Mark a Stress for each one you wish to hit with this spell. They are killed and can’t come back to life by any means.",
+  ..fx("domain-card", "disintegration-wave", "Disintegration Wave"),
   flags: source(213),
 )
 
@@ -695,6 +765,7 @@
   id: "transcendent-union", name: "Transcendent Union",
   domain: "Codex", level: 10, type: "Spell", recall-cost: 1,
   text: "Once per long rest, spend 5 Hope to cast this spell on two or more willing creatures. Until your next rest, when a creature connected by this union would mark Stress or Hit Points, the connected creatures can choose who marks it.",
+  ..fx("domain-card", "transcendent-union", "Transcendent Union"),
   flags: source(213),
 )
 
@@ -707,6 +778,7 @@
     - #"On a roll with Hope, deal d6+1 magic damage using your Proficiency. On a roll with Fear, deal d10+1 magic damage using your Proficiency."
     - #"The target’s next successful attack deals half damage. On a failure, you must spend a Hope or mark a Stress."
   ],
+  ..fx("domain-card", "blighting-strike", "Blighting Strike"),
   flags: source(213),
 )
 
@@ -714,6 +786,7 @@
   id: "umbral-veil", name: "Umbral Veil",
   domain: "Dread", level: 1, type: "Spell", recall-cost: 1,
   text: "Once per rest, you can mark a Stress to encase yourself in shadowy energy. When you do, place a number of tokens on this card equal to the number of Fear in the GM’s pool. After an attack roll is made against you, you can spend any number of tokens to give the result a −1 penalty per token spent. At the end of the scene, clear all unspent tokens.",
+  ..fx("domain-card", "umbral-veil", "Umbral Veil"),
   flags: source(213),
 )
 
@@ -721,6 +794,7 @@
   id: "voice-of-dread", name: "Voice of Dread",
   domain: "Dread", level: 1, type: "Spell", recall-cost: 0,
   text: "You can magically speak to a creature you can see, tormenting them with your words. Make a Spellcast Roll against them. On a success, they must mark a Stress and are frozen with terror, making them temporarily Restrained.",
+  ..fx("domain-card", "voice-of-dread", "Voice of Dread"),
   flags: source(213),
 )
 
@@ -728,6 +802,7 @@
   id: "hideous-retribution", name: "Hideous Retribution",
   domain: "Dread", level: 2, type: "Spell", recall-cost: 2,
   text: "When an ally within Close range takes damage from a target you can see, you can make a reaction roll against the target using your Spellcast trait. On a success, mark a Stress to deal d6 magic damage using your Proficiency.",
+  ..fx("domain-card", "hideous-retribution", "Hideous Retribution"),
   flags: source(213),
 )
 
@@ -735,6 +810,7 @@
   id: "siphon-essence", name: "Siphon Essence",
   domain: "Dread", level: 2, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against a target within Very Close range. Once per long rest on a success, the target takes d12+4 magic damage using your Proficiency. On a success with Fear, you gain a +1 bonus to your Proficiency for this attack. You clear a number of Hit Points equal to the number of Hit Points the target marked from this attack.",
+  ..fx("domain-card", "siphon-essence", "Siphon Essence"),
   flags: source(213),
 )
 
@@ -742,6 +818,7 @@
   id: "shared-trauma", name: "Shared Trauma",
   domain: "Dread", level: 3, type: "Spell", recall-cost: 1,
   text: "You can transfer suffering from one creature to another. Once per rest, mark any number of Hit Points on a willing creature within Melee range to clear an equal number of Hit Points on another willing creature within Melee range.",
+  ..fx("domain-card", "shared-trauma", "Shared Trauma"),
   flags: source(213),
 )
 
@@ -749,6 +826,7 @@
   id: "terrify", name: "Terrify",
   domain: "Dread", level: 3, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against a target within Close range. On a success, the target marks 1d4 Stress, and you can make the target flee one range away from you (such as Very Close to Close or Close to Far). On a success with Fear, the target also becomes temporarily Vulnerable.",
+  ..fx("domain-card", "terrify", "Terrify"),
   flags: source(213),
 )
 
@@ -756,6 +834,7 @@
   id: "chains-of-affliction", name: "Chains of Affliction",
   domain: "Dread", level: 4, type: "Spell", recall-cost: 2,
   text: "Mark 2 Stress to temporarily Chain a target within Close range. When a Chained creature deals damage, the target of their attack marks one fewer Hit Point than they normally would. You can’t have more than one creature Chained at a time.",
+  ..fx("domain-card", "chains-of-affliction", "Chains of Affliction"),
   flags: source(213),
 )
 
@@ -763,6 +842,7 @@
   id: "summon-horror", name: "Summon Horror",
   domain: "Dread", level: 4, type: "Spell", recall-cost: 2,
   text: "Once per scene, mark a Stress to summon an otherworldly creature that deals d8+1 magic damage using your Spellcast trait to a target within Far range. If the target marks any Hit Points from this attack, they must succeed on a Reaction Roll (12) to steel themselves against the horror or mark an equal number of Stress. After making the attack, the creature dissipates.",
+  ..fx("domain-card", "summon-horror", "Summon Horror"),
   flags: source(214),
 )
 
@@ -770,6 +850,7 @@
   id: "dire-strike", name: "Dire Strike",
   domain: "Dread", level: 5, type: "Spell", recall-cost: 2,
   text: "When a target marks any number of Hit Points from an attack you make, you can spend a Hope to drain power from them. The GM loses a Fear.",
+  ..fx("domain-card", "dire-strike", "Dire Strike"),
   flags: source(214),
 )
 
@@ -777,6 +858,7 @@
   id: "spectral-mist", name: "Spectral Mist",
   domain: "Dread", level: 5, type: "Spell", recall-cost: 0,
   text: "Spend 2 Hope to conjure an eerie mist that turns you and allies of your choice within Close range momentarily incorporeal. While a creature is incorporeal, they can move through solid objects and are immune to physical damage. They become corporeal again after they pass through a solid object or make an action roll. Otherwise, this effect lasts until the end of the scene.",
+  ..fx("domain-card", "spectral-mist", "Spectral Mist"),
   flags: source(214),
 )
 
@@ -784,6 +866,7 @@
   id: "darkfire", name: "Darkfire",
   domain: "Dread", level: 6, type: "Spell", recall-cost: 2,
   text: "Once per scene, spend any number of Hope to target an equal number of adversaries within Close range. Each target makes a Reaction Roll (15). Targets who fail take d8+6 magic damage using your Spellcast trait as they are engulfed in dark fire. Targets who succeed take half damage.",
+  ..fx("domain-card", "darkfire", "Darkfire"),
   flags: source(214),
 )
 
@@ -791,6 +874,7 @@
   id: "jump-scare", name: "Jump Scare",
   domain: "Dread", level: 6, type: "Spell", recall-cost: 1,
   text: "When you deal magic damage to a target, you can mark a Stress to teleport into Melee range with them. When you do, they are Vulnerable until they mark 1 or more Hit Points.",
+  ..fx("domain-card", "jump-scare", "Jump Scare"),
   flags: source(214),
 )
 
@@ -803,6 +887,7 @@
     - #"When you succeed with Fear, you can mark 2 Stress to prevent the GM from gaining a Fear."
     - #"Once per rest when making an action roll, you can gain a bonus to the roll equal to the number of Fear in the GM’s pool."
   ],
+  ..fx("domain-card", "dread-touched", "Dread-Touched"),
   flags: source(214),
 )
 
@@ -810,6 +895,7 @@
   id: "wall-of-hunger", name: "Wall of Hunger",
   domain: "Dread", level: 7, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (10). On a success, you can spend a Hope to create a visible wall of writhing necrotic energy between two points within Far range. The wall lasts until you mark a Hit Point or cast this spell again. A creature inside the wall when it appears or that passes through it must mark 2 Stress.",
+  ..fx("domain-card", "wall-of-hunger", "Wall of Hunger"),
   flags: source(214),
 )
 
@@ -817,6 +903,7 @@
   id: "dark-army", name: "Dark Army",
   domain: "Dread", level: 8, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (14). Once per long rest on a success, you can summon fiends that surround and move with you. Place 8 tokens on this card. When you deal damage to a target within Very Close range, you can spend any number of tokens to add 1d8 for each token spent to your damage roll. Additionally, when you take damage, you can spend any number of tokens to reduce the damage by 1d8 for each token spent. Each time you spend a token, a fiend acts on your behalf, then disappears. When you take a rest, clear all unspent tokens.",
+  ..fx("domain-card", "dark-army", "Dark Army"),
   flags: source(214),
 )
 
@@ -824,6 +911,7 @@
   id: "eldritch-flesh", name: "Eldritch Flesh",
   domain: "Dread", level: 8, type: "Spell", recall-cost: 1,
   text: "Gain a +1 bonus to your damage thresholds for each Stress you have marked. Additionally, when you roll with Fear, you can spend 2 Hope to clear an Armor Slot.",
+  ..fx("domain-card", "eldritch-flesh", "Eldritch Flesh"),
   flags: source(214),
 )
 
@@ -831,6 +919,7 @@
   id: "damnation", name: "Damnation",
   domain: "Dread", level: 9, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll against a target within Far range. On a success, mark any number of Stress to roll an equal number of d20s, dealing magic damage equal to the total result. If this attack defeats the target, all adversaries within Far range of the target must mark a Stress.",
+  ..fx("domain-card", "damnation", "Damnation"),
   flags: source(214),
 )
 
@@ -838,6 +927,7 @@
   id: "savor-the-anguish", name: "Savor the Anguish",
   domain: "Dread", level: 9, type: "Ability", recall-cost: 1,
   text: "When an adversary within Close range takes Severe damage, you can clear a Stress.",
+  ..fx("domain-card", "savor-the-anguish", "Savor the Anguish"),
   flags: source(214),
 )
 
@@ -845,6 +935,7 @@
   id: "avatar-of-terror", name: "Avatar of Terror",
   domain: "Dread", level: 10, type: "Spell", recall-cost: 2,
   text: "Mark a Stress to transform into a creature fueled by fear. While in this form, you gain a 1d6 bonus to your damage rolls for each Fear in the GM’s pool. Additionally, you gain a Hope when the GM spends a Fear to spotlight an adversary within Very Close range. Before you make an action roll, you must spend a Hope. If you can’t, you revert to your normal form.",
+  ..fx("domain-card", "avatar-of-terror", "Avatar of Terror"),
   flags: source(214),
 )
 
@@ -852,6 +943,7 @@
   id: "invoke-torment", name: "Invoke Torment",
   domain: "Dread", level: 10, type: "Ability", recall-cost: 2,
   text: "You deal double damage to targets that have all their Stress marked. Additionally, when an adversary within Close range is defeated with all its Stress marked, you gain a Hope..",
+  ..fx("domain-card", "invoke-torment", "Invoke Torment"),
   flags: source(214),
 )
 
@@ -859,6 +951,7 @@
   id: "deft-deceiver", name: "Deft Deceiver",
   domain: "Grace", level: 1, type: "Ability", recall-cost: 0,
   text: "Spend a Hope to gain advantage on a roll to deceive or trick someone into believing a lie you tell them.",
+  ..fx("domain-card", "deft-deceiver", "Deft Deceiver"),
   flags: source(215),
 )
 
@@ -866,6 +959,7 @@
   id: "enrapture", name: "Enrapture",
   domain: "Grace", level: 1, type: "Spell", recall-cost: 0,
   text: "Make a Spellcast Roll against a target within Close range. On a success, they become temporarily Enraptured. While Enraptured, a target’s attention is fixed on you, narrowing their field of view and drowning out any sound but your voice. Once per rest on a success, you can mark a Stress to force the Enraptured target to mark a Stress as well.",
+  ..fx("domain-card", "enrapture", "Enrapture"),
   flags: source(215),
 )
 
@@ -879,6 +973,7 @@
     - #"Your ally clears a Hit Point."
     - #"Your ally gains a Hope. When you take a long rest, clear all unspent tokens."
   ],
+  ..fx("domain-card", "inspirational-words", "Inspirational Words"),
   flags: source(215),
 )
 
@@ -886,6 +981,7 @@
   id: "tell-no-lies", name: "Tell No Lies",
   domain: "Grace", level: 2, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against a target within Very Close range. On a success, they can’t lie to you while they remain within Close range, but they are not compelled to speak. If you ask them a question and they refuse to answer, they must mark a Stress and the effect ends. The target is typically unaware this spell has been cast on them until it causes them to utter the truth.",
+  ..fx("domain-card", "tell-no-lies", "Tell No Lies"),
   flags: source(215),
 )
 
@@ -893,6 +989,7 @@
   id: "troublemaker", name: "Troublemaker",
   domain: "Grace", level: 2, type: "Ability", recall-cost: 2,
   text: "When you taunt or provoke a target within Far range, make a Presence Roll against them. Once per rest on a success, roll a number of d4s equal to your Proficiency. The target must mark Stress equal to the highest result rolled.",
+  ..fx("domain-card", "troublemaker", "Troublemaker"),
   flags: source(215),
 )
 
@@ -900,6 +997,7 @@
   id: "hypnotic-shimmer", name: "Hypnotic Shimmer",
   domain: "Grace", level: 3, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against all adversaries in front of you within Close range. Once per rest on a success, create an illusion of flashing colors and lights that temporarily Stuns targets you succeed against and forces them to mark a Stress. While Stunned, they can’t use reactions and can’t take any other actions until they clear this condition.",
+  ..fx("domain-card", "hypnotic-shimmer", "Hypnotic Shimmer"),
   flags: source(215),
 )
 
@@ -907,6 +1005,7 @@
   id: "invisibility", name: "Invisibility",
   domain: "Grace", level: 3, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll (10). On a success, mark a Stress and choose yourself or an ally within Melee range to become Invisible. An Invisible creature can’t be seen except through magical means and attack rolls against them are made with disadvantage. Place a number of tokens on this card equal to your Spellcast trait. When the Invisible creature takes an action, spend a token from this card. After the action that spends the last token is resolved, the effect ends. You can only hold Invisibility on one creature at a time.",
+  ..fx("domain-card", "invisibility", "Invisibility"),
   flags: source(215),
 )
 
@@ -914,6 +1013,7 @@
   id: "soothing-speech", name: "Soothing Speech",
   domain: "Grace", level: 4, type: "Ability", recall-cost: 1,
   text: "During a short rest, when you take the time to comfort another character while using the Tend to Wounds downtime move on them, clear an additional Hit Point on that character. When you do, you also clear 2 Hit Points.",
+  ..fx("domain-card", "soothing-speech", "Soothing Speech"),
   flags: source(215),
 )
 
@@ -921,6 +1021,7 @@
   id: "through-your-eyes", name: "Through Your Eyes",
   domain: "Grace", level: 4, type: "Spell", recall-cost: 1,
   text: "Choose a target within Very Far range. You can see through their eyes and hear through their ears. You can transition between using your own senses or the target’s freely until you cast another spell or until your next rest.",
+  ..fx("domain-card", "through-your-eyes", "Through Your Eyes"),
   flags: source(215),
 )
 
@@ -928,6 +1029,7 @@
   id: "thought-delver", name: "Thought Delver",
   domain: "Grace", level: 5, type: "Spell", recall-cost: 2,
   text: "You can peek into the minds of others. Spend a Hope to read the vague surface thoughts of a target within Far range. Make a Spellcast Roll against the target to delve for deeper, more hidden thoughts. On a roll with Fear, the target might, at the GM’s discretion, become aware that you’re reading their thoughts.",
+  ..fx("domain-card", "thought-delver", "Thought Delver"),
   flags: source(215),
 )
 
@@ -935,6 +1037,7 @@
   id: "words-of-discord", name: "Words of Discord",
   domain: "Grace", level: 5, type: "Spell", recall-cost: 1,
   text: "Whisper words of discord to an adversary within Melee range and make a Spellcast Roll (13). On a success, the target must mark a Stress and make an attack against another adversary instead of against you or your allies. Once this attack is over, the target realizes what happened. The next time you cast Words of Discord on them, gain a −5 penalty to the Spellcast Roll.",
+  ..fx("domain-card", "words-of-discord", "Words of Discord"),
   flags: source(215),
 )
 
@@ -942,6 +1045,7 @@
   id: "never-upstaged", name: "Never Upstaged",
   domain: "Grace", level: 6, type: "Ability", recall-cost: 2,
   text: "When you mark 1 or more Hit Points from an attack, you can mark a Stress to place a number of tokens equal to the number of Hit Points you marked on this card. On your next successful attack, gain a +5 bonus to your damage roll for each token on this card, then clear all tokens.",
+  ..fx("domain-card", "never-upstaged", "Never Upstaged"),
   flags: source(215),
 )
 
@@ -949,6 +1053,7 @@
   id: "share-the-burden", name: "Share the Burden",
   domain: "Grace", level: 6, type: "Spell", recall-cost: 0,
   text: "Once per rest, take on the Stress from a willing creature within Melee range. The target describes what intimate knowledge or emotions telepathically leak from their mind in this moment between you. Transfer any number of their marked Stress to you, then gain a Hope for each Stress transferred.",
+  ..fx("domain-card", "share-the-burden", "Share the Burden"),
   flags: source(216),
 )
 
@@ -956,6 +1061,7 @@
   id: "endless-charisma", name: "Endless Charisma",
   domain: "Grace", level: 7, type: "Ability", recall-cost: 1,
   text: "After you make an action roll to persuade, lie, or garner favor, you can spend a Hope to reroll the Hope or Fear Die.",
+  ..fx("domain-card", "endless-charisma", "Endless Charisma"),
   flags: source(216),
 )
 
@@ -968,6 +1074,7 @@
     - #"You can mark an Armor Slot instead of marking a Stress."
     - #"When you would force a target to mark a number of Hit Points, you can choose instead to force them to mark that number of Stress."
   ],
+  ..fx("domain-card", "grace-touched", "Grace-Touched"),
   flags: source(216),
 )
 
@@ -975,6 +1082,7 @@
   id: "astral-projection", name: "Astral Projection",
   domain: "Grace", level: 8, type: "Spell", recall-cost: 0,
   text: "Once per long rest, mark a Stress to create a projected copy of yourself that can appear anywhere you’ve been before. You can see and hear through the projection as though it were you and affect the world as though you were there. A creature investigating the projection can tell it’s of magical origin. This effect lasts until your next rest or your projection takes any damage.",
+  ..fx("domain-card", "astral-projection", "Astral Projection"),
   flags: source(216),
 )
 
@@ -982,6 +1090,7 @@
   id: "mass-enrapture", name: "Mass Enrapture",
   domain: "Grace", level: 8, type: "Spell", recall-cost: 3,
   text: "Make a Spellcast Roll against all targets within Far range. Targets you succeed against become temporarily Enraptured. While Enraptured, a target’s attention is fixed on you, narrowing their field of view and drowning out any sound but your voice. Mark a Stress to force all Enraptured targets to mark a Stress, ending this spell.",
+  ..fx("domain-card", "mass-enrapture", "Mass Enrapture"),
   flags: source(216),
 )
 
@@ -989,6 +1098,7 @@
   id: "copycat", name: "Copycat",
   domain: "Grace", level: 9, type: "Spell", recall-cost: 3,
   text: "Once per long rest, this card can mimic the features of another domain card of level 8 or lower in another player’s loadout. Spend Hope equal to half the card’s level to gain access to the feature. It lasts until your next rest or they place the card in their vault.",
+  ..fx("domain-card", "copycat", "Copycat"),
   flags: source(216),
 )
 
@@ -996,6 +1106,7 @@
   id: "master-of-the-craft", name: "Master of the Craft",
   domain: "Grace", level: 9, type: "Ability", recall-cost: 0,
   text: "Gain a permanent +2 bonus to two of your Experiences or a permanent +3 bonus to one of your Experiences. Then place this card in your vault permanently.",
+  ..fx("domain-card", "master-of-the-craft", "Master of the Craft"),
   flags: source(216),
 )
 
@@ -1003,6 +1114,7 @@
   id: "encore", name: "Encore",
   domain: "Grace", level: 10, type: "Spell", recall-cost: 1,
   text: "When an ally within Close range deals damage to an adversary, you can make a Spellcast Roll against that same target. On a success, you deal the same damage to the target that your ally dealt. If your Spellcast Roll succeeds with Fear, place this card in your vault.",
+  ..fx("domain-card", "encore", "Encore"),
   flags: source(216),
 )
 
@@ -1010,6 +1122,7 @@
   id: "notorious", name: "Notorious",
   domain: "Grace", level: 10, type: "Ability", recall-cost: 0,
   text: "People know who you are and what you’ve done, and they treat you differently because of it. When you leverage your notoriety to get what you want, you can mark a Stress before you roll to gain a +10 bonus to the result. Your food and drinks are always free wherever you go, and everything else you buy is reduced in price by one bag of gold (to a minimum of one handful).",
+  ..fx("domain-card", "notorious", "Notorious"),
   flags: source(216),
 )
 
@@ -1017,6 +1130,7 @@
   id: "pick-and-pull", name: "Pick and Pull",
   domain: "Midnight", level: 1, type: "Ability", recall-cost: 0,
   text: "You have advantage on action rolls to pick nonmagical locks, disarm nonmagical traps, or steal items from a target (either through stealth or by force).",
+  ..fx("domain-card", "pick-and-pull", "Pick and Pull"),
   flags: source(216),
 )
 
@@ -1024,6 +1138,7 @@
   id: "rain-of-blades", name: "Rain of Blades",
   domain: "Midnight", level: 1, type: "Spell", recall-cost: 1,
   text: "Spend a Hope to make a Spellcast Roll and conjure throwing blades that strike out at all targets within Very Close range. Targets you succeed against take d8+2 magic damage using your Proficiency. If a target you hit is Vulnerable, they take an extra 1d8 damage.",
+  ..fx("domain-card", "rain-of-blades", "Rain of Blades"),
   flags: source(216),
 )
 
@@ -1031,6 +1146,7 @@
   id: "uncanny-disguise", name: "Uncanny Disguise",
   domain: "Midnight", level: 1, type: "Spell", recall-cost: 0,
   text: "When you have a few minutes to prepare, you can mark a Stress to don the facade of any humanoid you can picture clearly in your mind. While disguised, you have advantage on Presence Rolls to avoid scrutiny. Place a number of tokens equal to your Spellcast trait on this card. When you take an action while disguised, spend a token from this card. After the action that spends the last token is resolved, the disguise drops.",
+  ..fx("domain-card", "uncanny-disguise", "Uncanny Disguise"),
   flags: source(216),
 )
 
@@ -1038,6 +1154,7 @@
   id: "midnight-spirit", name: "Midnight Spirit",
   domain: "Midnight", level: 2, type: "Spell", recall-cost: 1,
   text: "Spend a Hope to summon a humanoid-sized spirit that can move or carry things for you until your next rest. You can also send it to attack an adversary. When you do, make a Spellcast Roll against a target within Very Far range. On a success, the spirit moves into Melee range with that target. Roll a number of d6s equal to your Spellcast trait and deal that much magic damage to the target. The spirit then dissipates. You can only have one spirit at a time.",
+  ..fx("domain-card", "midnight-spirit", "Midnight Spirit"),
   flags: source(217),
 )
 
@@ -1045,6 +1162,7 @@
   id: "shadowbind", name: "Shadowbind",
   domain: "Midnight", level: 2, type: "Spell", recall-cost: 0,
   text: "Make a Spellcast Roll against all adversaries within Very Close range. Targets you succeed against are temporarily Restrained as their shadow binds them in place.",
+  ..fx("domain-card", "shadowbind", "Shadowbind"),
   flags: source(217),
 )
 
@@ -1052,6 +1170,7 @@
   id: "chokehold", name: "Chokehold",
   domain: "Midnight", level: 3, type: "Ability", recall-cost: 1,
   text: "When you position yourself behind a creature who’s about your size, you can mark a Stress to pull them into a chokehold, making them temporarily Vulnerable. When a creature attacks a target who is Vulnerable in this way, they deal an extra 2d6 damage.",
+  ..fx("domain-card", "chokehold", "Chokehold"),
   flags: source(217),
 )
 
@@ -1059,6 +1178,7 @@
   id: "veil-of-night", name: "Veil of Night",
   domain: "Midnight", level: 3, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll (13). On a success, you can create a temporary curtain of darkness between two points within Far range. Only you can see through this darkness. You’re considered Hidden to adversaries on the other side of the veil, and you have advantage on attacks you make through the darkness. The veil remains until you cast another spell.",
+  ..fx("domain-card", "veil-of-night", "Veil of Night"),
   flags: source(217),
 )
 
@@ -1066,6 +1186,7 @@
   id: "stealth-expertise", name: "Stealth Expertise",
   domain: "Midnight", level: 4, type: "Ability", recall-cost: 0,
   text: "When you roll with Fear while attempting to move unnoticed through a dangerous area, you can mark a Stress to roll with Hope instead. If an ally within Close range is also attempting to move unnoticed and rolls with Fear, you can mark a Stress to change their result to a roll with Hope.",
+  ..fx("domain-card", "stealth-expertise", "Stealth Expertise"),
   flags: source(217),
 )
 
@@ -1073,6 +1194,7 @@
   id: "glyph-of-nightfall", name: "Glyph of Nightfall",
   domain: "Midnight", level: 4, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against a target within Very Close range. On a success, spend a Hope to conjure a dark glyph upon their body that exposes their weak points, temporarily reducing the target’s Difficulty by a value equal to your Knowledge (minimum 1).",
+  ..fx("domain-card", "glyph-of-nightfall", "Glyph of Nightfall"),
   flags: source(217),
 )
 
@@ -1080,6 +1202,7 @@
   id: "hush", name: "Hush",
   domain: "Midnight", level: 5, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against a target within Close range. On a success, spend a Hope to conjure suppressive magic around the target that encompasses everything within Very Close range of them and follows them as they move. The target and anything within the area is Silenced until the GM spends a Fear on their turn to clear this condition, you cast Hush again, or you take Major damage. While Silenced, they can’t make noise and can’t cast spells.",
+  ..fx("domain-card", "hush", "Hush"),
   flags: source(217),
 )
 
@@ -1087,6 +1210,7 @@
   id: "phantom-retreat", name: "Phantom Retreat",
   domain: "Midnight", level: 5, type: "Spell", recall-cost: 2,
   text: "Spend a Hope to activate Phantom Retreat where you’re currently standing. Spend another Hope at any time before your next rest to disappear from where you are and reappear where you were standing when you activated Phantom Retreat. This spell ends after you reappear.",
+  ..fx("domain-card", "phantom-retreat", "Phantom Retreat"),
   flags: source(217),
 )
 
@@ -1101,6 +1225,7 @@
     - #"What are they afraid of?"
     - #"What do they cherish most in the world?"
   ],
+  ..fx("domain-card", "dark-whispers", "Dark Whispers"),
   flags: source(217),
 )
 
@@ -1108,6 +1233,7 @@
   id: "mass-disguise", name: "Mass Disguise",
   domain: "Midnight", level: 6, type: "Spell", recall-cost: 0,
   text: "When you have a few minutes of silence to focus, you can mark a Stress to change the appearance of all willing creatures within Close range. Their new forms must share a general body structure and size, and can be somebody or something you’ve seen before or entirely fabricated. A disguised creature has advantage on Presence Rolls to avoid scrutiny. Activate a Countdown (8). It ticks down as a consequence the GM chooses. When it triggers, the disguise drops.",
+  ..fx("domain-card", "mass-disguise", "Mass Disguise"),
   flags: source(217),
 )
 
@@ -1120,6 +1246,7 @@
     - #"Once per rest, when you have 0 Hope and the GM would gain a Fear, you can gain a Hope instead."
     - #"When you make a successful attack, you can mark a Stress to add the result of your Fear Die to your damage roll."
   ],
+  ..fx("domain-card", "midnight-touched", "Midnight-Touched"),
   flags: source(217),
 )
 
@@ -1127,6 +1254,7 @@
   id: "vanishing-dodge", name: "Vanishing Dodge",
   domain: "Midnight", level: 7, type: "Spell", recall-cost: 1,
   text: "When an attack made against you that would deal physical damage fails, you can spend a Hope to envelop yourself in shadow, becoming Hidden and teleporting to a point within Close range of the attacker. You remain Hidden until the next time you make an action roll.",
+  ..fx("domain-card", "vanishing-dodge", "Vanishing Dodge"),
   flags: source(218),
 )
 
@@ -1134,6 +1262,7 @@
   id: "shadowhunter", name: "Shadowhunter",
   domain: "Midnight", level: 8, type: "Ability", recall-cost: 2,
   text: "Your prowess is enhanced under the cover of shadow. While you’re shrouded in low light or darkness, you gain a +1 bonus to your Evasion and make attack rolls with advantage.",
+  ..fx("domain-card", "shadowhunter", "Shadowhunter"),
   flags: source(218),
 )
 
@@ -1141,6 +1270,7 @@
   id: "spellcharge", name: "Spellcharge",
   domain: "Midnight", level: 8, type: "Spell", recall-cost: 1,
   text: "When you take magic damage, place tokens equal to the number of Hit Points you marked on this card. You can store a number of tokens equal to your Spellcast trait. When you make a successful attack against a target, you can spend any number of tokens to add a d6 for each token spent to your damage roll.",
+  ..fx("domain-card", "spellcharge", "Spellcharge"),
   flags: source(218),
 )
 
@@ -1148,6 +1278,7 @@
   id: "night-terror", name: "Night Terror",
   domain: "Midnight", level: 9, type: "Spell", recall-cost: 2,
   text: "Once per long rest, choose any targets within Very Close range to perceive you as a nightmarish horror. The targets must succeed on a Reaction Roll (16) or become temporarily Horrified. While Horrified, they’re Vulnerable. Steal a number of Fear from the GM equal to the number of targets that are Horrified (up to the number of Fear in the GM’s pool). Roll a number of d6s equal to the number of stolen Fear and deal the total damage to each Horrified target. Discard the stolen Fear.",
+  ..fx("domain-card", "night-terror", "Night Terror"),
   flags: source(218),
 )
 
@@ -1155,6 +1286,7 @@
   id: "twilight-toll", name: "Twilight Toll",
   domain: "Midnight", level: 9, type: "Ability", recall-cost: 1,
   text: "Choose a target within Far range. When you succeed on an action roll against them that doesn’t result in making a damage roll, place a token on this card. When you deal damage to this target, spend any number of tokens to add a d12 for each token spent to your damage roll. You can only hold Twilight Toll on one creature at a time. When you choose a new target or take a rest, clear all unspent tokens.",
+  ..fx("domain-card", "twilight-toll", "Twilight Toll"),
   flags: source(218),
 )
 
@@ -1162,6 +1294,7 @@
   id: "eclipse", name: "Eclipse",
   domain: "Midnight", level: 10, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (16). Once per long rest on a success, plunge the entire area within Far range into complete darkness only you and your allies can see through. Attack rolls have disadvantage when targeting you or an ally within this shadow. Additionally, when you or an ally succeeds with Hope against an adversary within this shadow, the target must mark a Stress. This spell lasts until the GM spends a Fear on their turn to clear this effect or you take Severe damage.",
+  ..fx("domain-card", "eclipse", "Eclipse"),
   flags: source(218),
 )
 
@@ -1169,6 +1302,7 @@
   id: "specter-of-the-dark", name: "Specter of the Dark",
   domain: "Midnight", level: 10, type: "Spell", recall-cost: 1,
   text: "Mark a Stress to become Spectral until you make an action roll targeting another creature. While Spectral, you’re immune to physical damage and can float and pass through solid objects. Other creatures can still see you while you’re in this form.",
+  ..fx("domain-card", "specter-of-the-dark", "Specter of the Dark"),
   flags: source(218),
 )
 
@@ -1183,6 +1317,7 @@
     - #"What were they doing in this location?"
     - #"How many of them were here? When you encounter creatures you’ve tracked in this way, gain a +1 bonus to your Evasion against them."
   ],
+  ..fx("domain-card", "gifted-tracker", "Gifted Tracker"),
   flags: source(218),
 )
 
@@ -1190,6 +1325,7 @@
   id: "natures-tongue", name: "Nature’s Tongue",
   domain: "Sage", level: 1, type: "Ability", recall-cost: 0,
   text: "You can speak the language of the natural world. When you want to speak to the plants and animals around you, make an Instinct Roll (12). On a success, they’ll give you the information they know. On a roll with Fear, their knowledge might be limited or come at a cost. Additionally, before you make a Spellcast Roll while within a natural environment, you can spend a Hope to gain a +2 bonus to the roll.",
+  ..fx("domain-card", "natures-tongue", "Nature’s Tongue"),
   flags: source(218),
 )
 
@@ -1197,6 +1333,7 @@
   id: "vicious-entangle", name: "Vicious Entangle",
   domain: "Sage", level: 1, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against a target within Far range. On a success, roots and vines reach out from the ground, dealing 1d8+1 physical damage and temporarily Restraining the target. Additionally on a success, you can spend a Hope to temporarily Restrain another adversary within Very Close range of your target.",
+  ..fx("domain-card", "vicious-entangle", "Vicious Entangle"),
   flags: source(218),
 )
 
@@ -1214,6 +1351,7 @@
   id: "natural-familiar", name: "Natural Familiar",
   domain: "Sage", level: 2, type: "Spell", recall-cost: 1,
   text: "Spend a Hope to summon a small nature spirit or forest critter to your side until your next rest, you cast Natural Familiar again, or the familiar is targeted by an attack. If you spend an additional Hope, you can summon a familiar that flies. You can communicate with them, make a Spellcast Roll to command them to perform simple tasks, and mark a Stress to see through their eyes. When you deal damage to an adversary within Melee range of your familiar, you add a d6 to your damage roll.",
+  ..fx("domain-card", "natural-familiar", "Natural Familiar"),
   flags: source(219),
 )
 
@@ -1221,6 +1359,7 @@
   id: "corrosive-projectile", name: "Corrosive Projectile",
   domain: "Sage", level: 3, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against a target within Far range. On a success, deal d6+4 magic damage using your Proficiency. Additionally, mark 2 or more Stress to make them permanently Corroded. While a target is Corroded, they gain a −1 penalty to their Difficulty for every 2 Stress you spent. This condition can stack.",
+  ..fx("domain-card", "corrosive-projectile", "Corrosive Projectile"),
   flags: source(219),
 )
 
@@ -1228,6 +1367,7 @@
   id: "towering-stalk", name: "Towering Stalk",
   domain: "Sage", level: 3, type: "Spell", recall-cost: 1,
   text: "Once per rest, you can conjure a thick, twisting stalk within Close range that can be easily climbed. Its height can grow up to Far range. Mark a Stress to use this spell as an attack. Make a Spellcast Roll against an adversary or group of adversaries within Close range. The erupting stalk lifts targets you succeed against into the air and drops them, dealing d8 physical damage using your Proficiency.",
+  ..fx("domain-card", "towering-stalk", "Towering Stalk"),
   flags: source(219),
 )
 
@@ -1241,6 +1381,7 @@
     - #"You constrict the target and force them to mark 2 Stress."
     - #"All adversaries between you and the target must succeed on a Reaction Roll (13) or be hit by vines, taking 3d6+2 physical damage. On a success, vines reach out from your hands, causing the chosen effect and temporarily Restraining the target."
   ],
+  ..fx("domain-card", "death-grip", "Death Grip"),
   flags: source(219),
 )
 
@@ -1248,6 +1389,7 @@
   id: "healing-field", name: "Healing Field",
   domain: "Sage", level: 4, type: "Spell", recall-cost: 2,
   text: "Once per long rest, you can conjure a field of healing plants around you. Everywhere within Close range of you bursts to life with vibrant nature, allowing you and all allies in the area to clear a Hit Point. Spend 2 Hope to allow you and all allies to clear 2 Hit Points instead.",
+  ..fx("domain-card", "healing-field", "Healing Field"),
   flags: source(219),
 )
 
@@ -1255,6 +1397,7 @@
   id: "thorn-skin", name: "Thorn Skin",
   domain: "Sage", level: 5, type: "Spell", recall-cost: 1,
   text: "Once per rest, spend a Hope to sprout thorns all over your body. When you do, place a number of tokens equal to your Spellcast trait on this card. When you take damage, you can spend any number of tokens to roll that number of d6s. Add the results together and reduce the incoming damage by that amount. If you’re within Melee range of the attacker, deal that amount of damage back to them. When you take a rest, clear all unspent tokens.",
+  ..fx("domain-card", "thorn-skin", "Thorn Skin"),
   flags: source(219),
 )
 
@@ -1262,6 +1405,7 @@
   id: "wild-fortress", name: "Wild Fortress",
   domain: "Sage", level: 5, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll (13). On a success, spend 2 Hope to grow a natural barricade in the shape of a dome that you and one ally can take cover within. While inside the dome, a creature can’t be targeted by attacks and can’t make attacks. Attacks made against the dome automatically succeed. The dome has the following damage thresholds and lasts until it marks 3 Hit Points. Place tokens on this card to represent marking Hit Points. Thresholds: 15/30",
+  ..fx("domain-card", "wild-fortress", "Wild Fortress"),
   flags: source(219),
 )
 
@@ -1269,13 +1413,24 @@
   id: "conjured-steeds", name: "Conjured Steeds",
   domain: "Sage", level: 6, type: "Spell", recall-cost: 0,
   text: "Spend any number of Hope to conjure that many magical steeds (such as horses, camels, or elephants) that you and your allies can ride until your next long rest or the steeds take any damage. The steeds double your land speed while traveling and, when in danger, allow you to move within Far range without having to roll. Creatures riding a steed gain a −2 penalty to attack rolls and a +2 bonus to damage rolls.",
+  ..fx("domain-card", "conjured-steeds", "Conjured Steeds"),
   flags: source(219),
 )
 
 #let forager = domain-card(
   id: "forager", name: "Forager",
   domain: "Sage", level: 6, type: "Ability", recall-cost: 1,
-  text: "As an additional downtime move you can choose, roll a d6 to see what you forage. Work with the GM to describe it and add it to your inventory as a consumable. Your party can carry up to five foraged consumables at a time. 1. A unique food (Clear 2 Stress) 2. A beautiful relic (Gain 2 Hope) 3. An arcane rune (+2 to a Spellcast Roll) 4. A healing vial (Clear 2 Hit Points) 5. A luck charm (Reroll any die) 6. Choose one of the options above.",
+  text: [
+    #"As an additional downtime move you can choose, roll a d6 to see what you forage. Work with the GM to describe it and add it to your inventory as a consumable. Your party can carry up to five foraged consumables at a time."
+
+    1. #"A unique food (Clear 2 Stress)"
+    2. #"A beautiful relic (Gain 2 Hope)"
+    3. #"An arcane rune (+2 to a Spellcast Roll)"
+    4. #"A healing vial (Clear 2 Hit Points)"
+    5. #"A luck charm (Reroll any die)"
+    6. #"Choose one of the options above."
+  ],
+  ..fx("domain-card", "forager", "Forager"),
   flags: source(219),
 )
 
@@ -1288,6 +1443,7 @@
     - #"While you’re in a natural environment, you gain a +2 bonus to your Spellcast Rolls."
     - #"Once per rest, you can double your Agility or Instinct when making a roll that uses that trait. You must choose to do this before you roll."
   ],
+  ..fx("domain-card", "sage-touched", "Sage-Touched"),
   flags: source(220),
 )
 
@@ -1295,6 +1451,7 @@
   id: "wild-surge", name: "Wild Surge",
   domain: "Sage", level: 7, type: "Spell", recall-cost: 2,
   text: "Once per long rest, mark a Stress to channel the natural world around you and enhance yourself. Describe how your appearance changes, then place a d6 on this card with the 1 value facing up. While the Wild Surge Die is active, you add its value to every action roll you make. After you add its value to a roll, increase the Wild Surge Die’s value by one. When the die’s value would exceed 6 or you take a rest, this form drops and you must mark an additional Stress. --",
+  ..fx("domain-card", "wild-surge", "Wild Surge"),
   flags: source(220),
 )
 
@@ -1307,6 +1464,7 @@
     - #"Your allies gain a +3 bonus to attack rolls against adversaries within Melee range of a sprite."
     - #"An ally who marks an Armor Slot while within Melee range of a sprite can mark an additional Armor Slot. A sprite vanishes after granting a benefit or taking any damage."
   ],
+  ..fx("domain-card", "forest-sprites", "Forest Sprites"),
   flags: source(220),
 )
 
@@ -1314,6 +1472,7 @@
   id: "rejuvenation-barrier", name: "Rejuvenation Barrier",
   domain: "Sage", level: 8, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll (15). Once per rest on a success, create a temporary barrier of protective energy around you at Very Close range. You and all allies within the barrier when this spell is cast clear 1d4 Hit Points. While the barrier is up, you and all allies within have resistance to physical damage from outside the barrier. When you move, the barrier follows you.",
+  ..fx("domain-card", "rejuvenation-barrier", "Rejuvenation Barrier"),
   flags: source(220),
 )
 
@@ -1321,6 +1480,7 @@
   id: "fane-of-the-wilds", name: "Fane of the Wilds",
   domain: "Sage", level: 9, type: "Ability", recall-cost: 2,
   text: "After a long rest, place a number of tokens equal to the number of Sage domain cards in your loadout and vault on this card. When you would make a Spellcast Roll, you can spend any number of tokens after the roll to gain a +1 bonus for each token spent. When you critically succeed on a Spellcast Roll for a Sage domain spell, gain a token. When you take a long rest, clear all unspent tokens.",
+  ..fx("domain-card", "fane-of-the-wilds", "Fane of the Wilds"),
   flags: source(220),
 )
 
@@ -1328,6 +1488,7 @@
   id: "plant-dominion", name: "Plant Dominion",
   domain: "Sage", level: 9, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll (18). Once per long rest on a success, you reshape the natural world, changing the surrounding plant life anywhere within Far range of you. For example, you can grow trees instantly, clear a path through dense vines, or create a wall of roots.",
+  ..fx("domain-card", "plant-dominion", "Plant Dominion"),
   flags: source(220),
 )
 
@@ -1341,6 +1502,7 @@
     - #"When you deal enough damage to defeat a creature within Close range, you absorb them and clear an Armor Slot."
     - #"You can’t be Restrained. Before you make an action roll, you must spend a Hope. If you can’t, you revert to your normal form."
   ],
+  ..fx("domain-card", "force-of-nature", "Force of Nature"),
   flags: source(220),
 )
 
@@ -1354,6 +1516,7 @@
     - #"Hurricane: Deal 3d10+10 magic damage and choose a direction the wind is blowing. Targets can’t move against the wind."
     - #"Sandstorm: Deal 5d6+9 magic damage. Attacks made from beyond Melee range have disadvantage."
   ],
+  ..fx("domain-card", "tempest", "Tempest"),
   flags: source(220),
 )
 
@@ -1361,6 +1524,7 @@
   id: "bolt-beacon", name: "Bolt Beacon",
   domain: "Splendor", level: 1, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll against a target within Far range. On a success, spend a Hope to send a bolt of shimmering light toward them, dealing d8+2 magic damage using your Proficiency. The target becomes temporarily Vulnerable and glows brightly until this condition is cleared.",
+  ..fx("domain-card", "bolt-beacon", "Bolt Beacon"),
   flags: source(221),
 )
 
@@ -1368,6 +1532,7 @@
   id: "mending-touch", name: "Mending Touch",
   domain: "Splendor", level: 1, type: "Spell", recall-cost: 1,
   text: "You lay your hands upon a creature and channel healing magic to close their wounds. When you can take a few minutes to focus on the target you’re helping, you can spend 2 Hope to clear a Hit Point or a Stress on them. Once per long rest, when you spend this healing time learning something new about them or revealing something about yourself, you can clear 2 Hit Points or 2 Stress on them instead.",
+  ..fx("domain-card", "mending-touch", "Mending Touch"),
   flags: source(221),
 )
 
@@ -1375,6 +1540,7 @@
   id: "reassurance", name: "Reassurance",
   domain: "Splendor", level: 1, type: "Ability", recall-cost: 0,
   text: "Once per rest, after an ally attempts an action roll but before the consequences take place, you can offer assistance or words of support. When you do, your ally can reroll their dice.",
+  ..fx("domain-card", "reassurance", "Reassurance"),
   flags: source(221),
 )
 
@@ -1382,6 +1548,7 @@
   id: "final-words", name: "Final Words",
   domain: "Splendor", level: 2, type: "Spell", recall-cost: 1,
   text: "You can infuse a corpse with a moment of life to speak with it. Make a Spellcast Roll (13). On a success with Hope, the corpse answers up to three questions. On a success with Fear, the corpse answers one question. The corpse answers truthfully, but it can’t impart information it didn’t know in life. On a failure, or once the corpse has finished answering your questions, the body turns to dust.",
+  ..fx("domain-card", "final-words", "Final Words"),
   flags: source(221),
 )
 
@@ -1389,6 +1556,7 @@
   id: "healing-hands", name: "Healing Hands",
   domain: "Splendor", level: 2, type: "Spell", recall-cost: 1,
   text: "Make a Spellcast Roll (13) and target a creature other than yourself within Melee range. On a success, mark a Stress to clear 2 Hit Points or 2 Stress on the target. On a failure, mark a Stress to clear a Hit Point or a Stress on the target. You can’t heal the same target again until your next long rest.",
+  ..fx("domain-card", "healing-hands", "Healing Hands"),
   flags: source(221),
 )
 
@@ -1396,6 +1564,7 @@
   id: "second-wind", name: "Second Wind",
   domain: "Splendor", level: 3, type: "Ability", recall-cost: 2,
   text: "Once per rest, when you succeed on an attack against an adversary, you can clear 3 Stress or a Hit Point. On a success with Hope, you also clear 3 Stress or a Hit Point on an ally within Close range of you.",
+  ..fx("domain-card", "second-wind", "Second Wind"),
   flags: source(221),
 )
 
@@ -1403,6 +1572,7 @@
   id: "voice-of-reason", name: "Voice of Reason",
   domain: "Splendor", level: 3, type: "Ability", recall-cost: 1,
   text: "You speak with an unmatched power and authority. You have advantage on action rolls to de-escalate violent situations or convince someone to follow your lead. Additionally, you’re emboldened in moments of duress. When all of your Stress slots are marked, you gain a +1 bonus to your Proficiency for damage rolls.",
+  ..fx("domain-card", "voice-of-reason", "Voice of Reason"),
   flags: source(221),
 )
 
@@ -1410,6 +1580,7 @@
   id: "divination", name: "Divination",
   domain: "Splendor", level: 4, type: "Spell", recall-cost: 1,
   text: "Once per long rest, spend 3 Hope to reach out to the forces beyond and ask one “yes or no” question about an event, person, place, or situation in the near future. For a moment, the present falls away and you see the answer before you.",
+  ..fx("domain-card", "divination", "Divination"),
   flags: source(221),
 )
 
@@ -1417,6 +1588,7 @@
   id: "life-ward", name: "Life Ward",
   domain: "Splendor", level: 4, type: "Spell", recall-cost: 1,
   text: "Spend 3 Hope and choose an ally within Close range. They are marked with a glowing sigil of protection. When this ally would make a death move, they clear a Hit Point instead. This effect ends when it saves the target from a death move, you cast Life Ward on another target, or you take a long rest.",
+  ..fx("domain-card", "life-ward", "Life Ward"),
   flags: source(221),
 )
 
@@ -1424,6 +1596,7 @@
   id: "shape-material", name: "Shape Material",
   domain: "Splendor", level: 5, type: "Spell", recall-cost: 1,
   text: "Spend a Hope to shape a section of natural material you’re touching (such as stone, ice, or wood) to suit your purpose. The area of the material can be no larger than you. For example, you can form a rudimentary tool or create a door. You can only affect the material within Close range of where you’re touching it.",
+  ..fx("domain-card", "shape-material", "Shape Material"),
   flags: source(221),
 )
 
@@ -1431,6 +1604,7 @@
   id: "smite", name: "Smite",
   domain: "Splendor", level: 5, type: "Spell", recall-cost: 2,
   text: "Once per rest, spend 3 Hope to charge your powerful smite. When you next successfully attack with a weapon, double the result of your damage roll. This attack deals magic damage regardless of the weapon’s damage type.",
+  ..fx("domain-card", "smite", "Smite"),
   flags: source(221),
 )
 
@@ -1438,6 +1612,7 @@
   id: "restoration", name: "Restoration",
   domain: "Splendor", level: 6, type: "Spell", recall-cost: 2,
   text: "After a long rest, place a number of tokens equal to your Spellcast trait on this card. Touch a creature and spend any number of tokens to clear 2 Hit Points or 2 Stress for each token spent. You can also spend a token from this card when touching a creature to clear the Vulnerable condition or heal a physical or magical ailment (the GM might require additional tokens depending on the strength of the ailment). When you take a long rest, clear all unspent tokens.",
+  ..fx("domain-card", "restoration", "Restoration"),
   flags: source(221),
 )
 
@@ -1445,6 +1620,7 @@
   id: "zone-of-protection", name: "Zone of Protection",
   domain: "Splendor", level: 6, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (16). Once per long rest on a success, choose a point within Far range and create a visible zone of protection there for all allies within Very Close range of that point. When you do, place a d6 on this card with the 1 value facing up. When an ally in this zone takes damage, they reduce it by the die’s value. You then increase the die’s value by one. When the die’s value would exceed 6, this effect ends.",
+  ..fx("domain-card", "zone-of-protection", "Zone of Protection"),
   flags: source(222),
 )
 
@@ -1452,6 +1628,7 @@
   id: "healing-strike", name: "Healing Strike",
   domain: "Splendor", level: 7, type: "Spell", recall-cost: 1,
   text: "When you deal damage to an adversary, you can spend 2 Hope to clear a Hit Point on an ally within Close range.",
+  ..fx("domain-card", "healing-strike", "Healing Strike"),
   flags: source(222),
 )
 
@@ -1464,6 +1641,7 @@
     - #"+3 bonus to your Severe damage threshold"
     - #"Once per long rest, when incoming damage would require you to mark a number of Hit Points, you can choose to mark that much Stress or spend that much Hope instead."
   ],
+  ..fx("domain-card", "splendor-touched", "Splendor-Touched"),
   flags: source(222),
 )
 
@@ -1471,6 +1649,7 @@
   id: "shield-aura", name: "Shield Aura",
   domain: "Splendor", level: 8, type: "Spell", recall-cost: 2,
   text: "Mark a Stress to cast a protective aura on a target within Very Close range. When the target marks an Armor Slot, they reduce the severity of the attack by an additional threshold. If this spell causes a creature who would be damaged to instead mark no Hit Points, the effect ends. You can only hold Shield Aura on one creature at a time.",
+  ..fx("domain-card", "shield-aura", "Shield Aura"),
   flags: source(222),
 )
 
@@ -1478,6 +1657,7 @@
   id: "stunning-sunlight", name: "Stunning Sunlight",
   domain: "Splendor", level: 8, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll to unleash powerful rays of burning sunlight against all adversaries in front of you within Far range. On a success, spend any number of Hope and force that many targets you succeeded against to make a Reaction Roll (14). Targets who succeed take 3d20+3 magic damage. Targets who fail take 4d20+5 magic damage and are temporarily Stunned. While Stunned, they can’t use reactions and can’t take any other actions until they clear this condition.",
+  ..fx("domain-card", "stunning-sunlight", "Stunning Sunlight"),
   flags: source(222),
 )
 
@@ -1485,6 +1665,7 @@
   id: "overwhelming-aura", name: "Overwhelming Aura",
   domain: "Splendor", level: 9, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (15) to magically empower your aura. On a success, spend 2 Hope to make your Presence equal to your Spellcast trait until your next long rest. While this spell is active, an adversary must mark a Stress when they target you with an attack.",
+  ..fx("domain-card", "overwhelming-aura", "Overwhelming Aura"),
   flags: source(222),
 )
 
@@ -1492,6 +1673,7 @@
   id: "salvation-beam", name: "Salvation Beam",
   domain: "Splendor", level: 9, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (16). On a success, mark any number of Stress to target a line of allies within Far range. You can clear Hit Points on the targets equal to the number of Stress marked, divided among them however you’d like.",
+  ..fx("domain-card", "salvation-beam", "Salvation Beam"),
   flags: source(222),
 )
 
@@ -1499,6 +1681,7 @@
   id: "invigoration", name: "Invigoration",
   domain: "Splendor", level: 10, type: "Spell", recall-cost: 3,
   text: "When you or an ally within Close range has used a feature that has an exhaustion limit (such as once per rest or once per session), you can spend any number of Hope and roll that many d6s. If any roll a 6, the feature can be used again.",
+  ..fx("domain-card", "invigoration", "Invigoration"),
   flags: source(222),
 )
 
@@ -1506,6 +1689,7 @@
   id: "resurrection", name: "Resurrection",
   domain: "Splendor", level: 10, type: "Spell", recall-cost: 2,
   text: "Make a Spellcast Roll (20). On a success, restore one creature who has been dead no longer than 100 years to full strength. Then roll a d6. On a result of 5 or lower, place this card in your vault permanently. On a failure, you can’t cast Resurrection again for a week.",
+  ..fx("domain-card", "resurrection", "Resurrection"),
   flags: source(222),
 )
 
@@ -1520,6 +1704,7 @@
     - #"Tier 3: 13/31"
     - #"Tier 4: 15/38"
   ],
+  ..fx("domain-card", "bare-bones", "Bare Bones"),
   flags: source(222),
 )
 
@@ -1527,6 +1712,7 @@
   id: "forceful-push", name: "Forceful Push",
   domain: "Valor", level: 1, type: "Ability", recall-cost: 0,
   text: "Make an attack with your primary weapon against a target within Melee range. On a success, you deal damage and knock them back to Close range. On a success with Hope, add a d6 to your damage roll. Additionally, you can spend a Hope to make them temporarily Vulnerable.",
+  ..fx("domain-card", "forceful-push", "Forceful Push"),
   flags: source(222),
 )
 
@@ -1534,6 +1720,7 @@
   id: "i-am-your-shield", name: "I Am Your Shield",
   domain: "Valor", level: 1, type: "Ability", recall-cost: 1,
   text: "When an ally within Very Close range would take damage, you can mark a Stress to stand in the way and make yourself the target of the attack instead. When you take damage from this attack, you can mark any number of Armor Slots.",
+  ..fx("domain-card", "i-am-your-shield", "I Am Your Shield"),
   flags: source(223),
 )
 
@@ -1541,6 +1728,7 @@
   id: "body-basher", name: "Body Basher",
   domain: "Valor", level: 2, type: "Ability", recall-cost: 1,
   text: "You use the full force of your body in a fight. On a successful attack using a weapon with a Melee range, gain a bonus to your damage roll equal to your Strength.",
+  ..fx("domain-card", "body-basher", "Body Basher"),
   flags: source(223),
 )
 
@@ -1548,6 +1736,7 @@
   id: "bold-presence", name: "Bold Presence",
   domain: "Valor", level: 2, type: "Ability", recall-cost: 0,
   text: "When you make a Presence Roll, you can spend a Hope to add your Strength to the roll. Additionally, once per rest when you would gain a condition, you can describe how your bold presence aids you in the situation and avoid gaining the condition.",
+  ..fx("domain-card", "bold-presence", "Bold Presence"),
   flags: source(223),
 )
 
@@ -1555,6 +1744,7 @@
   id: "critical-inspiration", name: "Critical Inspiration",
   domain: "Valor", level: 3, type: "Ability", recall-cost: 1,
   text: "Once per rest, when you critically succeed on an attack, all allies within Very Close range can clear a Stress or gain a Hope.",
+  ..fx("domain-card", "critical-inspiration", "Critical Inspiration"),
   flags: source(223),
 )
 
@@ -1562,6 +1752,7 @@
   id: "lean-on-me", name: "Lean on Me",
   domain: "Valor", level: 3, type: "Ability", recall-cost: 1,
   text: "Once per long rest, when you console or inspire an ally who failed an action roll, you can both clear 2 Stress.",
+  ..fx("domain-card", "lean-on-me", "Lean on Me"),
   flags: source(223),
 )
 
@@ -1569,6 +1760,7 @@
   id: "goad-them-on", name: "Goad Them on",
   domain: "Valor", level: 4, type: "Ability", recall-cost: 1,
   text: "Describe how you taunt a target within Close range, then make a Presence Roll against them. On a success, the target must mark a Stress, and the next time the GM spotlights them, they must target you with an attack, which they make with disadvantage.",
+  ..fx("domain-card", "goad-them-on", "Goad Them on"),
   flags: source(223),
 )
 
@@ -1576,6 +1768,7 @@
   id: "support-tank", name: "Support Tank",
   domain: "Valor", level: 4, type: "Ability", recall-cost: 2,
   text: "When an ally within Close range fails a roll, you can spend 2 Hope to allow them to reroll either their Hope or Fear Die.",
+  ..fx("domain-card", "support-tank", "Support Tank"),
   flags: source(223),
 )
 
@@ -1583,6 +1776,7 @@
   id: "armorer", name: "Armorer",
   domain: "Valor", level: 5, type: "Ability", recall-cost: 1,
   text: "While you’re wearing armor, gain a +1 bonus to your Armor Score. During a rest, when you choose to repair your armor as a downtime move, your allies also clear an Armor Slot.",
+  ..fx("domain-card", "armorer", "Armorer"),
   flags: source(223),
 )
 
@@ -1590,6 +1784,7 @@
   id: "rousing-strike", name: "Rousing Strike",
   domain: "Valor", level: 5, type: "Ability", recall-cost: 1,
   text: "Once per rest, when you critically succeed on an attack, you and all allies who can see or hear you can clear a Hit Point or 1d4 Stress.",
+  ..fx("domain-card", "rousing-strike", "Rousing Strike"),
   flags: source(223),
 )
 
@@ -1597,6 +1792,7 @@
   id: "inevitable", name: "Inevitable",
   domain: "Valor", level: 6, type: "Ability", recall-cost: 1,
   text: "When you fail an action roll, your next action roll has advantage.",
+  ..fx("domain-card", "inevitable", "Inevitable"),
   flags: source(223),
 )
 
@@ -1604,6 +1800,7 @@
   id: "rise-up", name: "Rise Up",
   domain: "Valor", level: 6, type: "Ability", recall-cost: 2,
   text: "Gain a bonus to your Severe threshold equal to your Proficiency. When you mark 1 or more Hit Points from an attack, clear a Stress.",
+  ..fx("domain-card", "rise-up", "Rise Up"),
   flags: source(223),
 )
 
@@ -1611,6 +1808,7 @@
   id: "shrug-it-off", name: "Shrug It Off",
   domain: "Valor", level: 7, type: "Ability", recall-cost: 1,
   text: "When you would take damage, you can mark a Stress to reduce the severity of the damage by one threshold. When you do, roll a d6. On a result of 3 or lower, place this card in your vault.",
+  ..fx("domain-card", "shrug-it-off", "Shrug It Off"),
   flags: source(223),
 )
 
@@ -1623,6 +1821,7 @@
     - #"+1 bonus to your Armor Score"
     - #"When you mark 1 or more Hit Points without marking an Armor Slot, clear an Armor Slot."
   ],
+  ..fx("domain-card", "valor-touched", "Valor-Touched"),
   flags: source(223),
 )
 
@@ -1630,6 +1829,7 @@
   id: "full-surge", name: "Full Surge",
   domain: "Valor", level: 8, type: "Ability", recall-cost: 1,
   text: "Once per long rest, mark 3 Stress to push your body to its limits. Gain a +2 bonus to all of your character traits until your next rest.",
+  ..fx("domain-card", "full-surge", "Full Surge"),
   flags: source(223),
 )
 
@@ -1637,6 +1837,7 @@
   id: "ground-pound", name: "Ground Pound",
   domain: "Valor", level: 8, type: "Ability", recall-cost: 2,
   text: "Spend 2 Hope to strike the ground where you stand and make a Strength Roll against all targets within Very Close range. Targets you succeed against are thrown back to Far range and must make a Reaction Roll (17). Targets who fail take 4d10+8 damage. Targets who succeed take half damage.",
+  ..fx("domain-card", "ground-pound", "Ground Pound"),
   flags: source(223),
 )
 
@@ -1644,6 +1845,7 @@
   id: "hold-the-line", name: "Hold the Line",
   domain: "Valor", level: 9, type: "Ability", recall-cost: 1,
   text: "Describe the defensive stance you take and spend a Hope. If an adversary moves within Very Close range, they’re pulled into Melee range and Restrained. This condition lasts until you move or fail a roll with Fear, or the GM spends 2 Fear on their turn to clear it.",
+  ..fx("domain-card", "hold-the-line", "Hold the Line"),
   flags: source(223),
 )
 
@@ -1651,6 +1853,7 @@
   id: "lead-by-example", name: "Lead by Example",
   domain: "Valor", level: 9, type: "Ability", recall-cost: 3,
   text: "When you deal damage to an adversary, you can mark a Stress and describe how you encourage your allies. The next PC to make an attack against that adversary can clear a Stress or gain a Hope.",
+  ..fx("domain-card", "lead-by-example", "Lead by Example"),
   flags: source(224),
 )
 
@@ -1658,6 +1861,7 @@
   id: "unbreakable", name: "Unbreakable",
   domain: "Valor", level: 10, type: "Ability", recall-cost: 4,
   text: "When you mark your last Hit Point, instead of making a death move, you can roll a d6 and clear a number of Hit Points equal to the result. Then place this card in your vault.",
+  ..fx("domain-card", "unbreakable", "Unbreakable"),
   flags: source(224),
 )
 
@@ -1665,6 +1869,7 @@
   id: "unyielding-armor", name: "Unyielding Armor",
   domain: "Valor", level: 10, type: "Ability", recall-cost: 1,
   text: "When you would mark an Armor Slot, roll a number of d6s equal to your Proficiency. If any roll a 6, reduce the severity by one threshold without marking an Armor Slot.",
+  ..fx("domain-card", "unyielding-armor", "Unyielding Armor"),
   flags: source(224),
 )
 
