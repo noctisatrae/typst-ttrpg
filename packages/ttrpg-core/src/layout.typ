@@ -95,10 +95,19 @@
   ))
 }
 
-/// A named entry with a hanging indent: *_Name - Tag:_* body.
+/// A named entry with a hanging indent: *_Name - Tag:_* body. The body may
+/// hold several paragraphs and lists (a set rule, not `par(...)`, which
+/// can't contain them).
 #let entry(name, tag: none, body) = {
   let head = if tag == none { name } else { name + " - " + tag }
-  block(above: 0.6em, below: 0.6em, par(hanging-indent: 0.9em)[*_#head;:_* #body])
+  block(above: 0.6em, below: 0.6em, {
+    set par(hanging-indent: 0.9em, spacing: 0.45em)
+    set list(indent: 0.9em, spacing: 0.45em)
+    // The trailing parbreak makes even a one-line body a paragraph, so
+    // the hanging indent applies (inline text alone forms no paragraph).
+    [*_#head;:_* #body]
+    parbreak()
+  })
 }
 
 /// A generic stat block: title, a few header lines, bands of stats and
