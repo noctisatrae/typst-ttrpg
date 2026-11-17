@@ -32,15 +32,18 @@
 /// - "none": just the total.
 #let state-options = ("field", "boxes", "none")
 
-/// Starting value in a faint box, then "/ total".
+/// Starting value in a faint box, then "/ total". The box hugs the number
+/// (padding, not a fixed size), so the number stays on the text line.
 #let field(start, total) = [#box(
-  width: 2.1em,
-  height: 1.25em,
-  baseline: 0.2em,
+  inset: (x: 0.55em, y: 0.15em),
+  outset: (y: 0.1em),
   stroke: 0.6pt + luma(120),
   radius: 2pt,
-  align(center + horizon, text(fill: luma(185), str(start))),
+  text(fill: luma(185), str(start)),
 )~/~#total]
+
+// The sheet's boxes hug their text; the space goes BETWEEN elements.
+#let gap = 1.3em
 
 #let tick-boxes(n, shape: "square") = {
   let one = if shape == "circle" { circle(radius: 0.38em, stroke: 0.7pt + luma(40)) } else { box(width: 0.8em, height: 0.8em, stroke: 0.7pt + luma(40)) }
@@ -57,13 +60,12 @@
     ("Hope", d.hope.start, d.hope.max, "circle"),
     ("Armor", 0, d.armor-score.value, "square"),
   )
-  if state == "boxes" {
-    grid(columns: (6.5em, 1fr), row-gutter: 0.7em, align: horizon,
+  core.band(if state == "boxes" {
+    grid(columns: (6.5em, 1fr), row-gutter: 0.6em, align: horizon,
       ..items.map(((l, start, n, shape)) => (strong(l), tick-boxes(n, shape: shape))).flatten())
   } else {
-    grid(columns: (1fr,) * 4, align: left + horizon,
-      ..items.map(((l, start, n, _)) => [*#l*#h(0.5em)#if state == "field" { field(start, n) } else [#n]]))
-  }
+    items.map(((l, start, n, _)) => [*#l*~#if state == "field" { field(start, n) } else [#n]]).join(h(1.6em))
+  })
 }
 
 /// The sheet for character `c`. Registers it. `state` sets how play state
@@ -80,7 +82,7 @@
     block(below: 0.7em, text(weight: "bold", style: "italic", size: 1.1em)[Level #d.level #c.class.name · #c.subclass.name])
     block(below: 1.2em)[#c.ancestry.name · #c.community.name#if c.at("pronouns", default: none) != none [ · #c.pronouns]]
 
-    core.band(
+    block(above: 0pt, below: gap, core.band(
       core.stat-line(
         ("Evasion", with-sources(d.evasion)),
         ("Armor Score", with-sources(d.armor-score)),
@@ -88,18 +90,23 @@
         ("Proficiency", str(d.proficiency.value)),
       ),
       if d.spellcast-trait != none { core.stat-line(("Spellcast", d.spellcast-trait)) },
-    )
-    // The six traits side by side, name over modifier.
-    block(above: 1.4em, below: 1.4em, grid(
-      columns: (1fr,) * 6,
-      align: center,
-      row-gutter: 0.35em,
-      ..trait.values().map(t => text(size: 0.85em, strong(t))),
-      ..trait.keys().map(k => text(size: 1.2em, signed(d.traits.at(k).value))),
     ))
-
-    v(0.5em)
-    block(above: 1.4em, below: 0pt, play-state(d, state))
+    // The six traits, each in its own small box: name over modifier.
+    block(above: gap, below: gap, context {
+      let rule = core.current-theme().colors.rule
+      grid(
+        columns: (1fr,) * 6,
+        column-gutter: 6pt,
+        ..trait.pairs().map(((k, printed)) => block(
+          width: 100%,
+          inset: (x: 2pt, y: 4pt),
+          stroke: 0.6pt + rule,
+          radius: 3pt,
+          align(center, text(size: 0.85em, strong(printed)) + linebreak() + text(size: 1.15em, signed(d.traits.at(k).value))),
+        )),
+      )
+    })
+    block(above: gap, below: 0pt, play-state(d, state))
 
     section("Experiences")
     d.experiences.map(e => [#e.name #signed(e.bonus.value)]).join[ · ]
