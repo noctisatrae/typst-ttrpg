@@ -12,6 +12,11 @@ t = re.sub(r'/(zero|one|two|three|four|five|six|seven|eight|nine)\.tnum', lambda
 t = t.replace('/period.tab', '.').replace('/comma.tab', ',').replace('/hyphen.tab', '-')
 for lig, rep in (('ﬃ', 'ffi'), ('ﬄ', 'ffl'), ('ﬁ', 'fi'), ('ﬂ', 'fl'), ('ﬀ', 'ff')):
     t = t.replace(lig, rep)
-# Ligatures extracted as "fi t" / "ffi  culty": rejoin when a lowercase letter follows.
+# Ligatures extracted as "profi t" / "Diffi  culty" / "diff erent": rejoin when
+# a lowercase letter follows. A word that really ends in the "ff" glyph is
+# followed by two spaces ("Bite off  heads", "sniff  out"), so "ff" plus two
+# or more spaces is a word boundary; every other split is a broken word.
+t = re.sub(r'ff {2,}(?=[a-z])', 'ff\x00', t)
 t = re.sub(r'(ffi|ffl|fi|fl|ff) +(?=[a-z])', r'\1', t)
+t = t.replace('ff\x00', 'ff ')
 open(sys.argv[2], 'w', encoding='utf-8').write(t)

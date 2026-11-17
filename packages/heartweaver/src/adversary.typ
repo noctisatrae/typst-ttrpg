@@ -76,10 +76,14 @@
     severe: field(int, type(none), required: true),
   )),
   hp: field(int, required: true),
-  stress: field(int, required: true),
+  // Every SRD adversary has Stress except Spellbound Armor (p. 110), which
+  // prints "None": leave `stress` out for that.
+  stress: field(int),
   // Attack modifier and standard attack: name, range, damage (p. 93).
   attack: field(dictionary, required: true, keys: (
-    modifier: field(int, required: true),
+    // Usually a number; a string holds a dice modifier exactly as printed,
+    // e.g. "+2d4" (Outer Realms Abomination, p. 153).
+    modifier: field(int, str, required: true),
     name: field(str, required: true),
     range: field(str, required: true, one-of: attack-range.values()),
     // Dice or a flat number, e.g. "1d8+3" or "2".
@@ -129,8 +133,9 @@
 /// `extend` that knows heartweaver's kinds.
 #let extend = core.extend.with(schemas: (adversary: adversary-schema))
 
-/// Signed modifier as printed in the SRD: "+2", "−1" (U+2212 minus).
-#let signed(n) = if n < 0 { "−" + str(calc.abs(n)) } else { "+" + str(n) }
+/// Signed modifier as printed in the SRD: "+2", "−1" (U+2212 minus). A
+/// string (a dice modifier such as "+2d4") is printed as is.
+#let signed(n) = if type(n) == str { n } else if n < 0 { "−" + str(calc.abs(n)) } else { "+" + str(n) }
 
 #let format-thresholds(t) = {
   let show-one(v) = if v == none { "None" } else { str(v) }
@@ -157,7 +162,7 @@
           ("Difficulty", str(e.difficulty)),
           ("Thresholds", format-thresholds(e.thresholds)),
           ("HP", str(e.hp)),
-          ("Stress", str(e.stress)),
+          ("Stress", if "stress" in e { str(e.stress) } else { "None" }),
         ),
         core.stat-line(
           ("ATK", signed(e.attack.modifier)),
