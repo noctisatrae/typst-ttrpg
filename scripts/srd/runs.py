@@ -46,6 +46,8 @@ def clean(text):
     for lig, rep in LIGATURES:
         text = text.replace(lig, rep)
     text = re.sub(r'(ffi|ffl|fi|fl) +(?=[a-z])', r'\1', text)
+    # Before a hyphen too: "off -guard", "off -balance" (all of SRD 2.0).
+    text = re.sub(r'(ff|fi|fl) +(?=-[a-z])', r'\1', text)
     text = re.sub(r'(\b[A-Za-z]*ff)( +)(?=([a-z]+\b|[.,;:!?]))', rejoin_ff, text)
     return text
 
