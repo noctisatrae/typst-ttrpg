@@ -23,16 +23,22 @@ below). Personal, non-commercial project for now.
      homebrew on top. Records the SRD version it was transcribed from.
 4. `ttrpg-script` (depends on core) – screenplay-format campaign notes:
    `scene` (time optional; avoid CONTINUOUS, scenes are non-linear),
-   `intro`, `say`, `stats`, `open-play` (marks the hand-off to unscripted
+   `intro` (characters), `mention` (any other entity), `say`, `stats`,
+   `open-play` (marks the hand-off to unscripted
    play), `leads-to` (links to scenes by location; unwritten ones stay
    plain), `music` (a mood most of the time, "♪ Mood:"; `track:`/`by:`/
    `url:` for key moments, "♪ PLAY:", chosen over CUE as the more
    actionable word at the table; `url:` only makes the title a link and
    is never printed), `session-sheet` (per scene: page, then indented
-   groups under small bold headers CAST / MUSIC / LEADS TO), `cast`,
+   groups under small bold headers, one per outline kind, then MUSIC /
+   LEADS TO), `appendix()` (new page, separator, one section per kind),
    optional `transition`. `intro`/`say` register entities (cast appendix,
    session sheet) and record per-scene events. The system supplies
-   `setup(summary:, stats:)`, e.g. `hw.summary` / `hw.statblock`.
+   `setup(system: hw.system)`: `(kinds: (<kind>: (section:, outline:,
+   summary:, render:)))` in display order. heartweaver's `system.typ` is
+   where every new block kind registers; `outline: false` for classes,
+   ancestries, communities, transformations, domain cards. Kinds missing
+   from the system still work (titled by name, compact entry).
    GM lookup: `intro` names link to the cast appendix and show its page
    ("p. 3") for print; the cast starts on a new page after a rule and
    shows full stat blocks. Fonts: Courier Prime for the script,
@@ -229,7 +235,7 @@ Foundryborne clone, exported fixtures in `fixtures/`.
    adversaries transcribed and cross-checked.
 4. ✓ Screenplay notes (`ttrpg-script`): scenes, dialogue, open play,
    inline stat blocks, cast appendix, music cues, session sheet.
-5. Kinds are generic in the script: the system describes each entity kind
+5. ✓ Kinds are generic in the script: the system describes each entity kind
    once (section title, summary, renderer, whether it is listed in the
    session outline); `intro` for characters, `mention` for anything else;
    session sheet and appendix group by kind.
@@ -265,6 +271,8 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   (Typst cannot catch panics). `tests/support/creature.typ` is a made-up
   system for testing core; it is not game content.
 - Typst version: 0.15.1 (set as `compiler` in every `typst.toml`).
+- A function stored in a dictionary must be called as `(info.render)(e)`;
+  `info.render(e)` is an error.
 - Don't name exports after Typst built-ins (`range`, `type`, `list`, ...):
   hence `attack-range`, `adversary-type`.
 
