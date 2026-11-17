@@ -1,0 +1,11 @@
+[package]
+name = "daggerheart-srd"
+version = "0.1.0"
+entrypoint = "src/lib.typ"
+authors = ["Hector"]
+# Code is MPL-2.0; the SRD content is under the Darrington Press Community Gaming
+# License 2.0 (see NOTICE.md). Check Typst Universe rules on LicenseRef before publishing.
+license = "MPL-2.0 AND LicenseRef-DPCGL-2.0"
+description = "Daggerheart SRD 2.0 content as Typst data, for heartweaver. Unofficial."
+keywords = ["ttrpg", "daggerheart", "srd"]
+compiler = "0.15.1"

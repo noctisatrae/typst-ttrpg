@@ -1,0 +1,9 @@
+[package]
+name = "ttrpg-core"
+version = "0.1.0"
+entrypoint = "src/lib.typ"
+authors = ["Hector"]
+license = "MPL-2.0"
+description = "System-agnostic building blocks for tabletop RPG content: entities, tables, extend, layout."
+keywords = ["ttrpg", "rpg", "tabletop"]
+compiler = "0.15.1"

@@ -1,0 +1,9 @@
+[package]
+name = "heartweaver"
+version = "0.1.0"
+entrypoint = "src/lib.typ"
+authors = ["Hector"]
+license = "MPL-2.0"
+description = "Daggerheart Compatible schemas, derivation rules and renderers. Unofficial."
+keywords = ["ttrpg", "daggerheart", "heartweaver"]
+compiler = "0.15.1"

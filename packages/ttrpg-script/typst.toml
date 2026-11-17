@@ -1,0 +1,9 @@
+[package]
+name = "ttrpg-script"
+version = "0.1.0"
+entrypoint = "src/lib.typ"
+authors = ["Hector"]
+license = "MPL-2.0"
+description = "Screenplay-style campaign notes: scenes, dialogue and cast lists built on ttrpg-core entities."
+keywords = ["ttrpg", "screenplay", "script"]
+compiler = "0.15.1"
