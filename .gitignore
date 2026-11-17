@@ -2,3 +2,4 @@ reference/*.pdf
 *.pdf
 !fixtures/**
 .DS_Store
+.claude/worktrees/
