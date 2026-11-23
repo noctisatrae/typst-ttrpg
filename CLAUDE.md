@@ -326,6 +326,27 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
 4. New kinds: transformations (pp. 42-45), Druid Beastforms (pp. 15-18),
    Brawler Martial Stances (p. 13). Same path as the companion: parser in
    player.py + emitter + cross-check, numbers in heartweaver.
+   Transformations first (wanted by the Red Mist campaign, 2026-11-23):
+   - core (system-agnostic): `boxes(n, end:)` tick-box row and
+     `write-in(label, lines:)` blank lines to write on by pen.
+   - heartweaver: `transformation(id:, name:, description:, features:,
+     questions:, tracks:, write-ins:)` + `transformation-card`, registered
+     in `system.typ` with `outline: false`. `tracks` is generic:
+     `((name: "Hollowing", boxes: 3, end: "Hollow"),)` (also fits the SRD
+     Vampire's 6 feed tokens). Features may carry `replaces:` notes for
+     SRD rules they override.
+   - `character(..., transformation:)`; `sheet(c)` prints the card. The
+     SRD's "one transformation per PC" (p. 42) is the default check, with
+     an explicit opt-out (Red Mist: undead, then grafted = two cards).
+   - daggerheart-srd: the six SRD transformations generated + cross-checked.
+   - DONE BAR (ready to push): the Red Mist "Aware Undead" homebrew card
+     (`../red-mist/handbook/chapters/06-mechanics.typ`, draft box) builds
+     from `../red-mist/homebrew/` with this constructor, renders in the
+     screenplay theme with its 3 Hollowing boxes, 2 anchor lines and six
+     transformation questions inside the card, and prints on a character's
+     sheet; plus one compile test
+     per SRD transformation and a `tests/fail/` case for two
+     transformations without the opt-out.
 5. Multiclass derivation.
 
 ## Publishing (decided 2026-11-17)
