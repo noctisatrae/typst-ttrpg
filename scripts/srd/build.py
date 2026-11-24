@@ -5,7 +5,7 @@
 #                                  [--work DIR] [--foundryborne PATH]
 #
 # Kinds: adversaries, environments, loot, classes, ancestries, communities,
-# cards, weapons, armor (default: all). Extraction runs once per PDF and is
+# transformations, beastforms, stances, cards, weapons, armor, everyday-hero (default: all). Extraction runs once per PDF and is
 # cached in the work directory (default: a "srd-build" folder in the system
 # temp dir). Output is deterministic: rebuilding gives no git diff.
 #
@@ -42,7 +42,7 @@ from runs import clean, runs  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(HERE))
 SRD = os.path.join(ROOT, 'packages', 'daggerheart-srd', 'src')
-KINDS = ('adversaries', 'environments', 'loot', 'classes', 'ancestries', 'communities', 'cards', 'weapons', 'armor')
+KINDS = ('adversaries', 'environments', 'loot', 'classes', 'ancestries', 'communities', 'transformations', 'beastforms', 'stances', 'cards', 'weapons', 'armor', 'everyday-hero')
 REVIEW = []
 
 
@@ -84,6 +84,14 @@ def ranges(data):
     r['classes'] = (heading_page(data, r'^Class Domains$'), heading_page(data, r'^ANCESTRIES$') - 1)
     r['ancestries'] = (heading_page(data, r'^ANCESTRIES$'), heading_page(data, r'^COMMUNITIES$'))
     r['communities'] = (heading_page(data, r'^COMMUNITIES$'), heading_page(data, r'^TRANSFORMATIONS$'))
+    r['transformations'] = (heading_page(data, r'^TRANSFORMATIONS$'), heading_page(data, r'^CORE MECHANICS$') - 1)
+    # The parser stops at the first heading after the forms that is not a tier.
+    first = heading_page(data, r'^BEASTFORM OPTIONS$')
+    r['beastforms'] = (first, first + 4)
+    first = heading_page(data, r'^EVERYDAY HERO STARTING EQUIPMENT$')
+    r['everyday-hero'] = (first, first + 1)
+    first = heading_page(data, r'^MARTIAL STANCES$')
+    r['stances'] = (first, first + 1)
     r['weapons'] = (heading_page(data, r'^PRIMARY WEAPON TABLES$'), heading_page(data, r'^ARMOR$') - 1)
     r['armor'] = (heading_page(data, r'^ARMOR$'), heading_page(data, r'^LOOT$') - 1)
     r['items'] = (heading_page(data, r'^LOOT$'), heading_page(data, r'^CONSUMABLES$') - 1)
@@ -124,6 +132,21 @@ def build_player(data, rg, kinds, out):
         note(key, rev)
         out[key] = recs
         write(os.path.join(SRD, 'player', f'{key}.typ'), emit_player.heritage(recs, kind))
+    if 'transformations' in kinds:
+        recs, rev = player.transformations(pages(data, *rg['transformations']))
+        note('transformations', rev)
+        out['transformations'] = recs
+        write(os.path.join(SRD, 'player', 'transformations.typ'), emit_player.transformations(recs))
+    if 'beastforms' in kinds:
+        recs, rev = player.beastforms(pages(data, *rg['beastforms']))
+        note('beastforms', rev)
+        out['beastforms'] = recs
+        write(os.path.join(SRD, 'player', 'beastforms.typ'), emit_player.beastforms(recs))
+    if 'stances' in kinds:
+        recs, rev = player.stances(pages(data, *rg['stances']))
+        note('stances', rev)
+        out['stances'] = recs
+        write(os.path.join(SRD, 'player', 'stances.typ'), emit_player.stances(recs))
     if 'cards' in kinds:
         recs, rev = player.cards(pages(data, *rg['cards']))
         note('cards', rev)
@@ -139,6 +162,13 @@ def build_player(data, rg, kinds, out):
         note('armor', rev)
         out['armor'] = recs
         write(os.path.join(SRD, 'player', 'armor.typ'), emit_player.armor(recs))
+    if 'everyday-hero' in kinds:
+        w, ar, rev = player.everyday_hero(pages(data, *rg['everyday-hero']))
+        note('everyday hero', rev)
+        out['everyday-hero'] = (w, ar)
+        ws, ars = emit_player.everyday_hero(w, ar)
+        write(os.path.join(SRD, 'player', 'everyday-hero-weapons.typ'), ws)
+        write(os.path.join(SRD, 'player', 'everyday-hero-armor.typ'), ars)
     note('feature names', sorted(set(player.ODD_NAMES)))
     note('glyphs', sorted({f'p.{p}: a {f} glyph mapped to "{t.strip()}"' for p, f, t in data['runs']
                            if f.startswith('Wingdings')}))
@@ -295,7 +325,7 @@ def all_features(out):
             for step in ('foundation', 'specialization', 'mastery'):
                 for f in s[step]:
                     feats.append(('subclass', player.slug(s['name']), f['name'], txt(f), f['page']))
-    for key, kind in (('ancestries', 'ancestry'), ('communities', 'community')):
+    for key, kind in (('ancestries', 'ancestry'), ('communities', 'community'), ('transformations', 'transformation'), ('beastforms', 'beastform')):
         for r in out.get(key, []):
             for f in r['features']:
                 feats.append((kind, player.slug(r['name']), f['name'], txt(f), f['page']))
@@ -304,8 +334,9 @@ def all_features(out):
             feats.append(('domain-card', player.slug(r['name']), f['name'], txt(f), f['page']))
         if r['text']:
             feats.append(('domain-card', player.slug(r['name']), r['name'], txt({'body': r['text']}), r['page']))
-    for key, kind in (('weapons', 'weapon'), ('armor', 'armor')):
-        for r in out.get(key, []):
+    hero = out.get('everyday-hero', ([], []))
+    for recs, kind in ((out.get('weapons', []) + hero[0], 'weapon'), (out.get('armor', []) + hero[1], 'armor')):
+        for r in recs:
             if r['feature']:
                 feats.append((kind, player.slug(r['name']), r['feature'], r['feature-text'], r['page']))
     return feats
@@ -327,6 +358,10 @@ def check_overlay(out):
             note('effects overlay', [f'kind-wide entry {k!r} covers different texts: {sorted(by_kind_name[k])}'])
     suggestions = []
     for kind, owner, name, text, page in feats:
+        # A Beastform's features apply only while transformed, never to
+        # the character's own numbers.
+        if kind == 'beastform':
+            continue
         if f'{owner}/{name}' in keys or f'{kind}:{name}' in keys or f'{owner}/{name}' in SITUATIONAL:
             continue
         for pat, what in SUGGEST:
@@ -359,9 +394,17 @@ EXPORT = r'''
   subclasses: srd.subclasses.values().map(clean),
   ancestries: srd.ancestries.values().map(clean),
   communities: srd.communities.values().map(clean),
+  transformations: srd.transformations.values().map(clean),
+  beastforms: srd.beastforms.values().map(clean),
+  stances: srd.stances.values().map(clean),
+  stance-rules: (name: "Martial Stances", flags: srd.martial-stances.flags, description: srd.martial-stances.description,
+    rules: feats(srd.martial-stances.rules), focus: srd.martial-stances.focus,
+    start: srd.martial-stances.start, per-level: srd.martial-stances.per-level),
   cards: srd.cards.values().map(clean),
   weapons: srd.weapons.values().map(clean),
   armors: srd.armors.values().map(clean),
+  hero-weapons: srd.everyday-hero.weapons.values().map(clean),
+  hero-armors: srd.everyday-hero.armors.values().map(clean),
   companion: (
     name: "Ranger Companion", flags: srd.ranger-companion.flags,
     rules: feats(srd.ranger-companion.rules),
@@ -419,6 +462,38 @@ def check_player(data, work):
     for key, kind in (('ancestries', 'ancestry'), ('communities', 'community')):
         for e in ex[key]:
             want(kind, e, e['name'], e['description'], *fparts(e['features']))
+    e = ex['stance-rules']
+    words = {1: 'one', 2: 'two', 3: 'three', 4: 'four'}
+    rules = ' '.join(f['body'] for f in e['rules'])
+    want('stance rules', e, e['description'], *[f['name'] + ' ' + f['body'] for f in e['rules']])
+    for claim in (f'You can hold a maximum of {e["focus"]} Focus', f'You choose {words[e["start"]]} stances from Tier 1',
+                  'Mark a new stance from your tier or below each time you gain a level' if e['per-level'] == 1 else '(per-level not 1)'):
+        if claim not in rules:
+            misses.append(f'stance rules: number not stated in the rules: {claim!r}')
+    by_tier = {}
+    for s in ex['stances']:
+        by_tier.setdefault(s['tier'], []).append(s)
+    for tier, ss in sorted(by_tier.items()):
+        want('stance', ss[0], f'TIER {tier} ' + ' '.join(f'{s["name"]}: {s["text"]}' for s in ss))
+    for e in ex['beastforms']:
+        parts = [e['name'].upper()]
+        if e.get('examples'):
+            parts.append('(' + e['examples'] + ')')
+        if e.get('trait'):
+            parts.append(f'{e["trait"]} +{e["trait-bonus"]} | Evasion +{e["evasion-bonus"]}')
+        if e.get('attack'):
+            a = e['attack']
+            first = (a['trait'], a['range']) if e['flags'].get('attack-printed') == 'trait-first' else (a['range'], a['trait'])
+            parts.append(f'{first[0]} {first[1]} {a["damage"]} {a["damage-type"]}')
+        if e.get('advantages'):
+            parts.append('Gain advantage on: ' + ', '.join(e['advantages']))
+        want('beastform', e, ' '.join(parts), *fparts(e['features']))
+    for e in ex['transformations']:
+        want('transformation', e, e['name'], e['description'], *fparts(e['features']),
+             'TRANSFORMATION QUESTIONS ' + ' '.join(e['questions']))
+        for t in e.get('tracks', []):
+            if f'hold up to {t["boxes"]} tokens' not in ' '.join(f['body'] for f in e['features']):
+                misses.append(f'transformation {e["name"]}: track {t["name"]} ({t["boxes"]}) not stated in its features')
     for e in ex['cards']:
         want('domain card', e, f'{e["name"]} Level {e["level"]} {e["domain"]} {e["type"]} Recall Cost: {e["recall-cost"]}',
              e.get('text', ''), *fparts(e.get('features', [])))
@@ -426,6 +501,12 @@ def check_player(data, work):
         tier = str(e['tier']) if 'combat-wheelchair' in e.get('tags', []) else ''
         feat = fparts(e['features'])[0] if e['features'] else '—'
         want('weapon', e, f'{e["name"]} {tier} {e["trait"]} {e["range"]} {e["damage"]} {e["damage-type"]} {e["burden"]} {feat}')
+    for e in ex['hero-weapons']:
+        feat = fparts(e['features'])[0] if e['features'] else ''
+        want('everyday hero weapon', e, f'{e["name"]} {e["trait"]} {e["range"]} {e["damage"]} {e["damage-type"]} {e["burden"]} {feat}')
+    for e in ex['hero-armors']:
+        feat = fparts(e['features'])[0] if e['features'] else ''
+        want('everyday hero armor', e, f'{e["name"]} {e["thresholds"]["major"]} / {e["thresholds"]["severe"]} {e["score"]} {feat}')
     for e in ex['armors']:
         feat = fparts(e['features'])[0] if e['features'] else '—'
         want('armor', e, f'{e["name"]} {e["thresholds"]["major"]} / {e["thresholds"]["severe"]} {e["score"]} {feat}')
@@ -514,7 +595,9 @@ def main():
         note('structures (options become lists, introduced features become children)', scan_structures(a.work, out))
 
     lines = ['# SRD build review', '']
-    counts = {k: (len(v) if not isinstance(v, tuple) else f'{len(v[0])} + {len(v[1])} subclasses') for k, v in out.items()}
+    counts = {k: (f'{len(v[0])} weapons + {len(v[1])} armor' if k == 'everyday-hero'
+                  else f'{len(v[0])} + {len(v[1])} subclasses' if isinstance(v, tuple)
+                  else f'{len(v["stances"])} + rules' if k == 'stances' else len(v)) for k, v in out.items()}
     lines.append('Counts: ' + ', '.join(f'{k} {v}' for k, v in counts.items()))
     if a.check:
         pc, misses = check_player(data, a.work)

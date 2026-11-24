@@ -29,6 +29,9 @@ SMALL = {'of', 'the', 'a', 'an', 'and', 'or', 'to', 'in', 'on', 'at', 'for', 'by
 def norm(s):
     # A line that ends in a hyphen continues a compound ("sucker-" / "bearing").
     s = re.sub(r'-[ \t]*\n\s*', '-', s)
+    # The SRD sets em dashes closed ("blood—the life"); a line break next
+    # to one is not a space.
+    s = re.sub(r'—[ \t]*\n\s*|[ \t]*\n\s*—', '—', s)
     return re.sub(r'\s+', ' ', s).strip()
 
 
@@ -54,6 +57,12 @@ def title_case(s):
     return ' '.join(out)
 
 
+def join_sep(prev, line):
+    """What joins two printed lines: nothing after a hyphen or around an
+    em dash (set closed, see `norm`), else a space."""
+    return '' if prev.endswith(('-', '—')) or line.startswith('—') else ' '
+
+
 def body_blocks(text):
     """Split body text into paragraphs and bullet lists ("•" and "◦")."""
     blocks = []
@@ -68,9 +77,9 @@ def body_blocks(text):
             else:
                 blocks.append({'bullets': [item]})
         elif blocks and 'bullets' in blocks[-1]:
-            blocks[-1]['bullets'][-1] += ('' if blocks[-1]['bullets'][-1].endswith('-') else ' ') + line
+            blocks[-1]['bullets'][-1] += join_sep(blocks[-1]['bullets'][-1], line) + line
         elif blocks:
-            blocks[-1]['text'] += ('' if blocks[-1]['text'].endswith('-') else ' ') + line
+            blocks[-1]['text'] += join_sep(blocks[-1]['text'], line) + line
         else:
             blocks.append({'text': line})
     for b in blocks:
@@ -225,6 +234,263 @@ def heritage(rs, names, label, kind):
     for c in out:
         if len(c['features']) != want:
             review.append(f'p.{c["page"]}: {kind} {c["name"]} has {len(c["features"])} features, expected {want}')
+    return out, review
+
+
+def transformations(rs):
+    """Transformations (pp. 42-45): a heading, a description, "TRANSFORMATION
+    FEATURES", features, then "TRANSFORMATION QUESTIONS" and a bullet list.
+    The SRD has no list of their names: a heading counts when the
+    features label follows it. A feature that says how many tokens the card
+    holds ("You can hold up to 6 tokens", Vampire) gets a track of that
+    many boxes; the number is read from the text, never written by hand."""
+    out, review, cur, feat, mode = [], [], None, None, None
+
+    def close():
+        nonlocal cur, feat
+        if feat:
+            cur['features'].append(finish(feat))
+        feat = None
+        if cur and mode is not None and cur['features']:
+            cur['description'] = norm(cur.pop('raw'))
+            qs = body_blocks(cur.pop('q-raw'))
+            if len(qs) != 1 or 'bullets' not in qs[0]:
+                review.append(f'p.{cur["page"]}: {cur["name"]}: questions are not one bullet list: {qs!r:.80}')
+            cur['questions'] = [b for q in qs for b in q.get('bullets', [])]
+            out.append(cur)
+        cur = None
+
+    for k, t, page in tokens(rs):
+        if k == 'heading':
+            close()
+            cur = {'name': title_case(t), 'page': page, 'raw': '', 'q-raw': '', 'features': []}
+            mode = 'desc'
+            continue
+        if cur is None:
+            continue
+        if k == 'label':
+            if caps(t) == 'TRANSFORMATION FEATURES':
+                mode = 'features'
+            elif caps(t) == 'TRANSFORMATION QUESTIONS':
+                if feat:
+                    cur['features'].append(finish(feat))
+                feat, mode = None, 'questions'
+            elif mode == 'features' and feat:
+                feat['raw'] += t   # inline emphasis ("mark a Stress")
+            elif mode != 'desc':
+                review.append(f'p.{page}: {cur["name"]}: unexpected label {t!r}')
+            continue
+        if k == 'fname' and mode == 'features':
+            if feat:
+                cur['features'].append(finish(feat))
+            feat = new_feature(t, page)
+            continue
+        if mode == 'desc' and k == 'text':
+            cur['raw'] += t
+        elif mode == 'features' and feat:
+            feat['raw'] += t
+        elif mode == 'questions':
+            cur['q-raw'] += t
+    close()
+    for r in out:
+        r['tracks'] = []
+        for f in r['features']:
+            text = ' '.join(b.get('text', '') for b in f['body'])
+            m = re.search(r'You can hold up to (\d+) tokens', text)
+            if m:
+                r['tracks'].append({'name': 'Tokens', 'boxes': int(m.group(1)), 'feature': f['name']})
+                review.append(f'p.{f["page"]}: transformation {r["name"]}: a track of {m.group(1)} token boxes, '
+                              f'from "{m.group(0)}" ({f["name"]})')
+        if len(r['features']) != 2:
+            review.append(f'p.{r["page"]}: transformation {r["name"]} has {len(r["features"])} features, expected 2')
+        if len(r['questions']) != 6:
+            review.append(f'p.{r["page"]}: transformation {r["name"]} has {len(r["questions"])} questions, expected 6')
+    review.append('transformations found: ' + ', '.join(r['name'] for r in out))
+    return out, review
+
+
+BEAST_STATS = re.compile(r'^(\w+) \+(\d+) \| Evasion \+(\d+)$')
+BEAST_ATTACK = re.compile(r'^(?:(?P<r1>' + '|'.join(RANGES) + r') (?P<t1>\w+)|(?P<t2>\w+) (?P<r2>' + '|'.join(RANGES)
+                          + r')) (?P<dmg>d\d+(?:\+\d+)?) (?P<type>phy|mag)$')
+
+
+def beastforms(rs):
+    """Druid Beastform options (pp. 15-18). After the "BEASTFORM OPTIONS"
+    heading, "TIER n" headings set the tier; each form is a bold ALL-CAPS
+    name, its examples in parentheses, then (for most forms) "<Trait> +n |
+    Evasion +n", the attack ("Melee Agility d4 phy"), "Gain advantage on:
+    ...", and features. Upgraded forms (Legendary/Mythic Beast) have only
+    a feature; hybrids have no advantages. The section ends at the next
+    heading that is not a tier."""
+    out, review = [], []
+    started, tier, cur, feat = False, None, None, None
+
+    def close():
+        nonlocal cur, feat
+        if feat:
+            cur['features'].append(finish(feat))
+        feat = None
+        if cur:
+            parse_head(cur)
+            out.append(cur)
+        cur = None
+
+    def parse_head(f):
+        lines = [norm(l) for l in f.pop('raw').split('\n') if norm(l)]
+        text = ' '.join(lines)
+        m = re.match(r'^\((.+?)\)\s*', text)
+        if not m:
+            review.append(f'p.{f["page"]}: beastform {f["name"]}: no examples in parentheses: {text[:60]!r}')
+        f['examples'] = m.group(1) if m else None
+        rest = text[m.end():] if m else text
+        m = re.match(r'^(\w+) \+(\d+) \| Evasion \+(\d+)\s*', rest)
+        f['trait'], f['trait-bonus'], f['evasion-bonus'] = (m.group(1), int(m.group(2)), int(m.group(3))) if m else (None, None, None)
+        if m:
+            if f['trait'] not in TRAITS:
+                review.append(f'p.{f["page"]}: beastform {f["name"]}: unknown trait {f["trait"]!r}')
+            rest = rest[m.end():]
+        m = re.match(r'^(.+? (?:phy|mag))\s*', rest)
+        f['attack'] = None
+        if m:
+            a = BEAST_ATTACK.match(m.group(1))
+            if not a:
+                review.append(f'p.{f["page"]}: beastform {f["name"]}: attack line not read: {m.group(1)!r}')
+            else:
+                f['attack'] = {'range': a['r1'] or a['r2'], 'trait': a['t1'] or a['t2'], 'damage': a['dmg'], 'damage-type': a['type']}
+                if a['t2']:
+                    f['attack-printed'] = 'trait-first'
+                    review.append(f'p.{f["page"]}: beastform {f["name"]}: attack printed trait first: {m.group(1)!r}')
+                if f['attack']['trait'] not in TRAITS:
+                    review.append(f'p.{f["page"]}: beastform {f["name"]}: unknown attack trait {f["attack"]["trait"]!r}')
+            rest = rest[m.end():]
+        m = re.match(r'^Gain advantage on: (.+)$', rest)
+        f['advantages'] = [x.strip() for x in m.group(1).split(',')] if m else []
+        if m:
+            rest = ''
+        if rest.strip():
+            review.append(f'p.{f["page"]}: beastform {f["name"]}: unread text before the features: {rest[:60]!r}')
+        kind = 'upgraded' if f['trait'] is None else 'hybrid' if not f['advantages'] else 'form'
+        if kind != 'form':
+            review.append(f'p.{f["page"]}: beastform {f["name"]}: {kind} form (no '
+                          + ('stats' if kind == 'upgraded' else 'advantages') + ')')
+
+    for k, t, page in tokens(rs):
+        if k == 'heading':
+            if caps(t) == 'BEASTFORM OPTIONS':
+                started = True
+                continue
+            if not started:
+                continue
+            m = re.match(r'^TIER (\d)$', caps(t))
+            if m:
+                close()
+                tier = int(m.group(1))
+                continue
+            close()
+            break
+        if not started or tier is None:
+            continue
+        if k == 'label':
+            close()
+            cur = {'name': title_case(t), 'tier': tier, 'page': page, 'raw': '', 'features': []}
+            continue
+        if cur is None:
+            continue
+        if k == 'fname':
+            if feat:
+                cur['features'].append(finish(feat))
+            feat = new_feature(t, page)
+            continue
+        if feat:
+            feat['raw'] += t
+        else:
+            cur['raw'] += t
+    close()
+    per = {}
+    for f in out:
+        per[f['tier']] = per.get(f['tier'], 0) + 1
+        if not f['features']:
+            review.append(f'p.{f["page"]}: beastform {f["name"]} has no features')
+    review.append('beastforms per tier: ' + ', '.join(f'tier {t}: {n}' for t, n in sorted(per.items())))
+    return out, review
+
+
+def stances(rs):
+    """Martial Stances (Brawler, Martial Artist, p. 13): an intro, rules
+    under bold labels (STANCES, FOCUS, SHIFTING INTO STANCES, DROPPING OUT
+    OF STANCES), then "STANCE FEATURES": a "TIER n" line before each tier's
+    stances, each a feature name and its text. The Focus maximum is read
+    from the FOCUS rule ("You can hold a maximum of 6 Focus")."""
+    review = []
+    out = {'description': '', 'rules': [], 'stances': [], 'page': None}
+    started, mode, rule, feat, tier = False, None, None, None, None
+
+    def close_feat():
+        nonlocal feat
+        if feat:
+            out['stances'].append(finish(feat))
+        feat = None
+
+    for k, t, page in tokens(rs):
+        if k == 'heading':
+            if caps(t) == 'MARTIAL STANCES':
+                started, mode, out['page'] = True, 'desc', page
+                continue
+            if started:
+                break
+            continue
+        if not started:
+            continue
+        if k == 'label':
+            if caps(t) == 'STANCE FEATURES':
+                mode = 'intro'
+            elif mode in ('desc', 'rule'):
+                rule = {'name': title_case(t), 'page': page, 'raw': ''}
+                out['rules'].append(rule)
+                mode = 'rule'
+            elif feat:
+                feat['raw'] += t
+            continue
+        if k == 'text' and re.fullmatch(r'\s*TIER (\d)\s*', t):
+            close_feat()
+            tier = int(t.split()[1])
+            mode = 'stances'
+            continue
+        if k == 'fname' and mode == 'stances':
+            close_feat()
+            feat = new_feature(t, page)
+            feat['tier'] = tier
+            continue
+        if mode == 'desc':
+            out['description'] += t
+        elif mode == 'rule':
+            rule['raw'] += t
+        elif feat:
+            feat['raw'] += t
+    close_feat()
+    out['description'] = norm(out['description'])
+    for r in out['rules']:
+        r['body'] = body_blocks(r.pop('raw'))
+    focus = [m for r in out['rules'] for b in r['body'] for m in [re.search(r'You can hold a maximum of (\d+) Focus', b.get('text', ''))] if m]
+    out['focus'] = int(focus[0].group(1)) if focus else None
+    if not focus:
+        review.append('stances: no "You can hold a maximum of N Focus" in the rules')
+    # "You choose two stances from Tier 1 when you first take ... Mark a new
+    # stance from your tier or below each time you gain a level."
+    words = {'one': 1, 'two': 2, 'three': 3, 'four': 4}
+    text = ' '.join(b.get('text', '') for r in out['rules'] for b in r['body'])
+    m = re.search(r'You choose (\w+) stances from Tier 1', text)
+    out['start'] = words.get(m.group(1)) if m else None
+    out['per-level'] = 1 if 'Mark a new stance from your tier or below each time you gain a level' in text else None
+    if out['start'] is None or out['per-level'] is None:
+        review.append(f'stances: how many are known at first ({out["start"]}) or per level ({out["per-level"]}) not read')
+    per = {}
+    for s in out['stances']:
+        per[s['tier']] = per.get(s['tier'], 0) + 1
+    review.append(f'p.{out["page"]}: stances: rules {[r["name"] for r in out["rules"]]}, Focus max {out["focus"]}, '
+                  + ', '.join(f'tier {t}: {n}' for t, n in sorted(per.items())))
+    if sorted(per) != [1, 2, 3, 4]:
+        review.append(f'stances: tiers found {sorted(per)}')
     return out, review
 
 
@@ -388,7 +654,9 @@ def classes(rs, names):
 
     # The Ranger's companion section is read by companion().
     companion_heads = {'RANGER COMPANION', 'WORKING WITH', 'YOUR COMPANION', 'LEVELING UP YOUR', 'COMPANION'}
-    skipped = {n: [x for x in secs if caps(x[1]) not in companion_heads] for n, secs in skipped.items()}
+    # Beastforms and martial stances are read by beastforms() and stances().
+    own_kinds = {'MARTIAL STANCES', 'BEASTFORM OPTIONS', 'TIER 1', 'TIER 2', 'TIER 3', 'TIER 4'}
+    skipped = {n: [x for x in secs if caps(x[1]) not in companion_heads | own_kinds] for n, secs in skipped.items()}
     for name, secs in skipped.items():
         if not secs:
             continue
@@ -639,26 +907,33 @@ def weapons(rs):
             rec['frame'] = wheelchair
             if cells and cells[0].isdigit():
                 rec['tier'] = int(cells.pop(0))
-        if len(cells) != 4:
-            review.append(f'p.{page}: weapon {r["name"]!r}: cells {cells!r}')
-            continue
-        rec['trait'], rec['range'], dmg, rec['burden'] = cells
-        m = DAMAGE.match(dmg)
-        problems = []
-        if rec['trait'] not in WEAPON_TRAITS:
-            problems.append(f'trait {rec["trait"]!r}')
-        if rec['range'] not in RANGES:
-            problems.append(f'range {rec["range"]!r}')
-        if rec['burden'] not in BURDENS:
-            problems.append(f'burden {rec["burden"]!r}')
-        if not m:
-            problems.append(f'damage {dmg!r}')
-        if problems or not category or not tier:
-            review.append(f'p.{page}: weapon {r["name"]!r}: ' + ', '.join(problems or ['no tier/category']))
-            continue
-        rec['damage'], rec['damage-type'] = m.group(1).replace('−', '-'), m.group(2)
-        out.append(rec)
+        if weapon_cells(rec, cells, review):
+            out.append(rec)
     return out, review
+
+
+def weapon_cells(rec, cells, review):
+    """Fills `rec` from a weapon row's four cells (trait, range, damage,
+    burden); reports and returns False when a cell isn't one the SRD uses."""
+    if len(cells) != 4:
+        review.append(f'p.{rec["page"]}: weapon {rec["name"]!r}: cells {cells!r}')
+        return False
+    rec['trait'], rec['range'], dmg, rec['burden'] = cells
+    m = DAMAGE.match(dmg)
+    problems = []
+    if rec['trait'] not in WEAPON_TRAITS:
+        problems.append(f'trait {rec["trait"]!r}')
+    if rec['range'] not in RANGES:
+        problems.append(f'range {rec["range"]!r}')
+    if rec['burden'] not in BURDENS:
+        problems.append(f'burden {rec["burden"]!r}')
+    if not m:
+        problems.append(f'damage {dmg!r}')
+    if problems or not rec['category'] or not rec['tier']:
+        review.append(f'p.{rec["page"]}: weapon {rec["name"]!r}: ' + ', '.join(problems or ['no tier/category']))
+        return False
+    rec['damage'], rec['damage-type'] = m.group(1).replace('−', '-'), m.group(2)
+    return True
 
 
 def armor(rs):
@@ -682,3 +957,60 @@ def armor(rs):
                     'major': int(m.group(1)), 'severe': int(m.group(2)), 'score': int(cells[1]),
                     'feature': r['feature'], 'feature-text': r['feature-text']})
     return out, review
+
+
+EVERYDAY_TABLES = ('Primary Physical Weapons', 'Primary Magic Weapons', 'Secondary Weapons', 'Armor')
+
+
+def everyday_hero(rs):
+    """Everyday Hero starting equipment (pp. 191-192, a supplemental
+    mechanic): "PCs without access to standard weapons and armor can choose
+    from the following tables." Four tables under bold sub-headings, read
+    like the core tables (`table_rows`); the section ends at "Feasts". The
+    tables print no tier: they stand in for the starting equipment, which
+    comes "from the Tier 1" tables (p. 5), so every entry is tier 1."""
+    review = []
+    rs = list(rs)
+    start = next(i for i, (_, f, t) in enumerate(rs) if caps(t) == 'EVERYDAY HERO STARTING EQUIPMENT')
+    end = next((i for i, (_, _, t) in enumerate(rs) if i > start and t.strip() == 'Feasts'), len(rs))
+    rs = rs[start + 1:end]
+    cuts = [i for i, (_, f, t) in enumerate(rs) if f == 'QuestaSans-Bold' and t.strip() in EVERYDAY_TABLES]
+    found = [rs[i][2].strip() for i in cuts]
+    if found != list(EVERYDAY_TABLES):
+        review.append(f'everyday hero: tables found {found}, expected {list(EVERYDAY_TABLES)}')
+    weapons_out, armor_out = [], []
+    for a, b in zip(cuts, cuts[1:] + [len(rs)]):
+        table = rs[a][2].strip()
+        rows, rev = table_rows(rs[a + 1:b], 2 if table == 'Armor' else 4)
+        review += rev
+        for kind, r, page in rows:
+            if kind != 'row':
+                review.append(f'p.{page}: everyday hero {table}: unexpected heading {r!r}')
+                continue
+            if table == 'Armor':
+                cells = r['cells']
+                # This table sets the feature in the body font ("Flexible: +1
+                # to Evasion"), so it arrives as a third cell.
+                if len(cells) == 3 and not r['feature']:
+                    m = re.match(r'^([A-Z][\w ]+): (.+)$', cells[2])
+                    if m:
+                        r['feature'], r['feature-text'] = m.group(1), m.group(2)
+                        cells = cells[:2]
+                        review.append(f'p.{page}: everyday hero armor {r["name"]!r}: feature in the body font, read as {m.group(1)!r}')
+                m = re.match(r'^(\d+) / (\d+)$', cells[0]) if cells else None
+                if len(cells) != 2 or not m or not cells[1].isdigit():
+                    review.append(f'p.{page}: everyday hero armor {r["name"]!r}: cells {cells!r}')
+                    continue
+                armor_out.append({'name': r['name'], 'page': r['page'], 'tier': 1,
+                                  'major': int(m.group(1)), 'severe': int(m.group(2)), 'score': int(cells[1]),
+                                  'feature': r['feature'], 'feature-text': r['feature-text']})
+            else:
+                rec = {'name': r['name'], 'page': r['page'], 'tier': 1,
+                       'category': 'Secondary' if table.startswith('Secondary') else 'Primary',
+                       'feature': r['feature'], 'feature-text': r['feature-text']}
+                if weapon_cells(rec, r['cells'], review):
+                    weapons_out.append(rec)
+    review.append(f'everyday hero: {len(weapons_out)} weapons, {len(armor_out)} armor; tier 1 for all '
+                  f'(starting equipment, p. 5); no feature printed for: '
+                  + ', '.join(x['name'] for x in weapons_out + armor_out if not x['feature']))
+    return weapons_out, armor_out, review

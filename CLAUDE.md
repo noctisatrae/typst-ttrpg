@@ -37,7 +37,8 @@ below). Personal, non-commercial project for now.
    `setup(system: hw.system)`: `(kinds: (<kind>: (section:, outline:,
    summary:, render:)))` in display order. heartweaver's `system.typ` is
    where every new block kind registers; `outline: false` for classes,
-   ancestries, communities, transformations, domain cards. Kinds missing
+   ancestries, communities, transformations, beastforms, stances, domain
+   cards (factions are outlined). Kinds missing
    from the system still work (titled by name, compact entry).
    GM lookup: `intro` names link to the cast appendix and show its page
    ("p. 3") for print; the cast starts on a new page after a rule and
@@ -166,9 +167,22 @@ thresholds, max HP are computed at runtime and exported as 0/null).
   printed ("07"). Environment GM questions: stat block only.
 - Foundryborne v2.12.9 packs follow SRD 2.0; 12 modeling disagreements
   (Shadowblade phy/mag, Arcane-Frame Wheelchair Spellcast/mag): SRD wins.
-- Not yet kinds: transformations (pp. 42-45; proposed schema in the merge
-  report), Druid Beastforms, Brawler Martial Stances,
-  campaign-frame equipment (p.190+).
+- Transformations (pp. 42-45), Druid Beastforms (pp. 15-18) and martial
+  stances (p. 13) are kinds (2026-11-23). Numbers they need (Vampire's 6
+  tokens, Focus max 6, 2 stances at first + 1 per level) are READ from the
+  SRD text by the parser and cross-checked, never typed. daggerheart-srd
+  binds the forms to the Druid's "Beastform" feature and the stance rules to
+  "Stance Fighter" (`grants:`), so characters need no extra fields.
+- SCOPE (owner, 2026-11-23): the full BASE game only. The Witherwild
+  (pp. 184-189) is the only campaign frame: skip it. Pp. 190-205 are
+  "Supplemental Campaign Mechanics" (optional modules for any campaign):
+  Everyday Hero starting equipment (pp. 191-192) is generated
+  (`everyday-hero.weapons/.armors`, tier 1 per p. 5, tag "everyday-hero").
+  No downtime-project template (owner: plain notes suffice); feasts
+  skipped. Factions (p. 190) are a heartweaver kind (`hw.faction`, outline:
+  true; no SRD data, GMs write their own): countdown sizes (major 10,
+  minor 4-6) and limits (1 major + 2 minor running, 1-3 per list) are
+  checked; ticks are play state. Homebrew comes later.
 - Ranger companion text (pp. 21-22) is generated into
   `player/companion.typ` (`ranger-companion`, cross-checked); its numbers
   live in heartweaver `companion.typ`. Starting Stress 3 and the per-option
@@ -323,30 +337,9 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
    tests/heartweaver-companion.typ today.
 3. Stat lines: never leave a "|" at a line edge when they wrap (core
    `stat-line`).
-4. New kinds: transformations (pp. 42-45), Druid Beastforms (pp. 15-18),
-   Brawler Martial Stances (p. 13). Same path as the companion: parser in
-   player.py + emitter + cross-check, numbers in heartweaver.
-   Transformations first (wanted by the Red Mist campaign, 2026-11-23):
-   - core (system-agnostic): `boxes(n, end:)` tick-box row and
-     `write-in(label, lines:)` blank lines to write on by pen.
-   - heartweaver: `transformation(id:, name:, description:, features:,
-     questions:, tracks:, write-ins:)` + `transformation-card`, registered
-     in `system.typ` with `outline: false`. `tracks` is generic:
-     `((name: "Hollowing", boxes: 3, end: "Hollow"),)` (also fits the SRD
-     Vampire's 6 feed tokens). Features may carry `replaces:` notes for
-     SRD rules they override.
-   - `character(..., transformation:)`; `sheet(c)` prints the card. The
-     SRD's "one transformation per PC" (p. 42) is the default check, with
-     an explicit opt-out (Red Mist: undead, then grafted = two cards).
-   - daggerheart-srd: the six SRD transformations generated + cross-checked.
-   - DONE BAR (ready to push): the Red Mist "Aware Undead" homebrew card
-     (`../red-mist/handbook/chapters/06-mechanics.typ`, draft box) builds
-     from `../red-mist/homebrew/` with this constructor, renders in the
-     screenplay theme with its 3 Hollowing boxes, 2 anchor lines and six
-     transformation questions inside the card, and prints on a character's
-     sheet; plus one compile test
-     per SRD transformation and a `tests/fail/` case for two
-     transformations without the opt-out.
+4. (Transformations done 2026-11-23/24; `tests/script-transformation.typ`
+   checks a homebrew-shaped card in the screenplay theme. Never edit
+   `../red-mist`: the owner writes there; renderer checks live in tests.)
 5. Multiclass derivation.
 
 ## Publishing (decided 2026-11-17)

@@ -15,7 +15,7 @@ Regenerates every `packages/daggerheart-srd/src/**` data file from the PDF
 and cross-checks the result (about 12 s cold, 5 s with the extraction
 cached). Deterministic: a rebuild gives no git diff. Options:
 
-- `--kinds adversaries,environments,loot,classes,ancestries,communities,cards,weapons,armor`
+- `--kinds adversaries,environments,loot,classes,ancestries,communities,transformations,beastforms,stances,cards,weapons,armor,everyday-hero`
   (default: all).
 - `--check`: rebuild each entity's text from the emitted Typst (`typst
   query`) and find it in a second extraction (plain page text), ignoring
@@ -34,8 +34,10 @@ children, overlay problems, and effect SUGGESTIONS (never applied).
 
 Generated files say GENERATED at the top: fix a parser or the overlay and
 rebuild instead of editing them. Modules: `player.py` (classes, subclasses,
-the Ranger companion, ancestries, communities, domain cards, weapons incl.
-combat wheelchairs, armor), `emit_player.py`, `structure.py` (numbered options and roll-table
+the Ranger companion, ancestries, communities, transformations, Druid
+Beastforms, martial stances, domain cards, weapons incl. combat
+wheelchairs, armor, Everyday Hero equipment; numbers such as the Vampire's 6 tokens, the Focus
+maximum and stances per level are read from the text and cross-checked), `emit_player.py`, `structure.py` (numbered options and roll-table
 rows become lists; a feature ending in ":" takes the following features as
 children), `foundryborne.py`, plus the tools below.
 

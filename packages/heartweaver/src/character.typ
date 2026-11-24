@@ -16,6 +16,7 @@
 #import core: field
 #import "player.typ": trait
 #import "companion.typ": check-companion, trainings
+#import "beastform.typ": beastform-numbers
 
 /// Traits as keys (`agility`) and as printed (`Agility`).
 #let trait-keys = trait.keys()
@@ -58,8 +59,11 @@
 /// When a feature grants cards at this level ("Accomplished"), `card:`
 /// takes a list. With a companion: its training marks (`companion:`, see
 /// `train`) and, at levels 2, 5 and 8, its new Experience.
-#let level(n, experience: none, card: none, advancements: (), companion: (), companion-experience: none) = (
+/// With martial stances ("Stance Fighter"): the stance learned (`stance:`,
+/// a list when more are due).
+#let level(n, experience: none, card: none, advancements: (), companion: (), companion-experience: none, stance: none) = (
   level: n, experience: experience,
+  stances: if stance == none { () } else if type(stance) == dictionary { (stance,) } else { stance },
   cards: if card == none { () } else if type(card) == dictionary or with-choices(card) != card { (with-choices(card),) } else { card.map(with-choices) },
   advancements: advancements, companion: companion, companion-experience: companion-experience,
 )
@@ -76,6 +80,18 @@
   armor: field(dictionary),
   cards: field(array, required: true, items: dictionary),
   companion: field(dictionary),
+  // Transformations (p. 42), always a list here; `character` takes one
+  // entity or a list. A PC can't have more than `transformation-limit`.
+  transformation: field(array, default: (), items: dictionary),
+  transformation-limit: field(int, default: 1),
+  // Beastform options (p. 15) in place of those a Beastform feature grants
+  // (daggerheart-srd's Druid: the SRD's forms), e.g. to add homebrew forms:
+  // `beastforms: beastforms.values() + (my-form,)`. A dictionary is taken
+  // as its values.
+  beastforms: field(array, items: dictionary),
+  // Martial stances known from the start (Martial Artist, p. 12); later
+  // ones come with `level(n, stance: ...)`.
+  stances: field(array, default: (), items: dictionary),
   vault: field(array, default: (), items: dictionary),
   inventory: field(array, default: ()),
   story: field(dictionary, default: (:)),
@@ -101,6 +117,7 @@
   }
   for f in c.ancestry.features { out.push((c.ancestry.name, f)) }
   for f in c.community.features { out.push((c.community.name, f)) }
+  for t in c.transformation { for f in t.features { out.push((t.name, f)) } }
   for w in c.weapons { for f in w.features { out.push((w.name, f)) } }
   if c.at("armor", default: none) != none { for f in c.armor.features { out.push((c.armor.name, f)) } }
   // Cards whose choices are permanent ("Vitality") count from the vault too.
@@ -231,6 +248,12 @@
     )
   })
 
+  let grants = ("domain-cards", "companion", "companion-training").map(k => (k, features.map(((_, f)) => f.at("grants", default: (:)).at(k, default: 0)).sum(default: 0))).to-dict()
+  // Beastform options: the character's own list, else those its features grant.
+  let beast-grants = features.filter(((_, f)) => "beastforms" in f.at("grants", default: (:)))
+  let forms = c.at("beastforms", default: beast-grants.map(((_, f)) => f.grants.beastforms).flatten())
+  let partial = (traits: traits, evasion: evasion, proficiency: proficiency, attack-bonus: attack-bonus)
+
   (
     level: lvl,
     tier: tier,
@@ -252,7 +275,16 @@
     vault: vault,
     features: features,
     subclass-cards: subclass-cards,
-    grants: ("domain-cards", "companion", "companion-training").map(k => (k, features.map(((_, f)) => f.at("grants", default: (:)).at(k, default: 0)).sum(default: 0))).to-dict(),
+    grants: grants,
+    // Attack bonus from every source but weapons (weapons can't be used in
+    // Beastform, p. 14).
+    attack-bonus: attack-bonus,
+    // The forms of the character's tier or lower (p. 14), with their numbers.
+    // Martial stances: the rules from the granting feature, and the stances
+    // known with the level each was learned.
+    stance-rules: features.map(((_, f)) => f.at("grants", default: (:)).at("stances", default: none)).filter(x => x != none).at(0, default: none),
+    stances: c.stances.map(s => (stance: s, level: 1)) + c.levels.enumerate().map(((i, l)) => l.at("stances", default: ()).map(s => (stance: s, level: i + 2))).flatten(),
+    beastforms: if beast-grants.len() > 0 { forms.filter(b => b.tier <= tier).map(b => beastform-numbers(b, partial)) } else { () },
   )
 }
 
@@ -293,7 +325,18 @@
   expect-kind("subclass", "subclass")
   expect-kind("ancestry", "ancestry")
   expect-kind("community", "community")
+  for t in c.transformation {
+    if t.at("kind", default: none) != "transformation" {
+      errors.push("`transformation` must be a transformation entity (e.g. from daggerheart-srd), got " + repr(t.at("kind", default: t)))
+    }
+  }
   if errors.len() > 0 { return errors }
+  // p. 42: "A PC can't have more than one transformation."
+  if c.transformation.len() > c.transformation-limit {
+    errors.push("`transformation`: a PC can't have more than " + if c.transformation-limit == 1 { "one transformation (p. 42)" } else { str(c.transformation-limit) + " transformations (`transformation-limit`)" } + ", got " + str(c.transformation.len()) + " (" + c.transformation.map(t => t.name).join(", ") + "); for a house rule that allows more, set `transformation-limit: " + str(c.transformation.len()) + "`")
+  }
+  let tids = c.transformation.map(t => t.id)
+  if tids.dedup().len() != tids.len() { errors.push("`transformation`: the same transformation is given twice") }
 
   if c.subclass.class != c.class.id {
     errors.push("subclass " + repr(c.subclass.name) + " belongs to " + repr(c.subclass.class) + ", not " + repr(c.class.id))
@@ -397,6 +440,36 @@
     }
   }
   if has-companion and c.at("companion", default: none) != none { errors += check-companion(c) }
+  // Beastforms (p. 14): a feature that grants them needs the list of forms.
+  let beast-features = d.features.filter(((_, f)) => "beastforms" in f.at("grants", default: (:)))
+  if beast-features.len() == 0 and "beastforms" in c {
+    errors.push("`beastforms`: only a character with a Beastform feature (Druid, p. 14) takes Beastform options")
+  }
+  // Martial stances (pp. 12-13): `start` Tier 1 stances when the feature is
+  // taken (at creation), then `per-level` each level, of the tier or lower.
+  let all-stances = d.stances
+  if d.stance-rules == none {
+    if all-stances.len() > 0 { errors.push("`stances`: only a character with a stance feature (Martial Artist's \"Stance Fighter\", p. 12) knows martial stances") }
+  } else {
+    let r = d.stance-rules
+    let bad = all-stances.filter(k => k.stance.at("kind", default: none) != "stance")
+    if bad.len() > 0 { errors.push("`stances`: " + bad.map(k => repr(k.stance.at("name", default: k.stance))).join(", ") + " is not a stance entity") } else {
+      if c.stances.len() != r.start or c.stances.any(s => s.tier != 1) {
+        errors.push("`stances`: choose " + str(r.start) + " Tier 1 stances at creation (p. 12), got " + if c.stances.len() == 0 { "none" } else { c.stances.map(s => s.name + " (tier " + str(s.tier) + ")").join(", ") })
+      }
+      for (i, l) in c.levels.enumerate() {
+        let n = i + 2
+        let got = l.at("stances", default: ())
+        if got.len() != r.per-level { errors.push("level " + str(n) + ": learn " + str(r.per-level) + " martial stance (p. 12), got " + str(got.len()) + "; use `level(" + str(n) + ", stance: stances.<name>)`") }
+        for s in got.filter(s => s.tier > tier-of(n)) { errors.push("level " + str(n) + ": " + s.name + " is a tier " + str(s.tier) + " stance; choose one of tier " + str(tier-of(n)) + " or lower (p. 12)") }
+      }
+      let ids = all-stances.map(k => k.stance.id)
+      if ids.dedup().len() != ids.len() { errors.push("`stances`: the same stance is learned twice") }
+    }
+  }
+  for b in c.at("beastforms", default: ()) {
+    if b.at("kind", default: none) != "beastform" { errors.push("`beastforms`: " + repr(b.at("name", default: b)) + " is not a beastform entity") }
+  }
   // Cards with choices ("Vitality", p. 208): exactly `pick` different options.
   for k in acquired.filter(k => "choices" in k) {
     let opts = k.choices.options.keys()
@@ -429,7 +502,7 @@
   class: none, subclass: none, ancestry: none, community: none,
   traits: none, experiences: none, weapons: none, armor: none,
   cards: none, vault: none, inventory: none, story: none, levels: none,
-  companion: none,
+  companion: none, transformation: none, transformation-limit: none, beastforms: none, stances: none,
   ..unknown,
 ) = {
   let c = core.entity("character", character-schema,
@@ -438,6 +511,10 @@
     traits: traits, experiences: experiences, weapons: weapons, armor: armor,
     cards: if type(cards) == array { cards.map(with-choices) } else { cards },
     vault: vault, inventory: inventory, story: story, levels: levels, companion: companion,
+    transformation: if type(transformation) == dictionary { (transformation,) } else { transformation },
+    transformation-limit: transformation-limit,
+    beastforms: if type(beastforms) == dictionary { beastforms.values() } else { beastforms },
+    stances: stances,
     ..unknown)
   core.report("character " + repr(c.id), check-rules(c))
   c

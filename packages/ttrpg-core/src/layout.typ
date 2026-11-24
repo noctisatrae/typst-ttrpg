@@ -147,3 +147,27 @@
     for e in s.entries { e }
   }
 })
+
+/// A row of `n` empty boxes to tick by pen, e.g. a countdown or a track.
+/// `shape`: "square" or "circle". `end`: a label after the last box, the
+/// result of filling the row ("Hollow"), drawn as "→ Hollow". The row is
+/// an inline box, so it sits on a text line.
+#let boxes(n, shape: "square") = context {
+  let stroke = 0.7pt + current-theme().colors.text
+  let one = if shape == "circle" { circle(radius: 0.38em, stroke: stroke) } else { box(width: 0.8em, height: 0.8em, stroke: stroke) }
+  box(baseline: 0.1em, stack(dir: ltr, spacing: 0.25em, ..range(n).map(_ => one)))
+}
+
+/// A label with `lines` blank lines to write on by pen: an anchor, a goal,
+/// a name chosen in play. The first line starts after the label.
+#let write-in(label, lines: 1) = context {
+  let rule = 0.5pt + current-theme().colors.card-stroke
+  // A grid, not linebreaks: the rows stay tight whatever the theme's
+  // paragraph leading, and every line starts under the first one.
+  let rule-cell = block(width: 100%, height: 1.4em, stroke: (bottom: rule))
+  block(above: 0.8em, below: 0.8em, grid(
+    columns: (auto, 1fr), column-gutter: 0.4em, align: bottom,
+    [*#label:*], rule-cell,
+    ..range(lines - 1).map(_ => ([], rule-cell)).flatten(),
+  ))
+}

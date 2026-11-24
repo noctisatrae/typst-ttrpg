@@ -138,8 +138,8 @@ def cards(records):
     return '\n'.join(out) + entries(names)
 
 
-def weapons(records):
-    out = [HEADER.format(title='Weapons and combat wheelchairs', imports='weapon, feature')]
+def weapons(records, title='Weapons and combat wheelchairs', tags=()):
+    out = [HEADER.format(title=title, imports='weapon, feature')]
     names = []
     for r in records:
         n = ident(r['name'])
@@ -151,6 +151,8 @@ def weapons(records):
         out.append(f'  burden: {lit(r["burden"])},')
         if r.get('frame'):
             out.append(f'  tags: ("combat-wheelchair", {lit(r["frame"] + "-frame")}),')
+        elif tags:
+            out.append('  tags: (' + ', '.join(lit(t) for t in tags) + ',),')
         if r['feature']:
             f = {'name': r['feature'], 'body': [{'text': r['feature-text']}] if r['feature-text'] else []}
             out.append(f'  features: ({feature("weapon", wid, f, 0).strip()}),')
@@ -159,8 +161,8 @@ def weapons(records):
     return '\n'.join(out) + entries(names)
 
 
-def armor(records):
-    out = [HEADER.format(title='Armor', imports='armor, feature')]
+def armor(records, title='Armor', tags=()):
+    out = [HEADER.format(title=title, imports='armor, feature')]
     names = []
     for r in records:
         n = ident(r['name'])
@@ -169,6 +171,8 @@ def armor(records):
         out.append(f'#let {n} = armor(')
         out.append(f'  id: {lit(aid)}, name: {lit(r["name"])}, tier: {r["tier"]},')
         out.append(f'  thresholds: (major: {r["major"]}, severe: {r["severe"]}), score: {r["score"]},')
+        if tags:
+            out.append('  tags: (' + ', '.join(lit(t) for t in tags) + ',),')
         if r['feature']:
             f = {'name': r['feature'], 'body': [{'text': r['feature-text']}] if r['feature-text'] else []}
             out.append(f'  features: ({feature("armor", aid, f, 0).strip()}),')
@@ -194,3 +198,92 @@ def companion(r):
     out.append(f'  flags: source({r["page"]}),')
     out.append(')')
     return '\n'.join(out) + '\n'
+
+
+def transformations(records):
+    """Transformations (pp. 42-45). Tracks come from the parser, which reads
+    their size from the feature text ("hold up to 6 tokens")."""
+    out = [HEADER.format(title='Transformations', imports='transformation, feature')]
+    names = []
+    for r in records:
+        n = ident(r['name'])
+        names.append(n)
+        tid = slug(r['name'])
+        out.append(f'#let {n} = transformation(')
+        out.append(f'  id: {lit(tid)},')
+        out.append(f'  name: {lit(r["name"])},')
+        out.append(f'  description: {lit(r["description"])},')
+        out.append(f'  features: {features("transformation", tid, r["features"], 2)},')
+        if r['tracks']:
+            out.append('  tracks: (' + ' '.join(f'(name: {lit(t["name"])}, boxes: {t["boxes"]}),' for t in r['tracks']) + '),')
+        out.append('  questions: (' + ''.join('\n    ' + lit(q) + ',' for q in r['questions']) + '\n  ),')
+        out.append(f'  flags: source({r["page"]}),')
+        out.append(')\n')
+    return '\n'.join(out) + entries(names)
+
+
+def beastforms(records):
+    """Druid Beastform options (pp. 15-18), in SRD order by tier."""
+    out = [HEADER.format(title='Beastform options (Druid)', imports='beastform, feature')]
+    names = []
+    for r in records:
+        n = ident(r['name'])
+        names.append(n)
+        bid = slug(r['name'])
+        out.append(f'#let {n} = beastform(')
+        out.append(f'  id: {lit(bid)}, name: {lit(r["name"])}, tier: {r["tier"]},')
+        if r['examples']:
+            out.append(f'  examples: {lit(r["examples"])},')
+        if r['trait']:
+            out.append(f'  trait: {lit(r["trait"])}, trait-bonus: {r["trait-bonus"]}, evasion-bonus: {r["evasion-bonus"]},')
+        if r['attack']:
+            a = r['attack']
+            out.append(f'  attack: (range: {lit(a["range"])}, trait: {lit(a["trait"])}, damage: {lit(a["damage"])}, damage-type: {lit(a["damage-type"])}),')
+        if r['advantages']:
+            out.append('  advantages: (' + ', '.join(lit(x) for x in r['advantages']) + ',),')
+        out.append(f'  features: {features("beastform", bid, r["features"], 2)},')
+        flags = f'source({r["page"]})'
+        if r.get('attack-printed'):
+            # The SRD prints this attack trait first ("Strength Melee"); kept
+            # so the cross-check can rebuild the line as printed.
+            flags += f' + (attack-printed: {lit(r["attack-printed"])})'
+        out.append(f'  flags: {flags},')
+        out.append(')\n')
+    return '\n'.join(out) + entries(names)
+
+
+def stances(r):
+    """Martial stances (p. 13): the rules as one `stance-rules` record (its
+    numbers read from the text by the parser), then each stance."""
+    out = [HEADER.format(title='Martial stances (Brawler, Martial Artist)', imports='stance, stance-rules, feature')]
+    out.append('#let martial-stances = stance-rules(')
+    out.append(f'  description: {lit(r["description"])},')
+    out.append('  rules: (')
+    for f in r['rules']:
+        out.append(f'    feature({lit(f["name"])}, {body(f["body"], 4)}),')
+    out.append('  ),')
+    out.append(f'  focus: {r["focus"]}, start: {r["start"]}, per-level: {r["per-level"]},')
+    out.append(f'  flags: source({r["page"]}),')
+    out.append(')\n')
+    names = []
+    for s in r['stances']:
+        n = ident(s['name'])
+        names.append(n)
+        out.append(f'#let {n} = stance(id: {lit(slug(s["name"]))}, name: {lit(s["name"])}, tier: {s["tier"]}, text: {body(s["body"], 2)}, flags: source({s["page"]}))')
+    return '\n'.join(out) + '\n' + entries(names)
+
+
+EVERYDAY_NOTE = """// Everyday Hero (pp. 191-192) is a supplemental mechanic: "PCs without
+// access to standard weapons and armor can choose from the following
+// tables." The tables print no tier; they stand in for the starting
+// equipment, taken "from the Tier 1" tables (p. 5), so all are tier 1.
+
+#import"""
+
+
+def everyday_hero(weapon_recs, armor_recs):
+    """Two files, tagged "everyday-hero"."""
+    def note(text):
+        return text.replace('\n#import', '\n' + EVERYDAY_NOTE, 1)
+    return (note(weapons(weapon_recs, 'Everyday Hero starting equipment: weapons', ('everyday-hero',))),
+            note(armor(armor_recs, 'Everyday Hero starting equipment: armor', ('everyday-hero',))))

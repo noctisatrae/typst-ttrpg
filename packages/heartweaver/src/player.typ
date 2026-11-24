@@ -67,6 +67,13 @@
   // training marks ("Expert Training", "Advanced Training").
   companion: field(int),
   companion-training: field(int),
+  // Beastforms (Druid "Beastform", p. 14): the forms the feature lets the
+  // character take; the sheet lists those of its tier or lower.
+  // daggerheart-srd binds the SRD's forms to the Druid's feature.
+  beastforms: field(array, items: dictionary),
+  // Martial stances ("Stance Fighter", p. 12): the rules (`stance-rules`),
+  // with how many stances are chosen at first and per level.
+  stances: field(dictionary),
 )
 
 /// Features of player-facing kinds: name and text, plus optional effects.

@@ -32,7 +32,8 @@ What you get:
 - **Registry**: the same id rendered twice counts once; different content
   under one id is an error.
 - **Layout**: `card`, `band`, `stat-line`, `section`, `entry`,
-  `statblock`, styled by the active theme (`setup`, `use-theme`).
+  `statblock`, styled by the active theme (`setup`, `use-theme`), plus
+  things to fill in by pen: `boxes(n)` and `write-in(label, lines:)`.
 
 Code under MPL-2.0. Source, tests and examples:
 https://github.com/noctisatrae/typst-ttrpg

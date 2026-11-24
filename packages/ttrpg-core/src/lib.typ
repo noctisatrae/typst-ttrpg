@@ -10,7 +10,7 @@
 #import "extend.typ": extend, add, remove, replace, all
 #import "registry.typ": register, lookup, registered
 #import "theme.typ": default-theme, setup, current-theme, merge-theme, use-theme
-#import "layout.typ": card, card-title, labeled, stat-line, band, section, entry, statblock, dice-pattern
+#import "layout.typ": card, card-title, labeled, stat-line, band, section, entry, statblock, dice-pattern, boxes, write-in
 
 /// Package metadata, useful for checking which version a document resolved.
 #let package-info = (name: "ttrpg-core", version: version(0, 1, 0))

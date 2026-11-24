@@ -17,6 +17,10 @@
 #import "player.typ": weapon, armor, ancestry, community, class, subclass, domain-card, mixed-ancestry, trait, weapon-category, burden, card-type
 #import "sheet.typ": sheet, character-summary
 #import "companion.typ": companion, companion-rules, derive-companion
+#import "transformation.typ": transformation, transformation-schema, transformation-card, transformation-summary
+#import "beastform.typ": beastform, beastform-schema, beastform-block, beastform-summary
+#import "stance.typ": stance, stance-schema, stance-rules, stance-card, stance-summary
+#import "faction.typ": faction, faction-schema, faction-card, faction-summary, relationship-name
 #import "training.typ" as train
 #import "character.typ": character, derive, cards-due, training-due, level, increase-traits, add-hit-point, add-stress, increase-experiences, extra-card, increase-evasion, upgrade-subclass, increase-proficiency, multiclass
 
@@ -34,6 +38,10 @@
   class: player.class-schema,
   subclass: player.subclass-schema,
   domain-card: player.domain-card-schema,
+  transformation: transformation-schema,
+  beastform: beastform-schema,
+  stance: stance-schema,
+  faction: faction-schema,
 ))
 
 #let package-info = (

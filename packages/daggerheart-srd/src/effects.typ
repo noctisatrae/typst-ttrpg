@@ -48,6 +48,9 @@
   "improved-tower-shield/Barrier": (modifiers: (armor-score: 3, evasion: -1)),  // p. 67
   "advanced-tower-shield/Barrier": (modifiers: (armor-score: 4, evasion: -1)),  // p. 68
   "legendary-tower-shield/Barrier": (modifiers: (armor-score: 5, evasion: -1)), // p. 69
+  // Everyday Hero shields (p. 192).
+  "barrel-lid-shield/Protective": (modifiers: (armor-score: 1)),           // "+1 to Armor Score"
+  "table-shield/Barrier": (modifiers: (armor-score: 2, evasion: -1)),      // "+2 to Armor Score; −1 to Evasion"
   "fighting-cloak/Padded": (modifiers: (thresholds: 2)),           // "+2 to damage thresholds" p. 66
   "improved-fighting-cloak/Padded": (modifiers: (thresholds: 3)),  // p. 67
   "advanced-fighting-cloak/Padded": (modifiers: (thresholds: 4)),  // p. 68
@@ -125,6 +128,9 @@
   "juggernaut/Rugged": (modifiers: (severe: 3)),                   // p. 12 "Gain a permanent +3 bonus to your Severe damage threshold."
   "nightwalker/Fleeting Shadow": (modifiers: (evasion: 1)),        // p. 23 "Gain a permanent +1 bonus to your Evasion. ..."
   "winged-sentinel/Ascendant": (modifiers: (severe: 4)),           // p. 24 "Gain a permanent +4 bonus to your Severe damage threshold."
+  // Transformations (pp. 43-45). Attack rolls and Spellcast Rolls are
+  // action rolls (p. 47); the +1 to other rolls and to damage stays text.
+  "demigod/Gifted": (modifiers: (attack: 1, spellcast: 1)),       // p. 43 "You gain a +1 bonus to action, reaction, and damage rolls."
 )
 
 /// The effects of `kind` entity `id`'s feature `name`, as named arguments

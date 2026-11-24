@@ -12,6 +12,7 @@
 #import "player.typ": trait
 #import "character.typ": derive
 #import "companion.typ": derive-companion
+#import "transformation.typ": transformation-body
 
 /// "11" plus its sources, at the same size, when there is more than one.
 #let with-sources(s) = {
@@ -48,10 +49,7 @@
 // The sheet's boxes hug their text; the space goes BETWEEN elements.
 #let gap = 1.3em
 
-#let tick-boxes(n, shape: "square") = {
-  let one = if shape == "circle" { circle(radius: 0.38em, stroke: 0.7pt + luma(40)) } else { box(width: 0.8em, height: 0.8em, stroke: 0.7pt + luma(40)) }
-  box(stack(dir: ltr, spacing: 0.25em, ..range(n).map(_ => one)))
-}
+#let tick-boxes(n, shape: "square") = core.boxes(n, shape: shape)
 
 /// HP, Stress, Hope and Armor slots in the chosen `state` style. HP,
 /// Stress and Armor count MARKED slots (start at 0); Hope is held (starts
@@ -168,9 +166,39 @@
     for (i, step) in ("foundation", "specialization", "mastery").enumerate() {
       if i < d.subclass-cards { for f in c.subclass.at(step) { entry(f.name, tag: upper(step.first()) + step.slice(1), f.body) } }
     }
+    // Beastforms of the character's tier or lower (Druid, pp. 14-18), with
+    // their numbers worked out: Evasion with the form's bonus, the attack
+    // with its trait bonus, damage with Proficiency.
+    if d.beastforms.len() > 0 {
+      section("Beastforms")
+      for k in d.beastforms {
+        let b = k.form
+        block(above: 1.4em, below: 0.6em)[*#b.name* --- Tier #b.tier#if k.evasion != none [ · Evasion #k.evasion · #b.attack.range, #b.attack.trait #signed(k.attack), #k.damage #b.attack.damage-type · #b.trait #signed(b.trait-bonus) while transformed]]
+        if b.advantages.len() > 0 { block(above: 0.6em, below: 0.6em)[_Advantage on:_ #b.advantages.join(", ")] }
+        for f in b.features { entry(f.name, f.body) }
+      }
+    }
+
+    // Martial stances (pp. 12-13): a Focus track, the stances known, and the
+    // rules for Focus and shifting.
+    if d.stance-rules != none {
+      let r = d.stance-rules
+      section("Martial Stances")
+      block(above: 0.8em, below: 0.8em)[*Focus:*~#core.boxes(r.focus, shape: "circle") (max #r.focus) #h(1.5em) *Active stance:*~#box(width: 9em, stroke: (bottom: 0.5pt + luma(140)))]
+      for k in d.stances.sorted(key: k => (k.stance.tier, k.level)) {
+        entry(k.stance.name, tag: "Tier " + str(k.stance.tier) + if k.level > 1 { ", level " + str(k.level) }, k.stance.text)
+      }
+      for f in r.rules { entry(f.name, f.body) }
+    }
+
     section("Heritage")
     for f in c.ancestry.features { entry(f.name, tag: c.ancestry.name, f.body) }
     for f in c.community.features { entry(f.name, tag: c.community.name, f.body) }
+    // Transformation cards sit with the heritage (p. 42), outside the loadout.
+    for t in c.transformation {
+      section("Transformation: " + t.name)
+      transformation-body(t, entry: entry, section: section)
+    }
 
     section("Loadout")
     for k in d.loadout {

@@ -100,7 +100,7 @@
   hope-feature: feature("Evolution", "Spend 3 Hope to transform into a Beastform without marking a Stress. When you do, choose one trait to raise by +1 until you drop out of that Beastform.", ..fx("class", "druid", "Evolution")),
   features: (
     feature("Beastform", "Mark a Stress to magically transform into a creature of your tier or lower from the Beastform list. You can drop out of this form at any time. While transformed, you can’t use weapons or cast spells from domain cards, but you can still use other features or abilities you have access to. Spells you cast before you transform stay active and last for their normal duration, and you can talk and communicate as normal. Additionally, you gain the Beastform’s features, add their Evasion bonus to your Evasion, and use the trait specified in their statistics for your attack. While you’re in a Beastform, your armor becomes part of your body and you mark Armor Slots as usual; when you drop out of a Beastform, those marked Armor Slots remain marked. If you mark your last Hit Point, you automatically drop out of this form.", ..fx("class", "druid", "Beastform")),
-    feature("Wildtouch", "You can perform harmless, subtle effects that involve nature—such as causing a flower to rapidly grow, summoning a slight gust of wind, or starting a campfire— at will.", ..fx("class", "druid", "Wildtouch")),
+    feature("Wildtouch", "You can perform harmless, subtle effects that involve nature—such as causing a flower to rapidly grow, summoning a slight gust of wind, or starting a campfire—at will.", ..fx("class", "druid", "Wildtouch")),
   ),
   background-questions: (
     "Why was the community you grew up in so reliant on nature and its creatures?",

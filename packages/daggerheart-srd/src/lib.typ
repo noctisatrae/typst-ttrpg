@@ -57,6 +57,12 @@
 #import "player/domain-cards.typ" as player-cards
 #import "player/weapons.typ" as player-weapons
 #import "player/armor.typ" as player-armor
+#import "player/transformations.typ" as player-transformations
+#import "player/beastforms.typ" as player-beastforms
+#import "player/stances.typ" as player-stances
+#import "player/everyday-hero-weapons.typ" as hero-weapons
+#import "player/everyday-hero-armor.typ" as hero-armor
+#import "player/stances.typ": martial-stances
 
 #import "player/companion.typ": ranger-companion
 #import "@local/heartweaver:0.1.0" as hw
@@ -64,12 +70,36 @@
 #let companion = hw.companion.with(rules: ranger-companion)
 
 #let by-kind(module, kind) = module.entries.filter(e => e.kind == kind).map(e => (e.id, e)).to-dict()
-#let classes = by-kind(player-classes, "class")
-#let subclasses = by-kind(player-classes, "subclass")
+#let beastforms = by-kind(player-beastforms, "beastform")
+// "Beastform: Mark a Stress to magically transform into a creature of your
+// tier or lower from the Beastform list" (p. 14): the Druid's feature
+// carries the SRD's forms, so every Druid's sheet lists them.
+#let stances = by-kind(player-stances, "stance")
+// "Stance Fighter: ... Take the Martial Stances sheet and choose two martial
+// stances from Tier 1" (p. 12): the feature carries the rules (p. 13).
+#let subclasses = {
+  let ss = by-kind(player-classes, "subclass")
+  let grant(f) = if f.name == "Stance Fighter" { f + (grants: (stances: martial-stances)) } else { f }
+  ss + (martial-artist: ss.martial-artist + (foundation: ss.martial-artist.foundation.map(grant)))
+}
+#let classes = {
+  let cs = by-kind(player-classes, "class")
+  let grant(f) = if f.name == "Beastform" { f + (grants: (beastforms: beastforms.values())) } else { f }
+  cs + (druid: cs.druid + (features: cs.druid.features.map(grant)))
+}
 #let ancestries = by-kind(player-ancestries, "ancestry")
 #let communities = by-kind(player-communities, "community")
 #let cards = by-kind(player-cards, "domain-card")
 #let weapons = by-kind(player-weapons, "weapon")
 #let armors = by-kind(player-armor, "armor")
+#let transformations = by-kind(player-transformations, "transformation")
+
+/// Everyday Hero starting equipment (pp. 191-192), an optional module:
+/// `everyday-hero.weapons.cleaver`, `everyday-hero.armors.leather-apron`.
+/// Kept apart from `weapons` and `armors`, which are the core tables.
+#let everyday-hero = (
+  weapons: by-kind(hero-weapons, "weapon"),
+  armors: by-kind(hero-armor, "armor"),
+)
 
 #let package-info = (name: "daggerheart-srd", version: version(0, 1, 0), srd: srd)

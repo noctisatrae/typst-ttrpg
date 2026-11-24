@@ -30,6 +30,13 @@ you write (homebrew) or load from a data package.
   Armor Score, Proficiency, attacks, each with its sources) and
   `hw.sheet(c)`. Every level-up rule is checked; companions
   (`hw.companion`, `hw.train`) included.
+- **Transformations** (`hw.transformation`, with tick-box `tracks` and
+  `write-ins`), **Beastforms** (`hw.beastform`; a Druid's sheet lists its
+  forms with Evasion, attack and damage worked out) and **martial stances**
+  (`hw.stance`; known stances are choices, checked per level).
+- **Factions** (`hw.faction`): relationships (−3 to +3, named), assets,
+  problems and objectives, with Objective Countdowns printed as boxes and
+  their sizes and limits checked.
 - **`hw.system`** plugs these kinds into
   [ttrpg-script](https://typst.app/universe/package/ttrpg-script).
 
