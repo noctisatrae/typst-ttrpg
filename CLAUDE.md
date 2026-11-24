@@ -456,7 +456,10 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   start rule: the SRD is silent; for the companion, a Demiplane forum post
   reports Darrington Press confirming "only ... each time you level up
   once you have the companion". Stances stay our ruling (owner agreed).
-- Not yet: wheelchair.
+- Combat wheelchair (pp. 70-71): generated as Primary weapons (tag
+  "combat-wheelchair"); Arcane Frame uses the Spellcast trait (named on
+  the sheet), Heavy/Reliable via effects.typ. Checked in
+  tests/heartweaver-wheelchair.typ.
 - First character: a real player character from the owner's Foundry export
   (fixtures/, kept out of git unless the owner says otherwise); its current
   Foundry values serve as a check for our derivation.

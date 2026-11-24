@@ -155,7 +155,10 @@
     section("Equipment")
     for a in d.attacks {
       let w = a.weapon
-      block(above: 1.1em, below: 0.6em)[*#w.name* --- #w.trait #signed(a.modifier) · #w.range · #a.damage #w.damage-type · #w.burden]
+      // "Spellcast" weapons (Arcane-Frame wheelchairs, p. 71) name the
+      // trait they use: "Knowledge (Spellcast) +3".
+      let t = if w.trait == "Spellcast" and d.spellcast-trait != none [#d.spellcast-trait (Spellcast)] else { w.trait }
+      block(above: 1.1em, below: 0.6em)[*#w.name* --- #t #signed(a.modifier) · #w.range · #a.damage #w.damage-type · #w.burden]
       for f in w.features { entry(f.name, f.body) }
     }
     if c.at("armor", default: none) != none {
