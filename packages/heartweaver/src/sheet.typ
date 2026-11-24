@@ -116,7 +116,7 @@
   let entries(source, fs, tag: none) = fs.map(f => entry(f.name, tag: tag, f.body))
   core.card({
     core.card-title(c.name)
-    block(below: 0.7em, text(weight: "bold", style: "italic", size: 1.1em)[Level #d.level #c.class.name · #c.subclass.name])
+    block(below: 0.7em, text(weight: "bold", style: "italic", size: 1.1em)[Level #d.level #c.class.name · #c.subclass.name#if d.multiclass != none [ · #d.multiclass.class.name · #d.multiclass.subclass.name]])
     block(below: 1.2em)[#c.ancestry.name · #c.community.name#if c.at("pronouns", default: none) != none [ · #c.pronouns]]
 
     block(above: 0pt, below: gap, core.band(
@@ -125,7 +125,11 @@
         ("Armor Score", with-sources(d.armor-score)),
         ("Thresholds", str(d.thresholds.major.value) + "/" + str(d.thresholds.severe.value)),
         ("Proficiency", str(d.proficiency.value)),
-        ..if d.spellcast-trait != none { (("Spellcast", if d.spellcast-bonus.value == 0 { d.spellcast-trait } else [#d.spellcast-trait, #signed(d.spellcast-bonus.value) to rolls]),) },
+        // With two Spellcast traits (multiclass) you choose per roll, p. 54.
+        ..if d.spellcast-trait != none {
+          let t = d.spellcast-traits.join(" or ")
+          (("Spellcast", if d.spellcast-bonus.value == 0 { t } else [#t, #signed(d.spellcast-bonus.value) to rolls]),)
+        },
       ),
     ))
     // The six traits, each in its own small box: name over modifier.
@@ -165,6 +169,18 @@
     section("Subclass: " + c.subclass.name)
     for (i, step) in ("foundation", "specialization", "mastery").enumerate() {
       if i < d.subclass-cards { for f in c.subclass.at(step) { entry(f.name, tag: upper(step.first()) + step.slice(1), f.body) } }
+    }
+    // Multiclass (p. 54): the class's features (all of them, as on the
+    // official multiclass sheets), the domain, the other subclass's cards.
+    let mc = d.multiclass
+    if mc != none {
+      section("Multiclass: " + mc.class.name)
+      block(above: 0.6em, below: 0.6em)[*Domain:* #mc.domain (cards at or below half your level, rounded up) · since level #mc.level]
+      for f in mc.features { entry(f.name, f.body) }
+      section("Subclass: " + mc.subclass.name)
+      for (i, step) in ("foundation", "specialization", "mastery").enumerate() {
+        if i < mc.subclass-cards { for f in mc.subclass.at(step) { entry(f.name, tag: upper(step.first()) + step.slice(1), f.body) } }
+      }
     }
     // Beastforms of the character's tier or lower (Druid, pp. 14-18), with
     // their numbers worked out: Evasion with the form's bonus, the attack

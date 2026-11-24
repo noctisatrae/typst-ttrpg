@@ -44,13 +44,26 @@
 #let extra-card(card) = (advancement: "card", card: with-choices(card), slots: 1)
 /// +1 Evasion.
 #let increase-evasion() = (advancement: "evasion", slots: 1)
-/// The next subclass card: specialization, then mastery.
-#let upgrade-subclass() = (advancement: "subclass", slots: 1)
+/// The next subclass card: specialization, then mastery. Once you have
+/// multiclassed you have two subclasses: name the one you upgrade,
+/// `upgrade-subclass(subclasses.warden-of-renewal)`.
+#let upgrade-subclass(..which) = {
+  let p = which.pos()
+  if p.len() > 1 or which.named().len() > 0 { panic("upgrade-subclass takes at most one subclass, e.g. upgrade-subclass(subclasses.moon)") }
+  (advancement: "subclass", subclass: p.at(0, default: none), slots: 1)
+}
 /// +1 Proficiency (takes both slots).
 #let increase-proficiency() = (advancement: "proficiency", slots: 2)
-/// Multiclass (takes both slots, level 5+): another class, one of its
-/// domains, and a subclass of it. Allowed by the format; derivation of its
-/// effects is not implemented yet.
+/// Multiclass (takes both slots, level 5+, once, p. 54): another class, one
+/// of its domains, the foundation card of one of its subclasses, and its
+/// class features: `multiclass(classes.druid, "Sage",
+/// subclasses.warden-of-renewal)`.
+///
+/// ALL of the class's features, not one: the SRD says "its class feature"
+/// (p. 54), but Darrington Press's official multiclass sheets (Additional
+/// Sheets, 2026-08-25) are headed "Multiclass Features" and print every
+/// feature of the class (Warlock: Patron's Pact and Favor; Witch: Hex and
+/// Commune). Never the class's Hope feature.
 #let multiclass(class, domain, subclass) = (advancement: "multiclass", class: class, domain: domain, subclass: subclass, slots: 2)
 
 /// One level-up (p. 53): a new Experience at levels 2, 5 and 8 (tier
@@ -100,6 +113,23 @@
 
 #let tier-of(level) = if level == 1 { 1 } else if level <= 4 { 2 } else if level <= 7 { 3 } else { 4 }
 
+/// The character's multiclass advancement with the level it was taken at,
+/// or none.
+#let multiclass-of(c) = {
+  for (i, l) in c.levels.enumerate() {
+    for a in l.advancements.filter(a => a.advancement == "multiclass") { return a + (level: i + 2) }
+  }
+  none
+}
+
+/// How many times subclass `sub` was upgraded; an upgrade naming no
+/// subclass is the main one's.
+#let subclass-upgrades(c, sub) = c.levels.map(l => l.advancements).flatten().filter(a => a.advancement == "subclass" and a.at("subclass", default: none) == none and sub.id == c.subclass.id or a.advancement == "subclass" and a.at("subclass", default: none) != none and a.subclass.at("id", default: none) == sub.id).len()
+
+/// The class features a multiclass gives: all of them, as on the official
+/// multiclass sheets (see `multiclass`).
+#let multiclass-features(mc) = mc.class.features
+
 // ---------------------------------------------------------------------
 // Tracked numbers: a value with the parts that add up to it.
 
@@ -108,12 +138,20 @@
 
 /// Every feature in effect, with where it comes from: class, subclass cards
 /// taken so far, heritage, equipped weapons and armor, loadout cards.
-#let active-features(c, subclass-cards) = {
+#let active-features(c, subclass-cards, mc: none, mc-cards: 0) = {
   let out = ()
   out.push((c.class.name + " (Hope)", c.class.hope-feature))
   for f in c.class.features { out.push((c.class.name, f)) }
   for (i, step) in ("foundation", "specialization", "mastery").enumerate() {
     if i < subclass-cards { for f in c.subclass.at(step) { out.push((c.subclass.name, f)) } }
+  }
+  // Multiclass (p. 54): the class feature, not its Hope feature, and the
+  // other subclass's cards.
+  if mc != none {
+    for f in multiclass-features(mc) { out.push((mc.class.name, f)) }
+    for (i, step) in ("foundation", "specialization", "mastery").enumerate() {
+      if i < mc-cards { for f in mc.subclass.at(step) { out.push((mc.subclass.name, f)) } }
+    }
   }
   for f in c.ancestry.features { out.push((c.ancestry.name, f)) }
   for f in c.community.features { out.push((c.community.name, f)) }
@@ -148,13 +186,15 @@
   let tier = tier-of(lvl)
   let ups = c.levels.map(l => l.advancements).flatten()
   let count(name) = ups.filter(a => a.advancement == name).len()
-  let subclass-cards = 1 + count("subclass")
+  let mc = multiclass-of(c)
+  let subclass-cards = 1 + subclass-upgrades(c, c.subclass)
+  let mc-cards = if mc == none { 0 } else { 1 + subclass-upgrades(c, mc.subclass) }
 
   let acquired = c.cards + c.levels.map(l => l.cards).flatten() + ups.filter(a => a.advancement == "card").map(a => a.card)
   let vault-ids = c.vault.map(v => v.id) + acquired.filter(k => k.at("permanent-vault", default: false)).map(k => k.id)
   let loadout = acquired.filter(k => k.id not in vault-ids)
   let vault = acquired.filter(k => k.id in vault-ids)
-  let features = active-features(c + (loadout: loadout, vault: vault), subclass-cards)
+  let features = active-features(c + (loadout: loadout, vault: vault), subclass-cards, mc: mc, mc-cards: mc-cards)
   // Modifiers for `key` from every active feature, except those of the
   // sources named in `except` (a weapon's attack bonus is its own).
   let mods(key, except: ()) = features.filter(((src, f)) => key in f.at("modifiers", default: (:)) and src not in except).map(((src, f)) => (src + ": " + f.name, f.modifiers.at(key)))
@@ -178,7 +218,12 @@
     for (label, m) in mods(k) { s = bump(s, label, if type(m) == function { m(early) } else { m }) }
     traits.insert(k, s)
   }
-  let spellcast = c.subclass.at("spellcast-trait", default: none)
+  // "If your foundation cards specify different Spellcast traits, you can
+  // choose which one to apply when making a Spellcast roll" (p. 54): the
+  // sheet counts the higher one (the main subclass's on a tie).
+  let spellcasts = (c.subclass,) + if mc != none { (mc.subclass,) } else { () }
+  let spellcasts = spellcasts.map(s => s.at("spellcast-trait", default: none)).filter(x => x != none).dedup()
+  let spellcast = spellcasts.sorted(key: t => -traits.at(trait-key(t)).value).at(0, default: none)
   let by-level(s, name) = {
     for (i, l) in c.levels.enumerate() {
       for a in l.advancements.filter(a => a.advancement == name) { s = bump(s, "level " + str(i + 2), 1) }
@@ -259,6 +304,8 @@
     tier: tier,
     traits: traits,
     spellcast-trait: spellcast,
+    // Every Spellcast trait the character can choose from (multiclass).
+    spellcast-traits: spellcasts,
     // Bonus to Spellcast Rolls on top of the trait ("Channeling", p. 74).
     spellcast-bonus: apply((value: 0, parts: ()), "spellcast"),
     proficiency: proficiency,
@@ -275,6 +322,9 @@
     vault: vault,
     features: features,
     subclass-cards: subclass-cards,
+    // The multiclass advancement (class, domain, subclass, level)
+    // with its subclass cards taken and the class features it gives.
+    multiclass: if mc == none { none } else { mc + (subclass-cards: mc-cards, features: multiclass-features(mc)) },
     grants: grants,
     // Attack bonus from every source but weapons (weapons can't be used in
     // Beastform, p. 14).
@@ -306,9 +356,25 @@
   )
 }
 
-/// Companion training marks due by level `n` (p. 22): one per level-up,
-/// plus "Expert Training" (+1) and "Advanced Training" (+2) once taken.
-#let training-due(c, n) = (n - 1) + derive(c + (levels: c.levels.slice(0, n - 1))).grants.companion-training
+/// The level at which a feature granting `key` (`"companion"`, `"stances"`)
+/// is first in effect: 1 from the class, later through multiclassing; none
+/// if never.
+#let gained-at(c, key) = {
+  for n in range(1, c.levels.len() + 2) {
+    let d = derive(c + (levels: c.levels.slice(0, n - 1)))
+    if d.features.any(((_, f)) => key in f.at("grants", default: (:))) { return n }
+  }
+  none
+}
+
+/// Companion training marks due by level `n` (p. 22): one per level-up
+/// since the companion came (level 1, or the multiclass level), plus
+/// "Expert Training" (+1) and "Advanced Training" (+2) once taken.
+#let training-due(c, n) = {
+  let from = gained-at(c, "companion")
+  if from == none or n <= from { return 0 }
+  (n - from) + derive(c + (levels: c.levels.slice(0, n - 1))).grants.companion-training
+}
 
 // ---------------------------------------------------------------------
 // Rules. Each returns error messages; `character` reports them all at once.
@@ -379,8 +445,40 @@
       }
     }
   }
-  if c.levels.map(l => l.advancements).flatten().filter(a => a.advancement == "multiclass").len() > 0 {
-    errors.push("multiclassing is accepted by the format but not derived yet; remove it for now")
+  // Multiclassing (pp. 53-54): once; another class, one of its domains,
+  // one of its subclasses (its class features come whole, see `multiclass`).
+  let mcs = c.levels.map(l => l.advancements).flatten().filter(a => a.advancement == "multiclass")
+  if mcs.len() > 1 { errors.push("multiclass only once: taking it crosses out every other multiclass option (p. 53), got " + str(mcs.len())) }
+  let mc = multiclass-of(c)
+  if mc != none {
+    let at = "level " + str(mc.level) + ": multiclass"
+    if mc.class.at("kind", default: none) != "class" { errors.push(at + ": the class must be a class entity (e.g. classes.druid), got " + repr(mc.class)); return errors }
+    if mc.subclass.at("kind", default: none) != "subclass" { errors.push(at + ": the subclass must be a subclass entity (e.g. subclasses.moon), got " + repr(mc.subclass)); return errors }
+    if mc.class.id == c.class.id { errors.push(at + ": choose an additional class (p. 54), not your own (" + c.class.name + ")") }
+    if mc.subclass.class != mc.class.id { errors.push(at + ": subclass " + mc.subclass.name + " belongs to " + repr(mc.subclass.class) + ", not " + repr(mc.class.id)) }
+    if mc.domain not in mc.class.domains { errors.push(at + ": domain must be one of " + mc.class.name + "'s, " + mc.class.domains.map(repr).join(" or ") + " (p. 54), got " + repr(mc.domain)) }
+  }
+  // Upgraded subclass cards (p. 53): taking one crosses out that tier's
+  // multiclass option, and multiclassing crosses out that tier's upgrade.
+  // With two subclasses, each upgrade names its subclass.
+  for (i, l) in c.levels.enumerate() {
+    let n = i + 2
+    for a in l.advancements.filter(a => a.advancement == "subclass") {
+      let target = a.at("subclass", default: none)
+      if mc != none and tier-of(n) == tier-of(mc.level) {
+        errors.push("level " + str(n) + ": no upgraded subclass in tier " + str(tier-of(n)) + ", where you multiclassed (level " + str(mc.level) + "); one crosses out the other (p. 53)")
+      }
+      if target == none {
+        if mc != none and n >= mc.level { errors.push("level " + str(n) + ": you have two subclasses; name the one to upgrade, `upgrade-subclass(subclasses." + c.subclass.id + ")` or `upgrade-subclass(subclasses." + mc.subclass.id + ")`") }
+      } else if target.at("kind", default: none) != "subclass" {
+        errors.push("level " + str(n) + ": `upgrade-subclass` takes a subclass entity, got " + repr(target))
+      } else if target.id != c.subclass.id and not (mc != none and target.id == mc.subclass.id and n >= mc.level) {
+        errors.push("level " + str(n) + ": " + target.name + " is not one of your subclasses" + if mc != none and target.id == mc.subclass.id { " yet (you multiclass at level " + str(mc.level) + ")" } else { "" })
+      }
+    }
+  }
+  for s in (c.subclass,) + if mc != none { (mc.subclass,) } else { () } {
+    if subclass-upgrades(c, s) > 2 { errors.push(s.name + ": upgraded " + str(subclass-upgrades(c, s)) + " times; a subclass has only a specialization and a mastery (p. 53)") }
   }
   if errors.len() > 0 { return errors }
 
@@ -401,16 +499,26 @@
   }
   // Domain cards (pp. 6, 54): from the class's domains, at or below level,
   // two at creation plus one per level, extra-card advancements and grants.
+  // A multiclass domain's cards: taken from the multiclass level on, at or
+  // below half the level they are taken at, rounded up (p. 54).
   let acquired = d.loadout + d.vault
-  for k in acquired {
+  let taken-at = c.cards.map(k => (k, 1)) + c.levels.enumerate().map(((i, l)) => (l.cards + l.advancements.filter(a => a.advancement == "card").map(a => a.card)).map(k => (k, i + 2))).sum(default: ())
+  for (k, n) in taken-at {
     if k.at("kind", default: none) != "domain-card" { errors.push("`cards`: " + repr(k.at("name", default: k)) + " is not a domain card"); continue }
-    if k.domain not in c.class.domains { errors.push("`cards`: " + k.name + " is a " + k.domain + " card; " + c.class.name + " has " + c.class.domains.join(" and ") + " (p. 6)") }
-    if k.level > d.level { errors.push("`cards`: " + k.name + " is level " + str(k.level) + ", above the character's level " + str(d.level)) }
+    if k.domain in c.class.domains {
+      if k.level > n { errors.push("`cards`: " + k.name + " is level " + str(k.level) + ", taken at " + (if n == 1 { "creation" } else { "level " + str(n) }) + "; a new card is at your level or lower (p. 53)") }
+    } else if mc != none and k.domain == mc.domain {
+      if n < mc.level { errors.push("`cards`: " + k.name + " is a " + k.domain + " card, taken at level " + str(n) + ", before you multiclass at level " + str(mc.level)) }
+      else if k.level > calc.ceil(n / 2) { errors.push("level " + str(n) + ": " + k.name + " is level " + str(k.level) + "; cards from your multiclass domain (" + k.domain + ") are at or below half your level, rounded up: " + str(calc.ceil(n / 2)) + " (p. 54)") }
+    } else {
+      errors.push("`cards`: " + k.name + " is a " + k.domain + " card; " + c.class.name + " has " + c.class.domains.join(" and ") + if mc != none { ", and " + mc.domain + " through multiclassing" } + " (p. 6)")
+    }
   }
   // Cards and companion training due at each level (`cards-due`,
   // `training-due`), so grants gained later ("Accomplished", "Expert
   // Training") are checked where they are gained.
   let has-companion = d.grants.companion > 0
+  let companion-from = if has-companion { gained-at(c, "companion") } else { none }
   if has-companion and c.at("companion", default: none) == none {
     errors.push("`companion`: " + d.features.filter(((_, f)) => "companion" in f.at("grants", default: (:))).map(((_, f)) => f.name).join(", ") + " gives this character an animal companion; add `companion: companion(...)` (p. 21)")
   }
@@ -426,7 +534,7 @@
       errors.push(at + ": " + str(due.total) + " domain cards due by now (" + due.why.join(", ") + "), got " + str(taken)
         + if n == 1 { "; write them in `cards:`" } else { "; give level " + str(n) + " `card:` (a list when it gets more than one)" })
     }
-    if has-companion and n > 1 {
+    if has-companion and n > companion-from {
       let marked = ls.map(l => l.companion.len()).sum(default: 0)
       let due = training-due(c, n)
       if marked != due { errors.push(at + ": " + str(due) + " companion training marks due by now (one per level-up, plus Expert/Advanced Training), got " + str(marked) + "; use `companion:` in `level(...)`") }
@@ -434,9 +542,9 @@
       if n in (2, 5, 8) and l.companion-experience == none { errors.push(at + ": your companion gains an Experience with yours; add `companion-experience:` (p. 21)") }
       if n not in (2, 5, 8) and l.companion-experience != none { errors.push(at + ": a companion's new Experiences come with yours, at levels 2, 5 and 8 (p. 21)") }
     }
-    if not has-companion and n > 1 {
+    if n > 1 and not (has-companion and n > companion-from) {
       let l = ls.last()
-      if l.companion.len() > 0 or l.companion-experience != none { errors.push(at + ": `companion:` and `companion-experience:` need a companion") }
+      if l.companion.len() > 0 or l.companion-experience != none { errors.push(at + ": `companion:` and `companion-experience:` need a companion" + if has-companion { ", which comes at level " + str(companion-from) + "; training starts the level after" } else { "" }) }
     }
   }
   if has-companion and c.at("companion", default: none) != none { errors += check-companion(c) }
@@ -454,12 +562,23 @@
     let r = d.stance-rules
     let bad = all-stances.filter(k => k.stance.at("kind", default: none) != "stance")
     if bad.len() > 0 { errors.push("`stances`: " + bad.map(k => repr(k.stance.at("name", default: k.stance))).join(", ") + " is not a stance entity") } else {
-      if c.stances.len() != r.start or c.stances.any(s => s.tier != 1) {
-        errors.push("`stances`: choose " + str(r.start) + " Tier 1 stances at creation (p. 12), got " + if c.stances.len() == 0 { "none" } else { c.stances.map(s => s.name + " (tier " + str(s.tier) + ")").join(", ") })
+      // The feature comes at creation, or later through multiclassing: the
+      // starting stances are then written in that level.
+      let from = gained-at(c, "stances")
+      let first = if from == 1 { c.stances } else { c.levels.at(from - 2).at("stances", default: ()) }
+      let where = if from == 1 { "at creation" } else { "at level " + str(from) + ", when you gain the feature" }
+      if first.len() != r.start or first.any(s => s.tier != 1) {
+        errors.push("`stances`: choose " + str(r.start) + " Tier 1 stances " + where + " (p. 12), got " + if first.len() == 0 { "none" } else { first.map(s => s.name + " (tier " + str(s.tier) + ")").join(", ") })
       }
+      if from > 1 and c.stances.len() > 0 { errors.push("`stances`: you gain martial stances at level " + str(from) + "; write them in `level(" + str(from) + ", stance: (...))`") }
       for (i, l) in c.levels.enumerate() {
         let n = i + 2
         let got = l.at("stances", default: ())
+        if n < from {
+          if got.len() > 0 { errors.push("level " + str(n) + ": no martial stances before level " + str(from)) }
+          continue
+        }
+        if n == from { continue }
         if got.len() != r.per-level { errors.push("level " + str(n) + ": learn " + str(r.per-level) + " martial stance (p. 12), got " + str(got.len()) + "; use `level(" + str(n) + ", stance: stances.<name>)`") }
         for s in got.filter(s => s.tier > tier-of(n)) { errors.push("level " + str(n) + ": " + s.name + " is a tier " + str(s.tier) + " stance; choose one of tier " + str(tier-of(n)) + " or lower (p. 12)") }
       }

@@ -28,8 +28,8 @@ you write (homebrew) or load from a data package.
 - **Characters** store choices and level history, never derived numbers:
   `hw.character(...)`, `hw.derive(c)` (Evasion, HP, Stress, thresholds,
   Armor Score, Proficiency, attacks, each with its sources) and
-  `hw.sheet(c)`. Every level-up rule is checked; companions
-  (`hw.companion`, `hw.train`) included.
+  `hw.sheet(c)`. Every level-up rule is checked, multiclassing
+  included (`hw.multiclass`); companions (`hw.companion`, `hw.train`) too.
 - **Transformations** (`hw.transformation`, with tick-box `tracks` and
   `write-ins`), **Beastforms** (`hw.beastform`; a Druid's sheet lists its
   forms with Evasion, attack and damage worked out) and **martial stances**

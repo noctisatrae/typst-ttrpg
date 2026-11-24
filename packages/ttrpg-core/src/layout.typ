@@ -87,7 +87,8 @@
 /// A small all-caps section heading such as FEATURES.
 #let section(title) = context {
   let theme = current-theme()
-  block(above: 1.3em, below: 0.6em, text(
+  // Sticky: a heading never ends a page apart from what follows it.
+  block(above: 1.3em, below: 0.6em, sticky: true, text(
     font: theme.fonts.title,
     size: theme.sizes.section,
     weight: 700,

@@ -340,7 +340,6 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
 4. (Transformations done 2026-11-23/24; `tests/script-transformation.typ`
    checks a homebrew-shaped card in the screenplay theme. Never edit
    `../red-mist`: the owner writes there; renderer checks live in tests.)
-5. Multiclass derivation.
 
 ## Publishing (decided 2026-11-17)
 - GitHub: public, https://github.com/noctisatrae/typst-ttrpg. Owner's
@@ -409,8 +408,7 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
 - Sheets: the black-and-white screenplay-style sheet first (owner's
   everyday print version); a book-inspired sheet later (inspired by, not
   copying, Darrington Press's sheet design).
-- Multiclassing: allowed by the data format from the start, implemented
-  once a second class's data exists.
+- Multiclassing: derived and checked (see "Multiclass" below).
 - API (heartweaver): `character(...)` takes ENTITIES, not strings
   (`class: classes.wizard`, `cards: (cards.book-of-ava, ...)` from
   daggerheart-srd), `experiences` as names (+2 each, derived), `story:` an
@@ -420,7 +418,7 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   `sheet(c)` renders it with the active theme. Advancements:
   `increase-traits`, `add-hit-point`, `add-stress`, `increase-experiences`,
   `extra-card`, `increase-evasion`, `upgrade-subclass`,
-  `increase-proficiency`, `multiclass` (format only). Features carry
+  `increase-proficiency`, `multiclass`. Features carry
   `modifiers:` (number or `ctx => number`) and `grants: (domain-cards:)`.
 - Checked against Foundryborne v2.12.9 `module/data/actor/character.mjs`
   (2026-11-17): Evasion, HP, Proficiency, thresholds (unarmored: level /
@@ -442,7 +440,23 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
   `level(n, companion: (train.aware(),), companion-experience: "...")`.
   `sheet` adds the companion sheet on its own page. Light in the Dark
   raises the character's Hope max.
-- Not yet: multiclass derivation, wheelchair.
+- Multiclass (done 2026-11-24): a multiclass gets ALL the class's
+  features (no Hope feature). The SRD says "its class feature" (p. 54),
+  but Darrington Press's official multiclass sheets (Additional Sheets PDF,
+  2026-08-25) print every feature under "Multiclass Features"; owner:
+  follow the canonical sheets. After multiclassing, `upgrade-subclass(subclasses.x)` names the subclass it
+  upgrades. Checked: once only, level 5+, no subclass upgrade in the
+  multiclass tier (either order), multiclass-domain cards from that level
+  on at <= ceil(level/2), at most 2 upgrades per subclass. Two Spellcast
+  traits: the sheet shows both, numbers use the higher. Companion and
+  stances gained through multiclassing start at that level (`gained-at`).
+  Main class keeps Evasion and HP.
+  Every domain card is checked against the level it was TAKEN at (p. 53
+  "at your level or lower"), not the final level. The companion/stances
+  start rule: the SRD is silent; for the companion, a Demiplane forum post
+  reports Darrington Press confirming "only ... each time you level up
+  once you have the companion". Stances stay our ruling (owner agreed).
+- Not yet: wheelchair.
 - First character: a real player character from the owner's Foundry export
   (fixtures/, kept out of git unless the owner says otherwise); its current
   Foundry values serve as a check for our derivation.
