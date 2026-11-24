@@ -335,8 +335,8 @@ compendium links, CLI wrapper (dedupe, IDs, packing).
 2. `examples/learn-characters.typ`: a commented walkthrough (creation,
    level-ups, card choice, companion, sheet); leveling is only shown in
    tests/heartweaver-companion.typ today.
-3. Stat lines: never leave a "|" at a line edge when they wrap (core
-   `stat-line`).
+3. (Stat lines done 2026-11-24: `stat-line` packs items greedily, wraps
+   only between items and drops the bar there; labels stay with values.)
 4. (Transformations done 2026-11-23/24; `tests/script-transformation.typ`
    checks a homebrew-shaped card in the screenplay theme. Never edit
    `../red-mist`: the owner writes there; renderer checks live in tests.)

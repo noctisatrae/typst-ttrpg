@@ -52,17 +52,36 @@
   ))
 }
 
-/// `Label: value` with a bold label.
-#let labeled(label, value) = [*#label:* #value]
+/// `Label: value` with a bold label. The label never ends a line apart
+/// from its value (non-breaking space).
+#let labeled(label, value) = [*#label:*~#value]
 
 /// One line of values separated by bars. Each item is a `(label, value)`
 /// pair or a bare value without a label:
 /// `stat-line(("ATK", "+1"), ("Daggers", "Melee"), "1d8+1 phy")`.
-#let stat-line(..items) = context {
+///
+/// When the items don't fit, they wrap BETWEEN items, never inside one,
+/// and the bar between two items on different lines is dropped: no line
+/// starts or ends with a "|". The items are packed greedily against the
+/// available width; an item wider than a whole line gets a line of its own
+/// and wraps inside.
+#let stat-line(..items) = layout(size => {
   let theme = current-theme()
   let bar = text(fill: theme.colors.card-stroke)[ | ]
-  items.pos().map(item => if type(item) == array { labeled(..item) } else { item }).join(bar)
-}
+  let parts = items.pos().map(item => if type(item) == array { labeled(..item) } else { item })
+  let lines = ()
+  let current = ()
+  for p in parts {
+    if current.len() > 0 and measure((current + (p,)).join(bar)).width > size.width {
+      lines.push(current)
+      current = (p,)
+    } else {
+      current.push(p)
+    }
+  }
+  if current.len() > 0 { lines.push(current) }
+  lines.map(l => l.join(bar)).join(linebreak())
+})
 
 /// A white band of stat lines with rounded corners.
 #let band(..lines) = context {
